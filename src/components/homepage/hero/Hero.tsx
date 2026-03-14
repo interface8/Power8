@@ -9,26 +9,27 @@ import {
 import { TrendingUp, Calculator, ShoppingBag } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const slides = [
-  {
-    image: "/images/power-2.jpg",
-    title: "Advanced Technology",
-    description: "State-of-the-art solar energy system",
-  },
-  {
-    image: "/images/power-1.jpg",
-    title: "Professional Installation",
-    description: "Expert solar panel installation for your home",
-  },
-  {
-    image: "/images/power-7.jpg",
-    title: "Power Your Household",
-    description: "Reliable Energy for your household",
-  },
-];
+type Slide = {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+};
 
 export default function Hero() {
+    const [slides, setSlides] = useState<Slide[]>([])
+
+    useEffect(() => {
+      const fetchSlides = async () => {
+        const res = await fetch("/api/hero")
+        const data = await res.json()
+        setSlides(data)
+      };
+
+      fetchSlides()
+    }, [])
   return (
     <section className="w-full bg-orange-50 py-40">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 xl:grid-cols-2 gap-12 items-center">
@@ -91,7 +92,6 @@ export default function Hero() {
           </div>
         </div>
 
-        
         <div className="relative w-full">
           <Carousel
             plugins={[
@@ -103,8 +103,8 @@ export default function Hero() {
             className="w-full"
           >
             <CarouselContent>
-              {slides.map((slide, index) => (
-                <CarouselItem key={index}>
+              {slides.map((slide) => (
+                <CarouselItem key={slide.id}>
                   <div className="relative h-64 sm:h-72 md:h-105 lg:h-120 rounded-2xl overflow-hidden">
                     <Image
                       src={slide.image}
@@ -113,7 +113,6 @@ export default function Hero() {
                       className="object-cover"
                     />
 
-                  
                     <div className="absolute bottom-6 sm:bottom-8 md:bottom:14 left-4 sm:left-6 md:left-8 text-white max-w-[80%]">
                       <h3 className="text-lg sm:text-xl md:text-4xl font-semibold leading-tight">
                         {slide.title}
@@ -128,12 +127,10 @@ export default function Hero() {
               ))}
             </CarouselContent>
 
-            
             <CarouselPrevious className="left-3 md:left-6 bg-white shadow-md" />
             <CarouselNext className="right-3 md:right-6 bg-white shadow-md" />
           </Carousel>
 
-          
           <div className="hidden lg:flex absolute bottom-6 -left-7 translate-y-1/2 bg-white rounded-2xl shadow-lg p-6 items-center gap-4">
             <div className="bg-green-500 text-white p-3 rounded-xl">
               <TrendingUp />
