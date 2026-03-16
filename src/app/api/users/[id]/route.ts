@@ -19,8 +19,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (error instanceof Error && error.message === "User not found") {
       return errorResponse("User not found", 404);
     }
-    const message =
-      error instanceof Error ? error.message : "Failed to fetch user";
+    const message = error instanceof Error ? error.message : "Failed to fetch user";
     return errorResponse(message, 500);
   }
 }
@@ -36,10 +35,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (!parsed.success) {
       return Response.json(
-        {
-          message: "Validation failed",
-          errors: parsed.error.flatten().fieldErrors,
-        },
+        { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
         { status: 400 },
       );
     }
@@ -50,12 +46,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (error instanceof Error && error.message === "Email already in use") {
       return errorResponse("Email already in use", 409);
     }
-    if (error instanceof Error && error.message === "Phone already in use") {
-      return errorResponse("Phone already in use", 409);
-    }
-
-    const message =
-      error instanceof Error ? error.message : "Failed to update user";
+    const message = error instanceof Error ? error.message : "Failed to update user";
     return errorResponse(message, 500);
   }
 }
@@ -72,8 +63,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (error instanceof Error && error.message === "User not found") {
       return errorResponse("User not found", 404);
     }
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
+    const message = error instanceof Error ? error.message : "Internal server error";
     return errorResponse(message, 500);
   }
 }

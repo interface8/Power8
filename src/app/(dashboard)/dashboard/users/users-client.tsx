@@ -40,7 +40,6 @@ import { Plus, Search, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-
 interface UserDto {
   id: string;
   email: string;
-  phone: string;
   name: string;
   isActive: boolean;
   createdAt: string;

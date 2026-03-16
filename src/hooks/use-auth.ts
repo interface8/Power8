@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 interface LoginCredentials {
   email: string;
@@ -10,7 +9,6 @@ interface LoginCredentials {
 interface RegisterCredentials {
   name: string;
   email: string;
-  phone: string;
   password: string;
 }
 
@@ -43,7 +41,6 @@ export function useAuth() {
         return { success: false, message: errorMessage };
       }
 
-      toast.success(data.message ?? "Login successful");
       router.push("/dashboard");
       router.refresh();
       return { success: true };
@@ -75,7 +72,6 @@ export function useAuth() {
         return { success: false, message: errorMessage };
       }
 
-      toast.success(data.message ?? "Registration successful");
       router.push("/dashboard");
       router.refresh();
       return { success: true };

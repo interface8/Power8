@@ -25,26 +25,31 @@ const userWithRoles = {
 interface UserWithRoles {
   id: string;
   email: string;
-  phone: string;
   name: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
   roles: Array<{
-    role: { id: string; name: string };
+    role: {
+      id: string;
+      name: string;
+    };
   }>;
 }
 
+// ─── Map Prisma result to UserDto ──────────────────────
 function toUserDto(user: UserWithRoles): UserDto {
   return {
     id: user.id,
     email: user.email,
-    phone: user.phone,
     name: user.name,
     isActive: user.isActive,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
-    roles: user.roles?.map((ur) => ({ id: ur.role.id, name: ur.role.name })) ?? [],
+    roles: user.roles?.map((ur) => ({
+      id: ur.role.id,
+      name: ur.role.name,
+    })) ?? [],
   };
 }
 
@@ -62,7 +67,6 @@ export async function findUsers(
     where.OR = [
       { email: { contains: search, mode: "insensitive" } },
       { name: { contains: search, mode: "insensitive" } },
-      { phone: { contains: search, mode: "insensitive" } },
     ];
   }
 
@@ -116,7 +120,6 @@ export async function createUser(input: CreateUserInput): Promise<UserDto> {
   const user = await prisma.user.create({
     data: {
       email: input.email,
-      phone: input.phone,
       password: hashedPassword,
       name: input.name,
       roles: input.roleIds?.length
@@ -137,7 +140,6 @@ export async function updateUser(
 ): Promise<UserDto> {
   const data: {
     email?: string;
-    phone?: string;
     name?: string;
     isActive?: boolean;
     password?: string;
@@ -145,7 +147,6 @@ export async function updateUser(
   } = {};
 
   if (input.email) data.email = input.email;
-  if (input.phone) data.phone = input.phone;
   if (input.name) data.name = input.name;
   if (input.isActive !== undefined) data.isActive = input.isActive;
   if (input.password) data.password = await hash(input.password, 12);
@@ -184,18 +185,3 @@ export async function emailExists(
   });
   return !!user;
 }
-
-export async function phoneExists(phone: string, excludeId?: string): Promise<boolean> {
-  const user = await prisma.user.findFirst({
-    where: {
-      phone,
-      ...(excludeId ? { id: { not: excludeId } } : {}),
-    },
-  });
-  return !!user;
-}
-
-export async function findRoleByName(name: string) {
-  return prisma.role.findUnique({ where: { name } });
-}
-

@@ -12,7 +12,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 interface UserDto {
   id: string;
   email: string;
-  phone: string;
   name: string;
   isActive: boolean;
   roles: { id: string; name: string }[];
@@ -40,7 +39,6 @@ export function UserFormModal({ user, onClose }: UserFormModalProps) {
 
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState(user?.phone ?? "");
   const [password, setPassword] = useState("");
   const [isActive, setIsActive] = useState(user?.isActive ?? true);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(
@@ -87,13 +85,9 @@ export function UserFormModal({ user, onClose }: UserFormModalProps) {
     const payload: Record<string, unknown> = {
       name,
       email,
-      phone,
       isActive,
+      roleIds: selectedRoleIds,
     };
-
-    if (selectedRoleIds.length > 0) {
-      payload.roleIds = selectedRoleIds;
-    }
 
     if (password) {
       payload.password = password;
@@ -128,17 +122,6 @@ export function UserFormModal({ user, onClose }: UserFormModalProps) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="user-phone">Phone</Label>
-        <Input
-          id="user-phone"
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
           required
         />
       </div>
@@ -185,9 +168,7 @@ export function UserFormModal({ user, onClose }: UserFormModalProps) {
           {roles?.map((role) => (
             <Badge
               key={role.id}
-              variant={
-                selectedRoleIds.includes(role.id) ? "default" : "outline"
-              }
+              variant={selectedRoleIds.includes(role.id) ? "default" : "outline"}
               className="cursor-pointer"
               onClick={() => toggleRole(role.id)}
             >
@@ -205,7 +186,11 @@ export function UserFormModal({ user, onClose }: UserFormModalProps) {
           Cancel
         </Button>
         <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Saving..." : isEditing ? "Update" : "Create"}
+          {mutation.isPending
+            ? "Saving..."
+            : isEditing
+              ? "Update"
+              : "Create"}
         </Button>
       </div>
     </form>

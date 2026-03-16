@@ -15,10 +15,7 @@ export async function POST(request: NextRequest) {
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
-      const firstError =
-        Object.values(parsed.error.flatten().fieldErrors).flat()[0] ??
-        "Invalid credentials format";
-      return errorResponse(firstError, 400);
+      return errorResponse("Invalid credentials format", 400);
     }
 
     const { email, password } = parsed.data;
