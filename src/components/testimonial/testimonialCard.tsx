@@ -60,14 +60,14 @@ export default function TestimonialCard({
       </CardContent>
 
       <CardFooter className="border-t pt-4 flex-col items-start gap-2 mt-4 mb-16 ">
-        <p className="text-lg font-bold flex flex-row items-center justify-between w-full">
+        <div className="text-lg font-bold flex flex-row items-center justify-between w-full">
           <span className="font-medium text-gray-400">System:</span>
           <div>{system}</div>
-        </p>
-        <p className="text-lg font-bold text-green-600 flex flex-row items-center justify-between w-full">
+        </div>
+        <div className="text-lg font-bold text-green-600 flex flex-row items-center justify-between w-full">
           <span className="font-medium text-gray-400">Annual Savings:</span>
           <div>{savings}</div>
-        </p>
+        </div>
       </CardFooter>
     </Card>
   );

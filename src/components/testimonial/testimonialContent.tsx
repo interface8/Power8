@@ -4,39 +4,10 @@ import Link from "next/link";
 import StatsSummary from "./StatsSummary";
 import TestimonialCard from "./testimonialCard";
 import CTASection from "./CTASection";
-import { useEffect, useState } from "react";
-// import Image from "next/image";
-
-
-type Testimonial = {
-  rating: string;
-  quote: string;
-  name: string;
-  role: string;
-  location: string;
-  system: string;
-  savings: string;
-  image: string
-
-  
-}
-
-
-
+import { useTestimonials } from "@/hooks/use-testimonials";
 
 export default function TestimonialContent() {
-  const [testimonial, setTestimonial] = useState<Testimonial[]>([])
-
-  useEffect(() => {
-    const fetchTestimonial = async() => {
-      const res = await fetch("/api/testimonialRoute")
-      const data = await res.json()
-      setTestimonial(data)
-
-    }
-    fetchTestimonial()
-  },[])
-
+  const { testimonials, loading, error } = useTestimonials();
 
   return (
     <div className="min-h-screen w-full bg-[#FFFAEC]">
@@ -71,17 +42,51 @@ export default function TestimonialContent() {
       <div className="px-4 sm:px-6 lg:px-8">
         <StatsSummary />
       </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4 px-6 my-24">
-            {testimonial.map((testimonial, index) => (
-              <TestimonialCard key={index} {...testimonial}  />
-             ))}
-          </div>
 
-          <div className="flex justify-center items-center pb-24">
-          <CTASection />
-
-          </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-24">
+          <p className="text-xl text-gray-600">Loading testimonials...</p>
         </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="flex justify-center items-center py-24">
+          <p className="text-xl text-red-600">Error: {error}</p>
+        </div>
+      )}
+
+      {/* Testimonials Grid */}
+      {!loading && !error && testimonials.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4 px-6 my-24">
+          {testimonials.map((testimonial) => (
+            <TestimonialCard 
+              key={testimonial.id} 
+              rating="1"
+              quote={testimonial.description}
+              name={testimonial.user.name}
+              role=""
+              location=""
+              system=""
+              savings=""
+              image=""
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && testimonials.length === 0 && (
+        <div className="flex justify-center items-center py-24">
+          <p className="text-xl text-gray-600">No testimonials yet.</p>
+        </div>
+      )}
+
+      <div className="flex justify-center items-center pb-24">
+        <CTASection />
+      </div>
+    </div>
   
   );
 }
