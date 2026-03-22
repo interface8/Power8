@@ -56,3 +56,11 @@ export async function categoryExists(id: string): Promise<boolean> {
   const count = await prisma.productCategory.count({ where: { id } });
   return count > 0;
 }
+
+export async function findCategoryByName(name: string): Promise<ProductCategoryDto | null> {
+  const category = await prisma.productCategory.findFirst({
+    where: { name: { equals: name, mode: "insensitive" } },
+  });
+  return category ? toCategoryDto(category) : null;
+}
+

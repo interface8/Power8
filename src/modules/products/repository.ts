@@ -101,3 +101,11 @@ export async function productExists(id: string): Promise<boolean> {
   const count = await prisma.product.count({ where: { id } });
   return count > 0;
 }
+
+export async function findProductByName(name: string): Promise<ProductDto | null> {
+  const product = await prisma.product.findFirst({
+    where: { name: { equals: name, mode: "insensitive" } },
+    ...productWithRelations,
+  });
+  return product ? toProductDto(product) : null;
+}

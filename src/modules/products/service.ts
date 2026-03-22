@@ -12,6 +12,9 @@ export async function getProductById(id: string) {
 }
 
 export async function createProduct(input: CreateProductInput) {
+   if (await productRepo.findProductByName(input.name)) {
+    throw new Error("Product already exists");
+  }
   return productRepo.createProduct(input);
 }
 

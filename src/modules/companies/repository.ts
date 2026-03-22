@@ -54,3 +54,11 @@ export async function companyExists(id: string): Promise<boolean> {
   const count = await prisma.company.count({ where: { id } });
   return count > 0;
 }
+
+export async function findCompanyByName(name: string): Promise<CompanyDto | null> {
+  const company = await prisma.company.findFirst({
+    where: { name: { equals: name, mode: "insensitive" } },
+  });
+  return company ? toCompanyDto(company) : null;
+}
+

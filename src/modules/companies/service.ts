@@ -12,6 +12,9 @@ export async function getCompanyById(id: string) {
 }
 
 export async function createCompany(input: CreateCompanyInput) {
+  if (await companyRepo.findCompanyByName(input.name)) {
+    throw new Error("Company already exists");
+  }
   return companyRepo.createCompany(input);
 }
 

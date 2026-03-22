@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
     const company = await companyService.createCompany(parsed.data);
     return jsonResponse(company, 201);
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "Company already exists") {
+      return errorResponse("Company already exists", 409);
+    }
     const message = error instanceof Error ? error.message : "Failed to create company";
     return errorResponse(message, 500);
   }

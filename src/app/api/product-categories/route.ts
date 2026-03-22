@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
     const category = await categoryService.createCategory(parsed.data);
     return jsonResponse(category, 201);
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "Category already exists") {
+      return errorResponse("Category already exists", 409);
+    }
     const message = error instanceof Error ? error.message : "Failed to create category";
     return errorResponse(message, 500);
   }

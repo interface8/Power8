@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
     const product = await productService.createProduct(parsed.data);
     return jsonResponse(product, 201);
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "Product already exists") {
+      return errorResponse("Product already exists", 409);
+    }
     const message =
       error instanceof Error ? error.message : "Failed to create product";
     return errorResponse(message, 500);
