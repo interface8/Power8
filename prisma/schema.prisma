@@ -8,16 +8,94 @@ datasource db {
 
 // ─── Models ──────────────────────────────────────────────
 
+model Company {
+  id            String     @id @default(cuid())
+  name          String
+  description   String? 
+  address       String
+  contactNumber String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+   products     Product[]
+
+  @@map("company")
+}
+
+model ProductCategory {
+  id            String     @id @default(cuid())
+  name          String
+  description   String? 
+  sort          Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+   products     Product[]
+
+  @@map("product_category")
+}
+
+model Product {
+  id            String     @id @default(cuid())
+  name          String
+  description   String?
+  categoryId    String
+  category      ProductCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  price         Decimal    @db.Decimal(10, 2)
+  warranty      Int
+  capacity      Int
+  imageUrl      String?
+  stockQuantity Int        @default(0)
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  cartItems     CartItem[]
+
+  @@map("products")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+   items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
   name      String
+  phone     String    @unique
+  cart      Cart?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   roles UserRole[]
+  testimonials Testimonial[]
 
   @@map("users")
 }
@@ -28,7 +106,6 @@ model Role {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
   users       UserRole[]
   permissions RolePermission[]
 
@@ -68,3 +145,18 @@ model RolePermission {
   @@id([roleId, permissionId])
   @@map("role_permissions")
 }
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  title        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rating  Int?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("testimonials")
+}
+

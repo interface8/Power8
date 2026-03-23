@@ -20,7 +20,7 @@ export default function Navbar() {
         {/* Right Side (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
           <Link
-            href="/testimonials"
+            href="/testimonial"
             className="flex items-center gap-1 px-4 py-2 text-sm font-medium border-2 border-orange-400 text-orange-600 rounded-lg hover:bg-orange-50 transition"
           >
             <Star size={14} />
@@ -47,7 +47,7 @@ export default function Navbar() {
         {/* Mobile Buttons */}
         <div className="flex md:hidden items-center gap-2">
           <Link
-            href="/testimonials"
+            href="/testimonial"
             className="border-2 border-orange-400 text-orange-600 p-2 rounded-md"
           >
             <Star size={18} />

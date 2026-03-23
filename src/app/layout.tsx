@@ -40,6 +40,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "@/components/providers/providers";
 import { ToastContainer } from "react-toastify";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -79,6 +81,8 @@ export default function RootLayout({
             theme="light"
           />
         </Providers>
+        <QueryProvider>{children}</QueryProvider>
+        <Toaster />
       </body>
     </html>
   );
