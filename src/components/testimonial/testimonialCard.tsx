@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter } from "../ui/card";
 import Image from "next/image";
-import { Quote } from "lucide-react";
+import { Quote, Star } from "lucide-react";
 
 interface TestimonialCardProps {
   rating: string;
@@ -29,14 +29,19 @@ export default function TestimonialCard({
      
     >
       <CardContent className="pt-6 ">
-        <div className="text-yellow-500 text-4xl flex items-center  mb-3">
-          <span className="text-orange-200 font-bold text-8xl">
-            <Quote />
-          </span>
-          {rating}
-        </div>
-
-        <p className="text-gray-500 font-normal mb-4 text-2xl pt-16 pb-12">
+       <div className="flex items-center pr-3 mb-4">
+  <Quote className="text-orange-200 w-12 h-12" />
+  <div className="flex items-center gap-1">
+    {[...Array(5)].map((_, index) => (
+      <Star 
+        key={index} 
+        className={`w-7 h-7 ${index < Number(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+      />
+    ))}
+    {/* <span className="ml-2 text-sm text-gray-500">({rating})</span> */}
+  </div>
+</div>
+        <p className="text-gray-600 font-normal mb-4 text-[16px] pt-16 pb-12">
           {quote}
         </p>
 
@@ -61,12 +66,12 @@ export default function TestimonialCard({
 
       <CardFooter className="border-t pt-4 flex-col items-start gap-2 mt-4 mb-16 ">
         <div className="text-lg font-bold flex flex-row items-center justify-between w-full">
-          <span className="font-medium text-gray-400">System:</span>
-          <div>{system}</div>
+          <span className="font-normal text-gray-400">System:</span>
+          <div>{system || "5kW Premium System"}</div>
         </div>
         <div className="text-lg font-bold text-green-600 flex flex-row items-center justify-between w-full">
-          <span className="font-medium text-gray-400">Annual Savings:</span>
-          <div>{savings}hello</div>
+          <span className="font-normal text-gray-400">Annual Savings:</span>
+          <div>{savings || "₦450,000/year"}</div>
         </div>
       </CardFooter>
     </Card>

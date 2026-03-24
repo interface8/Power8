@@ -8,6 +8,7 @@ export interface Testimonial {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  image: string;
   user: {
     id: string;
     name: string;

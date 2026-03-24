@@ -65,7 +65,7 @@ export default function TestimonialContent() {
           {testimonials.map((testimonial) => (
             <TestimonialCard 
               key={testimonial.id} 
-              rating="1"
+              rating={String(testimonial.rating)}
               quote={testimonial.description}
               name={testimonial.user.name}
               role=""
