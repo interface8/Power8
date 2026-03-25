@@ -68,11 +68,11 @@ export default function TestimonialContent() {
               rating={String(testimonial.rating)}
               quote={testimonial.description}
               name={testimonial.user.name}
-              role=""
-              location=""
+              role="Small Business Owner"
+              location="Lagos, Nigeria"
               system=""
               savings=""
-              image=""
+              imageUrl={testimonial.imageUrl || "/images/images-removebg-preview.png"}
             />
           ))}
         </div>
