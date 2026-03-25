@@ -1,12 +1,12 @@
 export type Product = {
   id: string;
   name: string;
-  image: string;
+  description?: string;
+  imageUrl?: string;
   price: number;
-  stock: number;
-  description: string; 
-  capacity?: string;
-  category?: string;
+  stockQuantity: number;
+  categoryName?: string;
   power?: string;
-  warranty?: string;
+  capacity?: string;
+  warranty?: number;
 };

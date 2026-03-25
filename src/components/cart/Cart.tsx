@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState, AppDispatch } from "@/store";
-import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import {
   increaseQuantity,
   decreaseQuantity,
@@ -24,24 +24,46 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="text-center">
-          <p className="text-xl font-medium text-gray-700 mb-4">
-            Your cart is empty
-          </p>
-          <Link
-            href="/products"
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition"
+      <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 flex flex-col justify-start items-center pt-12 sm:pt-16">
+        <div className="w-full max-w-7xl">
+          <h1 className="text-2xl sm:text-3xl font-bold text-green-950 mb-6">
+            Shopping Cart
+          </h1>
+
+          <div
+            className="bg-white border border-gray-200 rounded-xl 
+                    py-18 px-6 sm:px-10 
+                    flex flex-col items-center justify-center text-center
+                    shadow-sm"
           >
-            Continue Shopping
-          </Link>
+            <div className="mb-8 text-gray-400">
+              <ShoppingBag size={80} strokeWidth={1.5} />
+            </div>
+
+            <h2 className="text-base sm:text-2xl font-semibold text-green-950 mb-6">
+              Your cart is empty
+            </h2>
+
+            <p className="text-base text-gray-700 mt-1 mb-6">
+              Add some products to get started
+            </p>
+
+            <Link
+              href="/products"
+              className="w-full max-w-auto bg-orange-500 hover:bg-orange-600 
+                   text-white py-3 rounded-md 
+                   text-sm font-medium transition"
+            >
+              Browse Products
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-12 py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 mt-3 py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-green-950 mb-6 sm:mb-8">
           Shopping Cart
@@ -164,10 +186,10 @@ const Cart = () => {
                 </h4>
                 <ul className="space-y-2 text-sm sm:text-base text-gray-700">
                   <li className="flex items-center gap-2">
-                    <span className="text-green-600">✔</span> Full Payment
+                    <span className="text-green-600">✓</span> Full Payment
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-600">✔</span> Pay Small Small
+                    <span className="text-green-600">✓</span> Pay Small Small
                     (Installments)
                   </li>
                 </ul>

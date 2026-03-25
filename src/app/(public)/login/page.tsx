@@ -15,16 +15,19 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {/
     e.preventDefault();
     await login({ email, password });
   }
 
   return (
     <Card className="w-full p-6 md:p-8 gap-0">
-
       {/* Back to Home */}
-      <Button variant="ghost" className="self-start h-8 px-3 gap-1.5 mb-6" asChild>
+      <Button
+        variant="ghost"
+        className="self-start h-8 px-3 gap-1.5 mb-6"
+        asChild
+      >
         <Link href="/">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
@@ -33,10 +36,10 @@ export default function LoginPage() {
 
       {/* Logo */}
       <div className="flex items-center justify-center gap-2 mb-6 md:mb-8">
-        <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl shadow-lg">
+        <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow-lg">
           <Sun className="w-7 h-7 md:w-8 md:h-8 text-white" />
         </div>
-        <span className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+        <span className="text-xl md:text-2xl font-semibold bg-linear-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
           Power - 8
         </span>
       </div>
@@ -102,18 +105,26 @@ export default function LoginPage() {
       {/* Register link */}
       <div className="mt-6 text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-orange-500 hover:text-orange-600 font-medium">
+        <Link
+          href="/register"
+          className="text-orange-500 hover:text-orange-600 font-medium"
+        >
           Register here
         </Link>
       </div>
 
       {/* Demo credentials */}
       <div className="mt-6 md:mt-8 p-3 md:p-4 bg-blue-50 rounded-lg">
-        <p className="text-xs font-medium text-blue-800 mb-2">Demo Credentials:</p>
-        <p className="text-xs text-blue-700">Admin: admin@power8.com / admin123</p>
-        <p className="text-xs text-blue-700">Customer: any email / any password</p>
+        <p className="text-xs font-medium text-blue-800 mb-2">
+          Demo Credentials:
+        </p>
+        <p className="text-xs text-blue-700">
+          Admin: admin@power8.com / admin123
+        </p>
+        <p className="text-xs text-blue-700">
+          Customer: any email / any password
+        </p>
       </div>
-
     </Card>
   );
 }

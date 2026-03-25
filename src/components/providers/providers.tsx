@@ -1,6 +1,6 @@
 "use client";
 
-import { StoreProvider } from "./store-provider";
+import StoreProvider from "./store-provider";
 import { QueryProvider } from "./query-provider";
 import { AuthProvider } from "./auth-provider";
 
