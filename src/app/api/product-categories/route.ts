@@ -5,9 +5,6 @@ import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/product-categories — list all (sorted by sort field)
 export async function GET() {
-  const guard = await requireApiAuth();
-  if (isErrorResponse(guard)) return guard;
-
   try {
     const categories = await categoryService.listCategories();
     return jsonResponse({ data: categories });

@@ -8,6 +8,7 @@ export interface Testimonial {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  image: string;
   user: {
     id: string;
     name: string;
@@ -27,7 +28,7 @@ export function useTestimonials() {
   // Fetch testimonials on mount
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return {
     testimonials: data ?? [],
@@ -54,7 +55,7 @@ export function useTestimonialStats() {
   // Fetch testimonial stats on mount
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return {
     stats: data ?? { totalTestimonials: 0, averageRating: 0 },

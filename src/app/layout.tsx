@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers/providers";
 import { ToastContainer } from "react-toastify";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,20 +32,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          {children}
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            pauseOnHover
-            theme="light"
-          />
-        </Providers>
-
-        <Toaster />
+        <QueryProvider>
+          <Providers>
+            {children}
+            <ToastContainer
+              position="top-right"
+              autoClose={2000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              pauseOnHover
+              theme="light"
+            />
+          </Providers>
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );
