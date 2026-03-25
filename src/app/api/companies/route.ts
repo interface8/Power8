@@ -3,11 +3,8 @@ import { companyService, createCompanySchema } from "@/modules/companies";
 import { requireApiAuth, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
-// GET /api/companies — list all (auth required)
+// GET /api/companies — list all ()
 export async function GET() {
-  const guard = await requireApiAuth();
-  if (isErrorResponse(guard)) return guard;
-
   try {
     const companies = await companyService.listCompanies();
     return jsonResponse({ data: companies });
