@@ -4,8 +4,22 @@ import React from "react";
 import TestimonialCard from "@/components/ui/TestimonialCard";
 import { testimonialData } from "./testimonial";
 import { Users } from "lucide-react";
+import Link from "next/link";
+import { useTestimonials } from "@/hooks/use-testimonials";
 
 const TestimonialPrev = () => {
+  const { testimonials, loading } = useTestimonials();
+
+  // Use API data (up to 3) if available, otherwise fall back to static data
+  const displayData = testimonials.length > 0
+    ? testimonials.slice(0, 3).map((t) => ({
+        name: t.user.name,
+        role: "",
+        message: t.description,
+        rating: t.rating,
+      }))
+    : testimonialData;
+
   return (
     <section className="bg-[#fffbf6] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
@@ -28,14 +42,21 @@ const TestimonialPrev = () => {
           md:grid-cols-3
         "
         >
-          {testimonialData.map((item, index) => (
-            <TestimonialCard key={index} {...item} />
-          ))}
+          {loading ? (
+            <div className="col-span-full text-center text-gray-500 py-12">
+              Loading testimonials...
+            </div>
+          ) : (
+            displayData.map((item, index) => (
+              <TestimonialCard key={index} {...item} />
+            ))
+          )}
         </div>
 
         {/* Button */}
         <div className="flex items-center justify-center mt-8 sm:mt-10 md:mt-12">
-          <button
+          <Link
+            href="/testimonial"
             className="
             flex items-center justify-center gap-2 sm:gap-3
             border border-orange-300 
@@ -51,7 +72,7 @@ const TestimonialPrev = () => {
           >
             <Users size={16} />
             Read All Testimonials
-          </button>
+          </Link>
         </div>
       </div>
     </section>

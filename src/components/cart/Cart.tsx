@@ -1,26 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { useSelector, useDispatch } from "react-redux";
-import type { RootState, AppDispatch } from "@/store";
-import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
-import {
-  increaseQuantity,
-  decreaseQuantity,
-  removeFromCart,
-} from "@/store/cartSlice";
+import { Minus, Plus, Trash2, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import type { Cart as CartType } from "@/types/products";
 
-const Cart = () => {
-  const items = useSelector((state: RootState) => state.cart.items);
-  const dispatch = useDispatch<AppDispatch>();
+interface CartProps {
+  cart: CartType;
+  loading: boolean;
+  onUpdateItem: (itemId: string, quantity: number) => Promise<boolean>;
+  onRemoveItem: (itemId: string) => Promise<boolean>;
+}
 
-  const subtotal = items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0,
-  );
+const Cart = ({ cart, loading, onUpdateItem, onRemoveItem }: CartProps) => {
+  const items = cart.items;
+  const subtotal = cart.total;
   const vat = subtotal * 0.075;
   const total = subtotal + vat;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Loader2 className="animate-spin text-orange-500" size={36} />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -56,10 +60,10 @@ const Cart = () => {
                 className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 hover:shadow transition-shadow"
               >
                 {/* Product Image */}
-                <div className="relative w-full sm:w-28 md:w-32 h-44 sm:h-32 border border-orange-200 rounded-lg overflow-hidden -shrink-0">
+                <div className="relative w-full sm:w-28 md:w-32 h-44 sm:h-32 border border-orange-200 rounded-lg overflow-hidden shrink-0">
                   <Image
-                    src={item.image}
-                    alt={item.name}
+                    src={item.productImage || "/images/product-1.jpg"}
+                    alt={item.productName}
                     fill
                     className="object-cover"
                   />
@@ -68,7 +72,7 @@ const Cart = () => {
                 {/* Main content */}
                 <div className="flex-1 flex flex-col">
                   <h3 className="text-base sm:text-lg font-semibold text-green-950 mb-1">
-                    {item.name}
+                    {item.productName}
                   </h3>
 
                   <p className="text-lg font-bold text-orange-500 mb-3 sm:mb-4">
@@ -79,7 +83,7 @@ const Cart = () => {
                   <div className="flex items-center gap-4 sm:gap-6 mt-auto">
                     <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
                       <button
-                        onClick={() => dispatch(decreaseQuantity(item.id))}
+                        onClick={() => onUpdateItem(item.id, item.quantity - 1)}
                         className="px-3 py-1.5 hover:bg-green-200 rounded-lg transition-colors"
                         disabled={item.quantity <= 1}
                       >
@@ -91,7 +95,7 @@ const Cart = () => {
                       </span>
 
                       <button
-                        onClick={() => dispatch(increaseQuantity(item.id))}
+                        onClick={() => onUpdateItem(item.id, item.quantity + 1)}
                         className="px-3 py-1.5 hover:bg-green-200 rounded-lg transition-colors"
                       >
                         <Plus size={16} />
@@ -99,7 +103,7 @@ const Cart = () => {
                     </div>
 
                     <button
-                      onClick={() => dispatch(removeFromCart(item.id))}
+                      onClick={() => onRemoveItem(item.id)}
                       className="flex items-center gap-1.5 text-red-600 hover:bg-green-200 text-sm font-medium transition-colors"
                     >
                       <Trash2 size={16} />
@@ -108,9 +112,9 @@ const Cart = () => {
                   </div>
                 </div>
 
-                {/* Subtotal per item (right-aligned on larger screens) */}
+                {/* Subtotal per item */}
                 <div className="text-right font-bold text-green-950 text-lg sm:text-xl mt-3 sm:mt-0 sm:min-w-30">
-                  ₦{(item.price * item.quantity).toLocaleString()}
+                  ₦{item.subtotal.toLocaleString()}
                 </div>
               </div>
             ))}
@@ -123,7 +127,7 @@ const Cart = () => {
                 Order Summary
               </h3>
 
-              <div className="space-y-3  sm:space-y-4 text-sm sm:text-base text-gray-700">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-gray-700">
                 <div className="flex mt-8 justify-between">
                   <span>Subtotal</span>
                   <span className="text-green-950 font-semibold">
@@ -146,7 +150,7 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="flex justify-center items-center gap-3 w-full mt-15  bg-orange-500 hover:bg-orange-600 text-white py-2  rounded-lg font-medium text-base sm:text-lg transition shadow-sm hover:shadow active:scale-[0.98]">
+              <button className="flex justify-center items-center gap-3 w-full mt-15 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition shadow-sm hover:shadow active:scale-[0.98]">
                 Proceed to Checkout
                 <ArrowRight size={16} />
               </button>
@@ -157,7 +161,7 @@ const Cart = () => {
                 continue
               </p>
 
-              {/* Payment Options – added as per your Figma screenshot */}
+              {/* Payment Options */}
               <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-gray-200">
                 <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
                   Payment Options

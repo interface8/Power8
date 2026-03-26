@@ -1,14 +1,22 @@
+"use client";
+
 import Cart from "@/components/cart/Cart";
-import CartNavbar from "@/components/cart/CartNavbar";
-import React from "react";
+import { useCart } from "@/hooks/use-cart";
+import { useEffect } from "react";
 
-const page = () => {
+export default function CartPage() {
+  const { cart, loading, fetchCart, updateCartItem, removeCartItem } = useCart();
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
   return (
-    <>
-      <CartNavbar />
-      <Cart />
-    </>
+    <Cart
+      cart={cart}
+      loading={loading}
+      onUpdateItem={updateCartItem}
+      onRemoveItem={removeCartItem}
+    />
   );
-};
-
-export default page;
+}
