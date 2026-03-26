@@ -9,9 +9,6 @@ import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/products — list with filters 
 export async function GET(request: NextRequest) {
-  const guard = await requireApiAuth();
-  if (isErrorResponse(guard)) return guard;
-
   try {
     const { searchParams } = new URL(request.url);
     const filters = productFiltersSchema.parse(
