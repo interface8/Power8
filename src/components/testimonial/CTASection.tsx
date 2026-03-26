@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function CTASection() {
   return (
-    <div className="text-center mt-16 py-20.5 px-4  w-2/3  bg-linear-to-br from-orange-500 to-amber-300 rounded-2xl">
+    <div className="text-center mt-2 py-20.5 px-4  w-full md:w-2/3 bg-linear-to-br from-orange-500 to-amber-300 rounded-2xl">
       <h2 className="text-3xl md:text-5xl font-medium text-white mb-14">
         Ready to Join Them?
       </h2>
