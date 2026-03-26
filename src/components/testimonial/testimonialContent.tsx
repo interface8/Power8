@@ -4,10 +4,25 @@ import Link from "next/link";
 import StatsSummary from "./StatsSummary";
 import TestimonialCard from "./testimonialCard";
 import CTASection from "./CTASection";
-import { useTestimonials } from "@/hooks/use-testimonials";
+import type { Testimonial } from "@/hooks/use-testimonials";
 
-export default function TestimonialContent() {
-  const { testimonials, loading, error } = useTestimonials();
+interface TestimonialContentProps {
+  testimonials: Testimonial[];
+  loading: boolean;
+  error: string;
+  stats: { totalTestimonials: number; averageRating: number };
+  statsLoading: boolean;
+  statsError: string;
+}
+
+export default function TestimonialContent({
+  testimonials,
+  loading,
+  error,
+  stats,
+  statsLoading,
+  statsError,
+}: TestimonialContentProps) {
 
   return (
     <div className="min-h-screen w-full bg-[#FFFAEC] px-24">
@@ -42,7 +57,7 @@ export default function TestimonialContent() {
       </section>
 
       <div className="px-4 sm:px-6 lg:px-8">
-        <StatsSummary />
+        <StatsSummary stats={stats} loading={statsLoading} error={statsError} />
       </div>
 
       {/* Loading State */}
