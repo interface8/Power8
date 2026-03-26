@@ -25,24 +25,25 @@ export default function TestimonialContent({
 }: TestimonialContentProps) {
 
   return (
-    <div className="min-h-screen w-full bg-[#FFFAEC] px-24">
+    <div className="min-h-screen w-full bg-[#FFFAEC] px-2 md:px-24">
       <div className=" w-[97%] mx-auto pt-24  py-8">
-        <Link href="/" className="flex items-center space-x-4 pl-8">
-          <span>
-            <LucideArrowLeft size={15} />
-          </span>
-          <p className="text-gray-800 font-xl text-sm md:text-xl lg:font-semibold">
-            Back to Home
-          </p>
-        </Link>
+        <Link href="/" className="flex items-center space-x-3 pl-8 whitespace-nowrap">
+  <span>
+    <LucideArrowLeft size={20} />  {/* Increased icon size */}
+  </span>
+  <p className="text-gray-800 font-semibold text-2xl md:text-xl whitespace-nowrap">
+    Back to Home
+  </p>
+</Link>
       </div>
       <section className="py-4 px-4 ">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-7xl font-medium text-gray-900 mb-8 tracking-wider">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-7xl font-medium text-gray-900 md:mb-8 tracking-wider">
               Stories from Our
-              <div className="h-18 overflow-hidden">
-              <span className="block text-orange-600 leading-none">Happy Customers</span>
+              <div className="pb-2"></div>
+              <div className="h-18 overflow-hidden ">
+              <span className="block text-orange-600 leading-none ">Happy Customers</span>
               </div>
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 max-w-6xl mx-auto tracking-wide">
@@ -76,18 +77,18 @@ export default function TestimonialContent({
 
       {/* Testimonials Grid */}
       {!loading && !error && testimonials.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4 px-6 my-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-18 px-2 my-2 md:my-24">
           {testimonials.map((testimonial) => (
             <TestimonialCard 
               key={testimonial.id} 
               rating={String(testimonial.rating)}
               quote={testimonial.description}
               name={testimonial.user.name}
-              role=""
-              location=""
+              role="Small Business Owner"
+              location="Lagos, Nigeria"
               system=""
               savings=""
-              image=""
+              imageUrl={testimonial.imageUrl || "/images/images-removebg-preview.png"}
             />
           ))}
         </div>
@@ -100,7 +101,7 @@ export default function TestimonialContent({
         </div>
       )}
 
-      <div className="flex justify-center items-center pb-24">
+      <div className="flex justify-center items-center pb-24 mt-16">
         <CTASection />
       </div>
     </div>

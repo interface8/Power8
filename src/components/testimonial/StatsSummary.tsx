@@ -13,7 +13,7 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       )}
 
-      <div className="text-center py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
+      <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
         <div className="text-3xl sm:text-4xl font-bold mb-6 lg:text-5xl tracking-widest text-orange-600">
           {loading ? "Loading..." : stats.totalTestimonials}
         </div>
@@ -22,7 +22,7 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       </div>
 
-      <div className="text-center py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
+      <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
         <div className="text-3xl sm:text-4xl font-semibold mb-6  lg:text-5xl tracking-widest text-orange-600">
           {loading ? "Loading..." : (stats.averageRating?.toFixed(1) ?? 0)}
         </div>
@@ -31,7 +31,7 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       </div>
 
-      <div className="text-center py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
+      <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
         <div className="text-3xl sm:text-4xl font-semibold mb-6 lg:text-5xl  text-orange-600">
           ₦2.8B+
         </div>
@@ -40,7 +40,7 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       </div>
 
-      <div className="text-center py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
+      <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
         <div className="text-4xl sm:text-4xl font-semibold mb-6  lg:text-5xl tracking-widest text-orange-600">
           98%
         </div>
