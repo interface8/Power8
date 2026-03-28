@@ -96,6 +96,7 @@ model User {
 
   roles UserRole[]
   testimonials Testimonial[]
+  solarCalculations SolarCalculation[]
 
   @@map("users")
 }
@@ -160,5 +161,37 @@ model Testimonial {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("testimonials")
+}
+
+model CarouselSlide {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  linkUrl     String?
+  sort        Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("carousel_slides")
+}
+
+model SolarCalculation {
+  id              String   @id @default(cuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  appliances      Json
+  config          Json
+  results         Json
+  location        String?
+  totalDailyWh    Int
+  inverterSize    Int
+  solarPanelWatts Int
+  batteryAh       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("solar_calculations")
 }
 

@@ -97,6 +97,13 @@ export default function PublicNavbar() {
           </Link>
 
           <Link
+            href="/calculator"
+            className="bg-green-50 hover:bg-green-200 text-black p-2 rounded-md border border-gray-200"
+          >
+            <Calculator size={18} />
+          </Link>
+
+          <Link
             href="/login"
             className="border p-2 text-white bg-green-950 hover:bg-green-900 rounded-md"
           >
