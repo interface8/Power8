@@ -14,6 +14,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { extractApplianceData } from "@/lib/ocr";
+import { detectCategory } from "@/lib/appliance-profiles";
 import type { Appliance, OCRResult } from "@/types/solar";
 
 interface ApplianceScannerProps {
@@ -51,6 +52,16 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
 
       if (result.extractedWatts) {
         setWatts(String(result.extractedWatts));
+      }
+
+      // Auto-fill from detected category
+      if (result.detectedCategory) {
+        const profile = detectCategory(result.detectedCategory);
+        if (profile) {
+          if (!name) setName(profile.category);
+          setSurgeMultiplier(String(profile.defaultSurgeMultiplier));
+          setHoursPerDay(String(profile.defaultHoursPerDay));
+        }
       }
     } catch {
       setError("Failed to scan image. Please enter details manually.");
@@ -110,7 +121,7 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
   };
 
   return (
-    <Card className="border-orange-200 shadow-md hover:shadow-lg transition-shadow">
+    <Card className="mt-10 pb-5 border-orange-200 shadow-md hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3 sm:pb-4">
         <CardTitle className="text-base sm:text-lg flex items-center gap-2">
           <div className="bg-orange-100 p-1.5 rounded-lg">
@@ -189,7 +200,7 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
             />
             {ocrResult && (
               <div className="p-3 bg-orange-50 border-t border-orange-200 space-y-1">
-                <div className="flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 text-sm flex-wrap">
                   {ocrResult.extractedWatts ? (
                     <>
                       <Check size={14} className="text-green-600" />
@@ -206,10 +217,45 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
                       </span>
                     </>
                   )}
-                  <Badge variant="outline" className="ml-auto text-xs">
-                    {Math.round(ocrResult.confidence)}% confidence
+                  {/* Confidence tier badge */}
+                  <Badge
+                    variant="outline"
+                    className={`ml-auto text-xs ${
+                      ocrResult.adjustedConfidence >= 70
+                        ? "border-green-400 text-green-700 bg-green-50"
+                        : ocrResult.adjustedConfidence >= 40
+                          ? "border-amber-400 text-amber-700 bg-amber-50"
+                          : "border-red-400 text-red-700 bg-red-50"
+                    }`}
+                  >
+                    {Math.round(ocrResult.adjustedConfidence)}% confidence
                   </Badge>
                 </div>
+                {/* Confidence warning messages */}
+                {ocrResult.adjustedConfidence < 40 && (
+                  <p className="text-xs text-red-600 flex items-center gap-1">
+                    <AlertCircle size={12} />
+                    Low confidence — please verify values manually
+                  </p>
+                )}
+                {ocrResult.adjustedConfidence >= 40 &&
+                  ocrResult.adjustedConfidence < 70 && (
+                    <p className="text-xs text-amber-600 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      Moderate confidence — review values before adding
+                    </p>
+                  )}
+                {/* Category badge */}
+                {ocrResult.detectedCategory && (
+                  <div className="flex items-center gap-1">
+                    <Badge className="bg-purple-100 text-purple-700 border-purple-300 text-xs">
+                      {ocrResult.detectedCategory}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground">
+                      Auto-filled defaults
+                    </span>
+                  </div>
+                )}
                 {ocrResult.extractedAmps && ocrResult.extractedVolts && (
                   <p className="text-xs text-muted-foreground">
                     Also found: {ocrResult.extractedAmps}A ×{" "}

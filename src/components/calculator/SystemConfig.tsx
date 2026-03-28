@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings } from "lucide-react";
+import { Settings, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,16 +17,28 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import type { SolarConfig } from "@/types/solar";
+import type { SolarConfig, UsageProfile } from "@/types/solar";
+import { getAllRegions, getSunHours } from "@/lib/solar-regions";
 
 interface SystemConfigProps {
   config: SolarConfig;
   onChange: (config: SolarConfig) => void;
 }
 
+const regions = getAllRegions();
+
 export default function SystemConfig({ config, onChange }: SystemConfigProps) {
+  const handleCityChange = (city: string) => {
+    const sunHours = getSunHours(city);
+    onChange({
+      ...config,
+      location: city,
+      ...(sunHours != null ? { peakSunHours: sunHours } : {}),
+    });
+  };
+
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-md pb-4">
       <CardHeader className="pb-3 sm:pb-4">
         <CardTitle className="text-base sm:text-lg flex items-center gap-2">
           <div className="bg-gray-100 p-1.5 rounded-lg">
@@ -40,6 +52,29 @@ export default function SystemConfig({ config, onChange }: SystemConfigProps) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+          {/* City / Location */}
+          <div>
+            <Label className="flex items-center gap-1">
+              <MapPin size={12} /> City
+            </Label>
+            <Select
+              value={config.location || ""}
+              onValueChange={handleCityChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select city" />
+              </SelectTrigger>
+              <SelectContent>
+                {regions.map((r) => (
+                  <SelectItem key={r.city} value={r.city}>
+                    {r.city} ({r.peakSunHours}h)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Peak Sun Hours (auto-filled from city, still editable) */}
           <div>
             <Label htmlFor="sunHours">Peak Sun Hours</Label>
             <Input
@@ -57,6 +92,29 @@ export default function SystemConfig({ config, onChange }: SystemConfigProps) {
               }
             />
           </div>
+
+          {/* Usage Profile */}
+          <div>
+            <Label>Usage Profile</Label>
+            <Select
+              value={config.usageProfile}
+              onValueChange={(v) =>
+                onChange({ ...config, usageProfile: v as UsageProfile })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="home">Home (1.0×)</SelectItem>
+                <SelectItem value="business">Business (1.3×)</SelectItem>
+                <SelectItem value="school">School (0.5×)</SelectItem>
+                <SelectItem value="restaurant">Restaurant (1.5×)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Days of Autonomy */}
           <div>
             <Label htmlFor="autonomy">Days of Autonomy</Label>
             <Input
@@ -73,6 +131,8 @@ export default function SystemConfig({ config, onChange }: SystemConfigProps) {
               }
             />
           </div>
+
+          {/* System Voltage */}
           <div>
             <Label>System Voltage</Label>
             <Select
@@ -94,6 +154,8 @@ export default function SystemConfig({ config, onChange }: SystemConfigProps) {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Battery Type */}
           <div>
             <Label>Battery Type</Label>
             <Select
@@ -115,6 +177,63 @@ export default function SystemConfig({ config, onChange }: SystemConfigProps) {
                 </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Panel Rating */}
+          <div>
+            <Label htmlFor="panelRating">Panel Rating (W)</Label>
+            <Input
+              id="panelRating"
+              type="number"
+              min="100"
+              max="1000"
+              step="50"
+              value={config.panelRating}
+              onChange={(e) =>
+                onChange({
+                  ...config,
+                  panelRating: parseInt(e.target.value, 10) || 550,
+                })
+              }
+            />
+          </div>
+
+          {/* Battery Unit Ah */}
+          <div>
+            <Label htmlFor="batteryUnit">Battery Unit (Ah)</Label>
+            <Input
+              id="batteryUnit"
+              type="number"
+              min="50"
+              max="500"
+              step="50"
+              value={config.batteryUnitAh}
+              onChange={(e) =>
+                onChange({
+                  ...config,
+                  batteryUnitAh: parseInt(e.target.value, 10) || 200,
+                })
+              }
+            />
+          </div>
+
+          {/* Electricity Rate */}
+          <div className="sm:col-span-2">
+            <Label htmlFor="electricityRate">Electricity Rate (₦/kWh)</Label>
+            <Input
+              id="electricityRate"
+              type="number"
+              min="10"
+              max="500"
+              step="5"
+              value={config.electricityRate}
+              onChange={(e) =>
+                onChange({
+                  ...config,
+                  electricityRate: parseFloat(e.target.value) || 70,
+                })
+              }
+            />
           </div>
         </div>
       </CardContent>
