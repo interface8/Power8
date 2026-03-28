@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Sun, Zap, Camera, ArrowDown } from "lucide-react";
+import { Sun, Zap, Camera, ArrowDown, Save, Loader2, Download } from "lucide-react";
 import ApplianceScanner from "@/components/calculator/ApplianceScanner";
 import ApplianceList from "@/components/calculator/ApplianceList";
 import SystemConfig from "@/components/calculator/SystemConfig";
 import SolarResultsDisplay from "@/components/calculator/SolarResultsDisplay";
 import { calculateSolar } from "@/lib/solar-calculator";
+import { Button } from "@/components/ui/button";
+import { useSaveSolarCalculation } from "@/hooks/use-solar-calculations";
+import { useAuth } from "@/components/providers/auth-provider";
 import type { Appliance, SolarConfig } from "@/types/solar";
 
 export default function CalculatorPage() {
@@ -18,6 +21,11 @@ export default function CalculatorPage() {
     batteryType: "lithium",
     safetyFactor: 1.25,
     efficiencyLoss: 1.3,
+    panelRating: 550,
+    batteryUnitAh: 200,
+    electricityRate: 70,
+    location: "",
+    usageProfile: "home",
   });
 
   const results = useMemo(
@@ -31,6 +39,18 @@ export default function CalculatorPage() {
 
   const removeAppliance = (id: string) => {
     setAppliances((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  const user = useAuth();
+  const { save, loading: saving } = useSaveSolarCalculation();
+  const [savedId, setSavedId] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    const result = await save({ appliances, config });
+    if (result.data) {
+      const data = result.data as { data: { id: string } };
+      setSavedId(data.data.id);
+    }
   };
 
   return (
@@ -95,6 +115,40 @@ export default function CalculatorPage() {
         {results && (
           <div className="mt-6 sm:mt-8">
             <SolarResultsDisplay results={results} config={config} />
+
+            {/* Save & Download buttons — only for authenticated users */}
+            {user && (
+              <div className="mt-4 flex gap-3">
+                <Button
+                  onClick={handleSave}
+                  disabled={saving || !!savedId}
+                  className="bg-orange-500 hover:bg-orange-600 text-white shadow-md"
+                >
+                  {saving ? (
+                    <Loader2 className="animate-spin mr-2" size={16} />
+                  ) : (
+                    <Save className="mr-2" size={16} />
+                  )}
+                  {savedId ? "Saved!" : saving ? "Saving..." : "Save Calculation"}
+                </Button>
+
+                {savedId && (
+                  <Button
+                    variant="outline"
+                    className="border-orange-300 hover:bg-orange-50"
+                    asChild
+                  >
+                    <a
+                      href={`/api/solar-calculations/${savedId}/pdf`}
+                      download
+                    >
+                      <Download className="mr-2" size={16} />
+                      Download PDF
+                    </a>
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

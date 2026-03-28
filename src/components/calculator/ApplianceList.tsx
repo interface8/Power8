@@ -42,7 +42,7 @@ export default function ApplianceList({
   );
 
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-md pb-4 mt-10">
       <CardHeader className="pb-3 sm:pb-4">
         <CardTitle className="text-base sm:text-lg flex items-center gap-2">
           <div className="bg-orange-100 p-1.5 rounded-lg">

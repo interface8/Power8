@@ -96,6 +96,7 @@ model User {
 
   roles UserRole[]
   testimonials Testimonial[]
+  solarCalculations SolarCalculation[]
 
   @@map("users")
 }
@@ -174,5 +175,23 @@ model CarouselSlide {
   updatedAt   DateTime @updatedAt
 
   @@map("carousel_slides")
+}
+
+model SolarCalculation {
+  id              String   @id @default(cuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  appliances      Json
+  config          Json
+  results         Json
+  location        String?
+  totalDailyWh    Int
+  inverterSize    Int
+  solarPanelWatts Int
+  batteryAh       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("solar_calculations")
 }
 
