@@ -10,8 +10,9 @@ import { TrendingUp, Calculator, ShoppingBag } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
 import Image from "next/image";
+import { useCarouselSlides } from "@/hooks/use-carousel";
 
-const slides = [
+const fallbackSlides = [
   {
     image: "/images/power-2.jpg",
     title: "Advanced Technology",
@@ -30,6 +31,16 @@ const slides = [
 ];
 
 export default function Hero() {
+  const { slides: apiSlides } = useCarouselSlides();
+
+  const slides =
+    apiSlides.length > 0
+      ? apiSlides.map((s) => ({
+          image: s.imageUrl,
+          title: s.title,
+          description: s.description ?? "",
+        }))
+      : fallbackSlides;
   return (
     <section className="w-full bg-orange-50 py-40">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 xl:grid-cols-2 gap-12 items-center">
@@ -56,10 +67,13 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="flex items-center justify-center gap-2 w-full sm:w-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition">
+            <Link
+              href="/calculator"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition"
+            >
               <Calculator size={16} />
               <span> Calculate Solar Needs </span>
-            </button>
+            </Link>
 
             <Link
               href="/products"

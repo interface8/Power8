@@ -162,3 +162,17 @@ model Testimonial {
   @@map("testimonials")
 }
 
+model CarouselSlide {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  linkUrl     String?
+  sort        Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("carousel_slides")
+}
+

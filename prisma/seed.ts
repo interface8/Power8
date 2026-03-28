@@ -352,6 +352,37 @@ const viewerUser = await prisma.user.upsert({
 
   console.log(`  ✅ ${productsDefs.length} products created`);
 
+  // ─── 9. Create Carousel Slides ───────────────────────
+  const carouselDefs = [
+    {
+      title: "Professional Installation",
+      description: "Expert solar panel installation for your home",
+      imageUrl: "/images/power-1.jpg",
+      linkUrl: "/products",
+      sort: 1,
+    },
+    {
+      title: "Advanced Technology",
+      description: "State-of-the-art solar energy systems",
+      imageUrl: "/images/power-2.jpg",
+      linkUrl: "/products",
+      sort: 2,
+    },
+    {
+      title: "Power Your Household",
+      description: "Reliable energy for your household",
+      imageUrl: "/images/power-7.jpg",
+      linkUrl: "/calculator",
+      sort: 3,
+    },
+  ];
+
+  for (const slide of carouselDefs) {
+    await prisma.carouselSlide.create({ data: slide });
+  }
+
+  console.log(`  ✅ ${carouselDefs.length} carousel slides created`);
+
   console.log("\n🎉 Seed completed successfully!");
 }
 
