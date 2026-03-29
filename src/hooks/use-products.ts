@@ -15,6 +15,7 @@ export function useProducts(filters?: ProductFilters) {
     if (f?.search) params.set("search", f.search);
     if (f?.categoryId) params.set("categoryId", f.categoryId);
     if (f?.companyId) params.set("companyId", f.companyId);
+    if (f?.minCapacity != null) params.set("minCapacity", String(f.minCapacity));
 
     const url = `/api/products${params.toString() ? `?${params}` : ""}`;
 

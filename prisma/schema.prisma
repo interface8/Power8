@@ -18,8 +18,7 @@ model Company {
   updatedAt     DateTime   @updatedAt
 
    products     Product[]
-
-  @@map("company")
+  blogs        Blog[]
 }
 
 model ProductCategory {
@@ -97,8 +96,7 @@ model User {
   roles UserRole[]
   testimonials Testimonial[]
   solarCalculations SolarCalculation[]
-
-  @@map("users")
+  blogs              Blog[]
 }
 
 model Role {
@@ -193,5 +191,40 @@ model SolarCalculation {
   updatedAt       DateTime @updatedAt
 
   @@map("solar_calculations")
+}
+
+// ─── Blog ──────────────────────────────────────────────
+
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  sort        Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  blogs       Blog[]
+
+  @@map("blog_categories")
+}
+
+model Blog {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String?
+  content     String
+  imageUrl    String?
+  isPublished Boolean       @default(false)
+  publishedAt DateTime?
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  companyId   String?
+  company     Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  authorId    String?
+  author      User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("blogs")
 }
 
