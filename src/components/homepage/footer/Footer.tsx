@@ -33,6 +33,10 @@ export default function Footer() {
           >
             Testimonials
           </Link>
+
+          <Link href="/blogs" className="hover:text-orange-400 transition">
+            Blog
+          </Link>
         </div>
 
         <div className="w-full border-t border-gray-700 mt-6 pt-6">

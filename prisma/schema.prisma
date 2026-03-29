@@ -9,48 +9,49 @@ datasource db {
 // ─── Models ──────────────────────────────────────────────
 
 model Company {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
-  description   String? 
+  description   String?
   address       String
   contactNumber String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  products      Product[]
+  blogs         Blog[]
 
-   products     Product[]
-  blogs        Blog[]
+  @@map("company")
 }
 
 model ProductCategory {
-  id            String     @id @default(cuid())
-  name          String
-  description   String? 
-  sort          Int
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-   products     Product[]
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  sort        Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
 
   @@map("product_category")
 }
 
 model Product {
-  id            String     @id @default(cuid())
+  id            String          @id @default(cuid())
   name          String
   description   String?
   categoryId    String
-  category      ProductCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  companyId    String
-  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  price         Decimal    @db.Decimal(10, 2)
+  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  companyId     String
+  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  price         Decimal         @db.Decimal(10, 2)
   warranty      Int
   capacity      Int
   imageUrl      String?
-  stockQuantity Int        @default(0)
-  isActive      Boolean    @default(true)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  stockQuantity Int             @default(0)
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   cartItems     CartItem[]
+  bundleItems   BundleItem[]
 
   @@map("products")
 }
@@ -59,11 +60,9 @@ model Cart {
   id        String     @id @default(cuid())
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-
   userId    String     @unique
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-   items     CartItem[]
+  items     CartItem[]
 
   @@map("carts")
 }
@@ -87,16 +86,18 @@ model User {
   email     String   @unique
   password  String
   name      String
-  phone     String    @unique
+  phone     String   @unique
   cart      Cart?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  roles UserRole[]
-  testimonials Testimonial[]
+  roles             UserRole[]
+  testimonials      Testimonial[]
   solarCalculations SolarCalculation[]
-  blogs              Blog[]
+  blogs             Blog[]
+
+  @@map("users")
 }
 
 model Role {
@@ -118,8 +119,7 @@ model Permission {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  roles RolePermission[]
+  roles       RolePermission[]
 
   @@unique([resource, action], name: "resource_action")
   @@map("permissions")
@@ -128,8 +128,8 @@ model Permission {
 model UserRole {
   userId String
   roleId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@map("user_roles")
@@ -147,16 +147,14 @@ model RolePermission {
 
 model Testimonial {
   id          String   @id @default(cuid())
-  title        String
+  title       String
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  rating       Int?
-  imageUrl      String?
-
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int?
+  imageUrl    String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("testimonials")
 }
@@ -193,6 +191,31 @@ model SolarCalculation {
   @@map("solar_calculations")
 }
 
+// ─── Product Bundles ───────────────────────────────────
+
+model ProductBundle {
+  id               String       @id @default(cuid())
+  name             String
+  totalPrice       Decimal      @db.Decimal(10, 2)
+  systemCapacityKw Decimal?     @db.Decimal(10, 2)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  items            BundleItem[]
+
+  @@map("product_bundles")
+}
+
+model BundleItem {
+  id        String        @id @default(cuid())
+  bundleId  String
+  bundle    ProductBundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product       @relation(fields: [productId], references: [id])
+  quantity  Int
+
+  @@map("bundle_items")
+}
+
 // ─── Blog ──────────────────────────────────────────────
 
 model BlogCategory {
@@ -227,4 +250,3 @@ model Blog {
 
   @@map("blogs")
 }
-
