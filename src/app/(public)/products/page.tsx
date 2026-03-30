@@ -1,18 +1,29 @@
-import ProductHero from "@/components/products/ProductHero";
-import ProductList from "@/components/products/ProductList";
-import ProductNavbar from "@/components/products/ProductNavbar";
-import ProductSearch from "@/components/products/ProductSearch";
-import React from "react";
+"use client";
 
-const page = () => {
+import ProductHero from "@/components/products/ProductHero";
+import ProductsContent from "@/components/products/ProductsContent";
+import { useProducts } from "@/hooks/use-products";
+import { useCompanies } from "@/hooks/use-companies";
+import { useProductCategories } from "@/hooks/use-product-categories";
+import { useCart } from "@/hooks/use-cart";
+
+export default function ProductsPage() {
+  const { products, loading, fetchProducts } = useProducts();
+  const { companies } = useCompanies();
+  const { categories } = useProductCategories();
+  const { addToCart } = useCart();
+
   return (
-    <div className="pt-16">
-      <ProductNavbar />
+    <div>
       <ProductHero />
-      <ProductSearch />
-      <ProductList />
+      <ProductsContent
+        products={products}
+        loading={loading}
+        categories={categories}
+        companies={companies}
+        onAddToCart={addToCart}
+        fetchProducts={fetchProducts}
+      />
     </div>
   );
-};
-
-export default page;
+}

@@ -10,7 +10,7 @@ interface TestimonialCardProps {
   location: string;
   system: string;
   savings: string;
-  image: string;
+  imageUrl?: string;
 }
 
 export default function TestimonialCard({
@@ -21,7 +21,7 @@ export default function TestimonialCard({
   location,
   system,
   savings,
-  image,
+  imageUrl,
 }: TestimonialCardProps) {
   return (
     <Card
@@ -47,13 +47,19 @@ export default function TestimonialCard({
 
         <div className="flex items-center gap-3 mb-4">
           <div className="w-18 h-18 rounded-full overflow-hidden shrink-0 mb-4">
-            <Image
-              src={image}
-              alt={name}
-              width={50}
-              height={50}
-              className="object-cover w-full h-full"
-            />
+             {imageUrl ? (
+    <Image
+      src={imageUrl}
+      alt={name}
+      width={50}
+      height={50}
+      className="object-cover w-full h-full"
+    />
+  ) : (
+    <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-xl font-bold">
+      {name.charAt(0)}
+    </div>
+  )}
           </div>
 
           <div>
