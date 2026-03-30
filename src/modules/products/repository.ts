@@ -45,13 +45,14 @@ function toProductDto(product: {
 }
 
 export async function findProducts(filters: ProductFilters = {}): Promise<ProductDto[]> {
-  const { search, categoryId, companyId } = filters;
+  const { search, categoryId, companyId, minCapacity } = filters;
 
   const products = await prisma.product.findMany({
     where: {
       isActive: true,
       ...(categoryId ? { categoryId } : {}),
       ...(companyId ? { companyId } : {}),
+      ...(minCapacity != null ? { capacity: { gte: minCapacity } } : {}),
       ...(search
         ? {
             OR: [

@@ -1,7 +1,10 @@
-import { useTestimonialStats } from "@/hooks/use-testimonials";
+interface StatsSummaryProps {
+  stats: { totalTestimonials: number; averageRating: number };
+  loading: boolean;
+  error: string;
+}
 
-export default function StatsSummary() {
-  const { stats, loading, error } = useTestimonialStats();
+export default function StatsSummary({ stats, loading, error }: StatsSummaryProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 ">
       {error && (

@@ -4,53 +4,15 @@ import React from "react";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@/types/products";
-import { useDispatch } from "react-redux";
-import { addItem } from "@/store/cartSlice";
-import { toast } from "react-toastify";
 
 type Props = {
   product: Product;
+  onAddToCart: (productId: string, quantity?: number) => Promise<boolean>;
 };
 
-const ProductCard = ({ product }: Props) => {
-  // Category logic
-  const capacityCategories = [
-    "battery",
-    "batteries",
-    "accessory",
-    "accessories",
-  ];
-  const powerCategories = ["panel", "inverter"];
-
-  const category = product.category?.toLowerCase() ?? "";
-
-  const isCapacity = capacityCategories.includes(category);
-  const isPower = powerCategories.includes(category);
-
-  let specLabel = "";
-  let specValue = "";
-
-  if (isCapacity && product.capacity) {
-    specLabel = "Capacity";
-    specValue = product.capacity;
-  } else if (isPower && product.power) {
-    specLabel = "Power";
-    specValue = product.power;
-  }
- 
-  const dispatch = useDispatch();
-  const handleAddToCart = () => {
-    dispatch(
-      addItem({
-        id: product.id,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-        quantity: 1,
-      }),
-    );
-
-    toast.success("Product added to cart")
+const ProductCard = ({ product, onAddToCart }: Props) => {
+  const handleAddToCart = async () => {
+    await onAddToCart(product.id);
   };
 
   return (
@@ -58,7 +20,7 @@ const ProductCard = ({ product }: Props) => {
       {/* Image */}
       <div className="relative w-full aspect-4/3 sm:aspect-video">
         <Image
-          src={product.image}
+          src={product.imageUrl || "/images/product-1.jpg"}
           alt={product.name}
           fill
           className="object-cover"
@@ -67,9 +29,9 @@ const ProductCard = ({ product }: Props) => {
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        {/* Badge (like Figma) */}
+        {/* Badge */}
         <span className="inline-block bg-green-700 text-white text-[10px] px-2 py-1 rounded-md font-medium w-fit">
-          {product.category || "Panel"}
+          {product.categoryName}
         </span>
 
         {/* Title */}
@@ -84,12 +46,11 @@ const ProductCard = ({ product }: Props) => {
 
         {/* Specs */}
         <div className="text-[11px] text-gray-500 mt-2 space-y-1">
-          {specValue && (
-            <p>
-              {specLabel}: {specValue}
-            </p>
+          {product.capacity > 0 && <p>Capacity: {product.capacity}</p>}
+          {product.warranty > 0 && (
+            <p>Warranty: {product.warranty} {product.warranty === 1 ? "year" : "years"}</p>
           )}
-          {product.warranty && <p>Warranty: {product.warranty}</p>}
+          {product.companyName && <p>Brand: {product.companyName}</p>}
         </div>
 
         {/* Push bottom content down */}
@@ -100,16 +61,20 @@ const ProductCard = ({ product }: Props) => {
           <p className="text-lg font-bold text-orange-500">
             ₦{product.price.toLocaleString()}
           </p>
-          <p className="text-[12px] text-gray-400">Stock: {product.stock}</p>
+          <p className="text-[12px] text-gray-400">Stock: {product.stockQuantity}</p>
         </div>
 
         {/* Button */}
-        <button onClick={handleAddToCart} className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-3 transition">
+        <button
+          onClick={handleAddToCart}
+          disabled={product.stockQuantity === 0}
+          className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-3 transition"
+        >
           <ShoppingCart size={16} />
-          Add to Cart
+          {product.stockQuantity === 0 ? "Out of Stock" : "Add to Cart"}
         </button>
 
-        {/* Bottom spacing like Figma */}
+        {/* Bottom spacing */}
         <div className="mt-2" />
       </div>
     </div>

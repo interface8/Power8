@@ -35,4 +35,5 @@ export interface ProductFilters {
   search?: string;
   categoryId?: string;
   companyId?: string;
+  minCapacity?: number;
 }

@@ -4,10 +4,25 @@ import Link from "next/link";
 import StatsSummary from "./StatsSummary";
 import TestimonialCard from "./testimonialCard";
 import CTASection from "./CTASection";
-import { useTestimonials } from "@/hooks/use-testimonials";
+import type { Testimonial } from "@/hooks/use-testimonials";
 
-export default function TestimonialContent() {
-  const { testimonials, loading, error } = useTestimonials();
+interface TestimonialContentProps {
+  testimonials: Testimonial[];
+  loading: boolean;
+  error: string;
+  stats: { totalTestimonials: number; averageRating: number };
+  statsLoading: boolean;
+  statsError: string;
+}
+
+export default function TestimonialContent({
+  testimonials,
+  loading,
+  error,
+  stats,
+  statsLoading,
+  statsError,
+}: TestimonialContentProps) {
 
   return (
     <div className="bg-[#fffbf6] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
@@ -50,8 +65,8 @@ export default function TestimonialContent() {
         </div>
       </section>
 
-      <div className="px-2 sm:px-6 lg:px-8">
-        <StatsSummary />
+      <div className="px-4 sm:px-6 lg:px-8">
+        <StatsSummary stats={stats} loading={statsLoading} error={statsError} />
       </div>
 
       {/* Loading State */}
