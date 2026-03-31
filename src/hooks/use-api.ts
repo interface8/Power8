@@ -11,14 +11,14 @@ export function useApi<T = unknown>() {
 
   const fetchData = async (
     url: string,
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<{ data: T | null; error: string | null }> => {
     setError("");
     setLoading(true);
 
     try {
       const res = await fetch(url, options);
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
         const errorMessage = data.message ?? "Request failed";
@@ -28,7 +28,9 @@ export function useApi<T = unknown>() {
 
       return { data, error: null };
     } catch (err) {
-      const errorMessage = "Something went wrong" + (err instanceof Error ? `: ${err.message}` : "");
+      const errorMessage =
+        "Something went wrong" +
+        (err instanceof Error ? `: ${err.message}` : "");
       setError(errorMessage);
       return { data: null, error: errorMessage };
     } finally {
@@ -71,14 +73,14 @@ export function useQuery<T = unknown>(url: string, options?: UseApiOptions) {
 }
 
 export function useMutation<TData = unknown, TVariables = unknown>(
-  options?: UseApiOptions
+  options?: UseApiOptions,
 ) {
   const { fetchData, loading, error, clearError } = useApi<TData>();
 
   const mutate = async (
     url: string,
     data?: TVariables,
-    method: "POST" | "PUT" | "PATCH" | "DELETE" = "POST"
+    method: "POST" | "PUT" | "PATCH" | "DELETE" = "POST",
   ) => {
     const result = await fetchData(url, {
       method,

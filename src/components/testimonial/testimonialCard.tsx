@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Quote, Star } from "lucide-react";
 
 interface TestimonialCardProps {
-  rating: string;
+  rating: string | number;
   quote: string;
   name: string;
   role: string;
@@ -14,7 +14,7 @@ interface TestimonialCardProps {
 }
 
 export default function TestimonialCard({
-  rating,
+  rating = 5,
   quote,
   name,
   role,
@@ -24,60 +24,69 @@ export default function TestimonialCard({
   imageUrl,
 }: TestimonialCardProps) {
   return (
-    <Card
-      className="hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 px-8 mx-2 bg-white"
-     
-    >
-      <CardContent className="pt-6 ">
-       <div className="flex items-center pr-3 mb-4">
-  <Quote className="text-orange-200 w-12 h-12" />
-  <div className="flex items-center gap-1">
-    {[...Array(5)].map((_, index) => (
-      <Star 
-        key={index} 
-        className={`w-7 h-7 ${index < Number(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-      />
-    ))}
-    {/* <span className="ml-2 text-sm text-gray-500">({rating})</span> */}
-  </div>
-</div>
-        <p className="text-gray-600 font-normal mb-4 text-[16px] pt-16 pb-12">
+    <Card className="w-full max-w-95 mx-auto hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden">
+      <CardContent className="pt-8 pb-6 px-7">
+        {/* Quote Icon + Stars */}
+        <div className="flex  mb-15">
+          <Quote className="text-orange-200 w-9 h-9 shrink-0" />
+          <div className="flex gap-1 mt-2">
+            {[...Array(5)].map((_, index) => (
+              <Star
+                key={index}
+                className={`w-5 h-5 ${
+                  index < Number(rating)
+                    ? "text-yellow-400 fill-yellow-400"
+                    : "text-gray-200"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Testimonial Quote */}
+        <p className="text-gray-700 text-[15.5px] leading-relaxed mb-8 min-h-30">
           {quote}
         </p>
 
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-18 h-18 rounded-full overflow-hidden shrink-0 mb-4">
-             {imageUrl ? (
-    <Image
-      src={imageUrl}
-      alt={name}
-      width={50}
-      height={50}
-      className="object-cover w-full h-full"
-    />
-  ) : (
-    <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-xl font-bold">
-      {name.charAt(0)}
-    </div>
-  )}
+        {/* Profile Section */}
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-orange-300">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={name}
+                width={60}
+                height={60}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <div className="w-full h-full bg-[#F05700] flex items-center justify-center text-white text-2xl font-semibold">
+                {name.charAt(0)}
+              </div>
+            )}
           </div>
 
-          <div>
-            <h4 className="font-semibold text-2xl text-gray-900">{name}</h4>
-            <p className="text-lg text-gray-600">{role}</p>
-            <p className="text-base text-gray-500">{location}</p>
+          <div className="leading-tight">
+            <h4 className="font-semibold text-lg text-gray-900">{name}</h4>
+            <p className="text-gray-600 text-sm">{role}</p>
+            <p className="text-gray-500 text-xs">{location}</p>
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="border-t pt-4 flex-col items-start gap-2 mt-4 mb-16 ">
-        <div className="text-lg font-bold flex flex-row items-center justify-between w-full">
-          <span className="font-normal text-gray-400">System:</span>
-          <div>{system || "5kW Premium System"}</div>
+      {/* Footer - System & Savings */}
+      <CardFooter className="border-t border-orange-200 bg-white px-7 py-5 flex flex-col gap-3 text-sm">
+        <div className="flex justify-between w-full">
+          <span className="text-gray-500 font-medium">System:</span>
+          <span className="font-medium text-gray-800">
+            {system || "10kW Premium System"}
+          </span>
         </div>
-        <div className="text-lg font-bold text-green-600 flex flex-row items-center justify-between w-full">
-          <span className="font-normal text-gray-400">Annual Savings:</span>
-          <div>{savings || "₦450,000/year"}</div>
+        <div className="flex justify-between w-full">
+          <span className="text-gray-500 font-medium">Annual Savings:</span>
+          <span className="font-semibold text-green-600">
+            {savings || "₦850,000/year"}
+          </span>
         </div>
       </CardFooter>
     </Card>

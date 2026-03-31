@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { LucideArrowLeft } from "lucide-react";
 import Link from "next/link";
 import StatsSummary from "./StatsSummary";
@@ -23,18 +23,20 @@ export default function TestimonialContent({
   statsLoading,
   statsError,
 }: TestimonialContentProps) {
-
   return (
     <div className="min-h-screen w-full bg-[#FFFAEC] px-2 md:px-24">
       <div className=" w-[97%] mx-auto pt-24  py-8">
-        <Link href="/" className="flex items-center space-x-3 pl-8 whitespace-nowrap">
-  <span>
-    <LucideArrowLeft size={20} />  {/* Increased icon size */}
-  </span>
-  <p className="text-gray-800 font-semibold text-2xl md:text-xl whitespace-nowrap">
-    Back to Home
-  </p>
-</Link>
+        <Link
+          href="/"
+          className="flex items-center space-x-3 pl-8 whitespace-nowrap"
+        >
+          <span>
+            <LucideArrowLeft size={20} /> {/* Increased icon size */}
+          </span>
+          <p className="text-gray-800 font-semibold text-2xl md:text-xl whitespace-nowrap">
+            Back to Home
+          </p>
+        </Link>
       </div>
       <section className="py-4 px-4 ">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -43,13 +45,15 @@ export default function TestimonialContent({
               Stories from Our
               <div className="pb-2"></div>
               <div className="h-18 overflow-hidden ">
-              <span className="block text-orange-600 leading-none ">Happy Customers</span>
+                <span className="block text-orange-600 leading-none ">
+                  Happy Customers
+                </span>
               </div>
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 max-w-6xl mx-auto tracking-wide">
-              Real experiences from real people who&apos;ve{' '}
-                <br className="block sm:hidden" />
-                transformed their lives with solar energy
+              Real experiences from real people who&apos;ve{" "}
+              <br className="block sm:hidden" />
+              transformed their lives with solar energy
             </p>
           </div>
 
@@ -77,20 +81,34 @@ export default function TestimonialContent({
 
       {/* Testimonials Grid */}
       {!loading && !error && testimonials.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-18 px-2 my-2 md:my-24">
-          {testimonials.map((testimonial) => (
-            <TestimonialCard 
-              key={testimonial.id} 
-              rating={String(testimonial.rating)}
-              quote={testimonial.description}
-              name={testimonial.user.name}
-              role="Small Business Owner"
-              location="Lagos, Nigeria"
-              system=""
-              savings=""
-              imageUrl={testimonial.imageUrl || "/images/images-removebg-preview.png"}
-            />
-          ))}
+        <div className="max-w-7xl mx-auto px-4">
+          <div
+            className="
+      grid 
+      grid-cols-1 
+      md:grid-cols-2 
+      xl:grid-cols-3 
+      gap-6 
+      py-12 
+      md:py-20
+    "
+          >
+            {testimonials.map((testimonial) => (
+              <TestimonialCard
+                key={testimonial.id}
+                rating={String(testimonial.rating)}
+                quote={testimonial.description}
+                name={testimonial.user.name}
+                role="Small Business Owner"
+                location="Lagos, Nigeria"
+                system=""
+                savings=""
+                imageUrl={
+                  testimonial.imageUrl || "/images/images-removebg-preview.png"
+                }
+              />
+            ))}
+          </div>
         </div>
       )}
 
@@ -105,6 +123,5 @@ export default function TestimonialContent({
         <CTASection />
       </div>
     </div>
-  
   );
 }
