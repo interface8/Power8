@@ -2,17 +2,18 @@
 
 import Link from "next/link";
 import { LogIn, Calculator, Sun, ShoppingCart } from "lucide-react";
+import CartIcon from "../cart/CartIcon";
 
 export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <div className="bg-orange-500 p-2 rounded-xl shadow">
             <Sun className="text-white" size={30} />
           </div>
           <span className="text-xl text-orange-600 font-bold">Power - 8</span>
-        </div>
+        </Link>
 
         <div className="hidden md:flex items-center gap-4">
           <Link
@@ -23,13 +24,10 @@ export default function Navbar() {
             Calculator
           </Link>
 
-          <Link
-            href="/cart"
-            className="flex items-center gap-3 font-medium bg-green-50 hover:bg-green-200 hover:shadow-lg text-black px-4 py-2 rounded-md text-sm"
-          >
-            <ShoppingCart size={16} />
+          <div className="flex items-center gap-4 font-medium bg-green-50 hover:bg-green-200 hover:shadow-lg text-black px-4 py-2 rounded-md text-sm">
+            <CartIcon />
             Cart
-          </Link>
+          </div>
 
           <Link
             href="/login"

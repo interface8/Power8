@@ -23,20 +23,17 @@ export default function TestimonialContent({
   statsLoading,
   statsError,
 }: TestimonialContentProps) {
-
   return (
-    <div className="bg-[#fffbf6] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
-      {/* Reduced top padding */}
-      <div className="w-[97%] mx-auto pt-8 py-4">
-        {/* Back to Home */}
+    <div className="min-h-screen w-full bg-[#FFFAEC] px-2 md:px-24">
+      <div className=" w-[97%] mx-auto pt-24  py-8">
         <Link
           href="/"
-          className="flex items-center space-x-2 pl-6 whitespace-nowrap"
+          className="flex items-center space-x-3 pl-8 whitespace-nowrap"
         >
           <span>
-            <LucideArrowLeft size={18} />
+            <LucideArrowLeft size={20} /> {/* Increased icon size */}
           </span>
-          <p className="text-gray-800 font-semibold text-base md:text-lg whitespace-nowrap">
+          <p className="text-gray-800 font-semibold text-2xl md:text-xl whitespace-nowrap">
             Back to Home
           </p>
         </Link>
@@ -50,11 +47,13 @@ export default function TestimonialContent({
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-medium text-gray-900 md:mb-8 tracking-wider">
               Stories from Our
               <div className="pb-2"></div>
-              <span className="block text-orange-600 leading-none whitespace-nowrap md:text-5xl lg:text-7xl mb-4">
-                Happy Customers
-              </span>
+              <div className="h-18 overflow-hidden ">
+                <span className="block text-orange-600 leading-none ">
+                  Happy Customers
+                </span>
+              </div>
             </h2>
-            <p className="text-xl md:text-2xl text-gray-700 max-w-6xl mx-auto tracking-wide ">
+            <p className="text-xl md:text-2xl text-gray-700 max-w-6xl mx-auto tracking-wide">
               Real experiences from real people who&apos;ve{" "}
               <br className="block sm:hidden" />
               transformed their lives with solar energy
@@ -85,22 +84,34 @@ export default function TestimonialContent({
 
       {/* Testimonials Grid */}
       {!loading && !error && testimonials.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-18 px-2 my-2 md:my-24">
-          {testimonials.map((testimonial) => (
-            <TestimonialCard
-              key={testimonial.id}
-              rating={String(testimonial.rating)}
-              quote={testimonial.description}
-              name={testimonial.user.name}
-              role="Small Business Owner"
-              location="Lagos, Nigeria"
-              system=""
-              savings=""
-              imageUrl={
-                testimonial.imageUrl || "/images/images-removebg-preview.png"
-              }
-            />
-          ))}
+        <div className="max-w-7xl mx-auto px-4">
+          <div
+            className="
+      grid 
+      grid-cols-1 
+      md:grid-cols-2 
+      xl:grid-cols-3 
+      gap-6 
+      py-12 
+      md:py-20
+    "
+          >
+            {testimonials.map((testimonial) => (
+              <TestimonialCard
+                key={testimonial.id}
+                rating={String(testimonial.rating)}
+                quote={testimonial.description}
+                name={testimonial.user.name}
+                role="Small Business Owner"
+                location="Lagos, Nigeria"
+                system=""
+                savings=""
+                imageUrl={
+                  testimonial.imageUrl || "/images/images-removebg-preview.png"
+                }
+              />
+            ))}
+          </div>
         </div>
       )}
 
