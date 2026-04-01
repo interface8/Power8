@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { Camera, Upload, Loader2, X, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -193,10 +194,13 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
             >
               <X size={14} />
             </button>
-            <img
+            <Image
               src={previewUrl}
               alt="Appliance label"
+              width={800}
+              height={400}
               className="w-full max-h-48 object-contain bg-gray-50"
+              unoptimized
             />
             {ocrResult && (
               <div className="p-3 bg-orange-50 border-t border-orange-200 space-y-1">

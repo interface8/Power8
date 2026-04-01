@@ -27,7 +27,7 @@ export function useSolarCalculations() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return {
     calculations: data?.data ?? [],
