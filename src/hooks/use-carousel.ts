@@ -25,7 +25,7 @@ export function useCarouselSlides() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return {
     slides: data ?? [],
