@@ -84,16 +84,19 @@ export default function TestimonialContent({
 
       {/* Testimonials Grid */}
       {!loading && !error && testimonials.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="   px-4 sm:px-6 lg:px-8 ">
           <div
             className="
       grid 
       grid-cols-1 
       md:grid-cols-2 
       xl:grid-cols-3 
-      gap-6 
+      place-items-center
+      md:justify-items-start
       py-12 
       md:py-20
+      
+    
     "
           >
             {testimonials.map((testimonial) => (
@@ -112,7 +115,7 @@ export default function TestimonialContent({
               />
             ))}
           </div>
-        </div>
+         </div>
       )}
 
       {/* Empty State */}

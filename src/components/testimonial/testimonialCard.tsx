@@ -24,7 +24,7 @@ export default function TestimonialCard({
   imageUrl,
 }: TestimonialCardProps) {
   return (
-    <Card className="w-full max-w-95 mx-auto hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden">
+    <Card className="w-full md:max-w-95  hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden">
       <CardContent className="pt-8 pb-6 px-7">
         {/* Quote Icon + Stars */}
         <div className="flex  mb-15">
