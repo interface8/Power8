@@ -6,6 +6,7 @@ import ApplianceScanner from "@/components/calculator/ApplianceScanner";
 import ApplianceList from "@/components/calculator/ApplianceList";
 import SystemConfig from "@/components/calculator/SystemConfig";
 import SolarResultsDisplay from "@/components/calculator/SolarResultsDisplay";
+import RecommendedProducts from "@/components/calculator/RecommendedProducts";
 import { calculateSolar } from "@/lib/solar-calculator";
 import { Button } from "@/components/ui/button";
 import { useSaveSolarCalculation } from "@/hooks/use-solar-calculations";
@@ -149,6 +150,8 @@ export default function CalculatorPage() {
                 )}
               </div>
             )}
+
+            <RecommendedProducts results={results} config={config} />
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogIn, Calculator, Sun, ShoppingCart, Star } from "lucide-react";
+import { LogIn, Calculator, Sun, ShoppingCart, Star, BookOpen } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function PublicNavbar() {
@@ -57,6 +57,18 @@ export default function PublicNavbar() {
           </Link>
 
           <Link
+            href="/blogs"
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition ${
+              pathname.startsWith("/blogs")
+                ? "border-orange-500 bg-orange-50 text-orange-600"
+                : "border-orange-400 text-orange-600 hover:bg-orange-50"
+            }`}
+          >
+            <BookOpen size={14} />
+            Blog
+          </Link>
+
+          <Link
             href="/calculator"
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 bg-green-50 text-black rounded-lg hover:bg-green-200 hover:shadow-lg transition"
           >
@@ -94,6 +106,13 @@ export default function PublicNavbar() {
             className="border-2 border-orange-400 text-orange-600 p-2 rounded-md"
           >
             <Star size={18} />
+          </Link>
+
+          <Link
+            href="/blogs"
+            className="border-2 border-orange-400 text-orange-600 p-2 rounded-md"
+          >
+            <BookOpen size={18} />
           </Link>
 
           <Link

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogIn, UserPlus, Sun, Star } from "lucide-react";
+import { LogIn, UserPlus, Sun, Star, BookOpen } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -19,6 +19,14 @@ export default function Navbar() {
 
         {/* Right Side (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
+          <Link
+            href="/blogs"
+            className="flex items-center gap-1 px-4 py-2 text-sm font-medium border-2 border-orange-400 text-orange-600 rounded-lg hover:bg-orange-50 transition"
+          >
+            <BookOpen size={14} />
+            Blog
+          </Link>
+
           <Link
             href="/testimonial"
             className="flex items-center gap-1 px-4 py-2 text-sm font-medium border-2 border-orange-400 text-orange-600 rounded-lg hover:bg-orange-50 transition"
@@ -46,6 +54,13 @@ export default function Navbar() {
 
         {/* Mobile Buttons */}
         <div className="flex md:hidden items-center gap-2">
+          <Link
+            href="/blogs"
+            className="border-2 border-orange-400 text-orange-600 p-2 rounded-md"
+          >
+            <BookOpen size={18} />
+          </Link>
+
           <Link
             href="/testimonial"
             className="border-2 border-orange-400 text-orange-600 p-2 rounded-md"

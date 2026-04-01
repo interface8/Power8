@@ -19,4 +19,5 @@ export const productFiltersSchema = z.object({
   search: z.string().optional(),
   categoryId: z.string().optional(),
   companyId: z.string().optional(),
+  minCapacity: z.coerce.number().int().min(0).optional(),
 });

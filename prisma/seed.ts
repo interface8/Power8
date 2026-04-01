@@ -383,6 +383,101 @@ const viewerUser = await prisma.user.upsert({
 
   console.log(`  ✅ ${carouselDefs.length} carousel slides created`);
 
+  // ─── 10. Create Blog Categories ──────────────────────
+  const blogCategoryDefs = [
+    { name: "Solar Tips", description: "Tips and tricks for solar energy", sort: 1 },
+    { name: "Industry News", description: "Latest news in the solar industry", sort: 2 },
+    { name: "Installation Guides", description: "Step-by-step installation guides", sort: 3 },
+    { name: "Product Reviews", description: "Reviews of solar products", sort: 4 },
+  ];
+
+  const createdBlogCategories = [];
+  for (const cat of blogCategoryDefs) {
+    const created = await prisma.blogCategory.create({ data: cat });
+    createdBlogCategories.push(created);
+  }
+
+  console.log(`  ✅ ${createdBlogCategories.length} blog categories created`);
+
+  // ─── 11. Create Blogs ────────────────────────────────
+  const blogDefs = [
+    {
+      title: "How to Size Your Solar Panel System",
+      slug: "how-to-size-solar-panel-system",
+      excerpt: "Learn the step-by-step process for determining the right solar panel system size for your home or business.",
+      content: `Sizing a solar panel system correctly is crucial for getting the most value from your investment. Here's a comprehensive guide:\n\n## Step 1: Calculate Your Daily Energy Usage\nStart by listing all your appliances and their wattage. Multiply each by the number of hours used daily to get watt-hours (Wh).\n\n## Step 2: Account for System Losses\nSolar systems aren't 100% efficient. Factor in about 20-30% losses from inverter conversion, cable resistance, and panel degradation.\n\n## Step 3: Determine Peak Sun Hours\nNigeria averages 4-6 peak sun hours depending on location. Northern states like Sokoto get more sun than coastal cities like Lagos.\n\n## Step 4: Calculate Panel Requirements\nDivide your total daily Wh by peak sun hours, then divide by your chosen panel wattage.\n\n## Step 5: Size Your Battery Bank\nFor off-grid systems, multiply daily usage by days of autonomy, then divide by battery voltage and depth of discharge.\n\nUse our Solar Calculator to automate these calculations!`,
+      imageUrl: "/images/power-1.jpg",
+      isPublished: true,
+      publishedAt: new Date("2026-03-01"),
+      categoryId: createdBlogCategories[0].id,
+      companyId: createdCompanies[0].id,
+      authorId: adminUser.id,
+    },
+    {
+      title: "Top 5 Benefits of Switching to Solar Energy in Nigeria",
+      slug: "top-5-benefits-solar-energy-nigeria",
+      excerpt: "Discover why thousands of Nigerian homes and businesses are making the switch to solar power.",
+      content: `Solar energy is transforming how Nigerians power their homes and businesses. Here are the top 5 benefits:\n\n## 1. Eliminate Generator Costs\nThe average Nigerian household spends ₦50,000-₦150,000 monthly on fuel. Solar eliminates this expense entirely.\n\n## 2. Reliable Power Supply\nUnlike the national grid, solar provides consistent electricity. With battery storage, you have power even at night.\n\n## 3. Environmental Impact\nEach solar installation reduces carbon emissions by approximately 1.5 tons per year.\n\n## 4. Increased Property Value\nHomes with solar installations see a 10-15% increase in property value.\n\n## 5. Low Maintenance\nSolar panels require minimal maintenance — just occasional cleaning and annual inspections.\n\nReady to make the switch? Browse our product catalog to find the perfect system.`,
+      imageUrl: "/images/power-2.jpg",
+      isPublished: true,
+      publishedAt: new Date("2026-03-10"),
+      categoryId: createdBlogCategories[1].id,
+      authorId: adminUser.id,
+    },
+    {
+      title: "Understanding Solar Inverters: Pure Sine vs Modified Sine",
+      slug: "understanding-solar-inverters",
+      excerpt: "A complete comparison of pure sine wave and modified sine wave inverters for solar systems.",
+      content: `Choosing the right inverter is one of the most important decisions when setting up a solar system.\n\n## Pure Sine Wave Inverters\n- Produce clean, smooth electrical output identical to grid power\n- Safe for all appliances including sensitive electronics\n- Higher efficiency (90-95%)\n- More expensive but worth the investment\n\n## Modified Sine Wave Inverters\n- Produce a stepped approximation of a sine wave\n- Suitable for basic appliances like lights and fans\n- Can damage sensitive electronics over time\n- More affordable but limited compatibility\n\n## Our Recommendation\nFor Nigerian homes and businesses, we always recommend pure sine wave inverters. The slightly higher cost pays for itself in appliance protection and energy efficiency.\n\nCheck out our inverter collection to find the right one for your needs.`,
+      imageUrl: "/images/power-7.jpg",
+      isPublished: true,
+      publishedAt: new Date("2026-03-15"),
+      categoryId: createdBlogCategories[3].id,
+      companyId: createdCompanies[1].id,
+      authorId: adminUser.id,
+    },
+    {
+      title: "Step-by-Step: Installing Solar Panels on Your Roof",
+      slug: "step-by-step-installing-solar-panels",
+      excerpt: "A beginner-friendly guide to understanding the solar panel installation process.",
+      content: `While professional installation is recommended, understanding the process helps you make informed decisions.\n\n## Planning Phase\n1. Assess your roof condition and orientation\n2. Check for shading from trees or buildings\n3. Obtain necessary permits from local authorities\n\n## Installation Steps\n1. Install mounting rails on the roof\n2. Secure solar panels to the mounting system\n3. Wire panels in series or parallel configuration\n4. Connect to charge controller\n5. Connect batteries\n6. Connect inverter\n7. Test the entire system\n\n## Safety Considerations\n- Always work with a certified electrician\n- Use proper safety gear when working on roofs\n- Ensure all connections are weatherproofed\n\n## Post-Installation\n- Register your system for monitoring\n- Schedule annual maintenance checks\n- Keep panels clean for optimal performance\n\nNeed professional installation? Contact our partner companies for a quote.`,
+      imageUrl: "/images/power-1.jpg",
+      isPublished: true,
+      publishedAt: new Date("2026-03-20"),
+      categoryId: createdBlogCategories[2].id,
+      companyId: createdCompanies[2].id,
+      authorId: adminUser.id,
+    },
+    {
+      title: "Battery Technology: Lithium vs GEL vs Lead Acid",
+      slug: "battery-technology-comparison",
+      excerpt: "Compare the three main battery types used in solar energy storage systems.",
+      content: `Choosing the right battery technology can significantly impact your solar system's performance and total cost of ownership.\n\n## Lithium Iron Phosphate (LiFePO4)\n- 5,000+ charge cycles\n- 95% depth of discharge\n- Lightweight and compact\n- Higher upfront cost but lowest cost per cycle\n- 10+ year lifespan\n\n## GEL Batteries\n- 1,200-1,500 charge cycles\n- 50% recommended depth of discharge\n- Maintenance-free\n- Good for moderate budgets\n- 3-5 year lifespan\n\n## Lead Acid (Flooded)\n- 500-1,000 charge cycles\n- 50% depth of discharge\n- Requires regular maintenance\n- Lowest upfront cost\n- 2-4 year lifespan\n\n## The Verdict\nFor long-term value, lithium batteries are the clear winner despite the higher initial cost. For budget-conscious buyers, GEL batteries offer a good middle ground.\n\nExplore our battery selection to find the right fit for your budget and needs.`,
+      imageUrl: "/images/power-2.jpg",
+      isPublished: true,
+      publishedAt: new Date("2026-03-25"),
+      categoryId: createdBlogCategories[3].id,
+      companyId: createdCompanies[1].id,
+      authorId: adminUser.id,
+    },
+    {
+      title: "Upcoming: Solar Incentives and Government Programs",
+      slug: "upcoming-solar-incentives",
+      excerpt: "Preview of upcoming government solar incentive programs for Nigerian households.",
+      content: `Stay tuned for exciting updates on government programs designed to make solar energy more accessible...\n\nThis article is currently being prepared and will be published soon.`,
+      imageUrl: "/images/power-7.jpg",
+      isPublished: false,
+      categoryId: createdBlogCategories[1].id,
+      authorId: adminUser.id,
+    },
+  ];
+
+  for (const blog of blogDefs) {
+    await prisma.blog.create({ data: blog });
+  }
+
+  console.log(`  ✅ ${blogDefs.length} blogs created (${blogDefs.filter(b => b.isPublished).length} published)`);
+
   console.log("\n🎉 Seed completed successfully!");
 }
 
