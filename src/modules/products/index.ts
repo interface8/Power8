@@ -9,7 +9,7 @@ export {
   updateProductSchema,
   productFiltersSchema,
 } from "./validation";
-// export * as productService from "./service";
-// export * as productRepository from "./repository";
+export * as productService from "./service";
+export * as productRepository from "./repository";
 export * from "./client";
 export type { Product } from "@/types/products"
