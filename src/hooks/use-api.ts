@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface UseApiOptions {
   onSuccess?: () => void;
@@ -9,7 +9,7 @@ export function useApi<T = unknown>() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  const fetchData = async (
+  const fetchData = useCallback(async (
     url: string,
     options?: RequestInit
   ): Promise<{ data: T | null; error: string | null }> => {
@@ -34,9 +34,9 @@ export function useApi<T = unknown>() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const clearError = () => setError("");
+  const clearError = useCallback(() => setError(""), []);
 
   return {
     fetchData,
@@ -49,17 +49,19 @@ export function useApi<T = unknown>() {
 export function useQuery<T = unknown>(url: string, options?: UseApiOptions) {
   const [data, setData] = useState<T | null>(null);
   const { fetchData, loading, error, clearError } = useApi<T>();
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
-  const refetch = async () => {
+  const refetch = useCallback(async () => {
     const result = await fetchData(url);
     if (result.data) {
       setData(result.data);
-      options?.onSuccess?.();
+      optionsRef.current?.onSuccess?.();
     } else if (result.error) {
-      options?.onError?.(result.error);
+      optionsRef.current?.onError?.(result.error);
     }
     return result;
-  };
+  }, [fetchData, url]);
 
   return {
     data,
