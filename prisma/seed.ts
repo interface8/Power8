@@ -26,6 +26,11 @@ async function main() {
     { resource: "permissions", action: "read", description: "View permissions" },
     { resource: "permissions", action: "update", description: "Update permissions" },
     { resource: "permissions", action: "delete", description: "Delete permissions" },
+    // Bundles
+    { resource: "bundles", action: "create", description: "Create bundles" },
+    { resource: "bundles", action: "update", description: "Update bundles" },
+    // Systems
+    { resource: "systems", action: "control", description: "Control solar systems" },
   ];
 
   const permissions = [];

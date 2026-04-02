@@ -66,6 +66,7 @@ export async function updateSystemStatus(
   id: string,
   status: "ACTIVE" | "LIMITED" | "DISABLED",
   action: "ENABLE" | "LIMIT" | "DISABLE",
+  actorId: string,
 ): Promise<SolarSystemDto> {
   const system = await prisma.$transaction(async (tx) => {
     // Log the control action

@@ -62,17 +62,17 @@ export async function findCreditById(id: string): Promise<CreditAccountDto | nul
 }
 
 export async function createCredit(input: ApplyCreditInput, totalAmount: number): Promise<CreditAccountDto> {
-  const monthlyAmount = totalAmount / input.durationMonths;
+  const monthlyAmount = Math.round((totalAmount / input.durationMonths) * 100) / 100;
 
   // Generate payment schedules — one per month starting from next month
+  const now = new Date();
+  let runningTotal = 0;
   const schedules = Array.from({ length: input.durationMonths }, (_, i) => {
-    const dueDate = new Date();
-    dueDate.setMonth(dueDate.getMonth() + i + 1);
-    dueDate.setDate(1); // Due on the 1st of each month
-    return {
-      dueDate,
-      amountDue: Math.round(monthlyAmount * 100) / 100,
-    };
+    const dueDate = new Date(now.getFullYear(), now.getMonth() + i + 1, 1);
+    const isLast = i === input.durationMonths - 1;
+    const amountDue = isLast ? Math.round((totalAmount - runningTotal) * 100) / 100 : monthlyAmount;
+    runningTotal += amountDue;
+    return { dueDate, amountDue };
   });
 
   const credit = await prisma.creditAccount.create({

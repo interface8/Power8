@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { bundleService, updateBundleSchema } from "@/modules/bundles";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermission, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/bundles/:id — public
@@ -25,7 +25,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermission("bundles.update");
   if (isErrorResponse(guard)) return guard;
 
   try {

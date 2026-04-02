@@ -12,5 +12,4 @@ export interface PaymentDto {
 
 export interface InitiatePaymentInput {
   orderId: string;
-  amount: number;
 }

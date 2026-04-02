@@ -14,6 +14,28 @@ export async function initiatePayment(
   if (!order) throw new Error("Order not found");
   if (order.userId !== userId) throw new Error("Order not found");
 
+  // Derive the payable amount server-side
+  let amount: number;
+
+  const credit = await prisma.creditAccount.findUnique({
+    where: { orderId: input.orderId },
+    include: {
+      schedules: {
+        where: { status: "PENDING" },
+        orderBy: { dueDate: "asc" },
+        take: 1,
+      },
+    },
+  });
+
+  if (credit && credit.schedules.length > 0) {
+    // Credit order: use the next scheduled payment amount
+    amount = credit.schedules[0].amountDue.toNumber();
+  } else {
+    // Full payment: use the order total
+    amount = order.totalAmount.toNumber();
+  }
+
   // Generate a unique payment reference
   const reference = `PAY-${randomUUID()}`;
 
@@ -21,7 +43,7 @@ export async function initiatePayment(
   const payment = await paymentRepo.createPayment({
     userId,
     orderId: input.orderId,
-    amount: input.amount,
+    amount,
     reference,
     status: "FAILED",
   });
@@ -36,66 +58,83 @@ export async function initiatePayment(
 }
 
 export async function handleWebhook(reference: string) {
-  // Find the payment by reference
-  const existing = await paymentRepo.findPaymentByReference(reference);
-  if (!existing) throw new Error("Payment not found");
-
-  if (existing.status === "SUCCESS") {
-    throw new Error("Payment already processed");
-  }
-
-  // Mark payment as successful
-  const payment = await paymentRepo.markPaymentSuccess(reference);
-
-  // If this order has a credit account, update the balance
-  const credit = await prisma.creditAccount.findUnique({
-    where: { orderId: payment.orderId },
-  });
-
-  if (credit) {
-    const newBalance = credit.balanceRemaining.toNumber() - payment.amount;
-
-    await prisma.creditAccount.update({
-      where: { id: credit.id },
-      data: {
-        balanceRemaining: Math.max(newBalance, 0),
-        status: newBalance <= 0 ? "COMPLETED" : "ACTIVE",
-      },
+  return prisma.$transaction(async (tx) => {
+    // Atomically mark payment as SUCCESS only if it's currently FAILED
+    const updated = await tx.payment.updateMany({
+      where: { reference, status: "FAILED" },
+      data: { status: "SUCCESS", paidAt: new Date() },
     });
 
-    // Mark the next PENDING schedule as PAID
-    const nextSchedule = await prisma.paymentSchedule.findFirst({
-      where: {
-        creditAccountId: credit.id,
-        status: "PENDING",
-      },
-      orderBy: { dueDate: "asc" },
+    // If no rows updated, either not found or already processed
+    if (updated.count === 0) {
+      const existing = await tx.payment.findUnique({ where: { reference } });
+      if (!existing) throw new Error("Payment not found");
+      throw new Error("Payment already processed");
+    }
+
+    const payment = await tx.payment.findUnique({ where: { reference } });
+    if (!payment) throw new Error("Payment not found");
+
+    const amount = payment.amount.toNumber();
+
+    // If this order has a credit account, update the balance
+    const credit = await tx.creditAccount.findUnique({
+      where: { orderId: payment.orderId },
     });
 
-    if (nextSchedule) {
-      await prisma.paymentSchedule.update({
-        where: { id: nextSchedule.id },
-        data: { status: "PAID" },
+    if (credit) {
+      const newBalance = credit.balanceRemaining.toNumber() - amount;
+
+      await tx.creditAccount.update({
+        where: { id: credit.id },
+        data: {
+          balanceRemaining: Math.max(newBalance, 0),
+          status: newBalance <= 0 ? "COMPLETED" : "ACTIVE",
+        },
+      });
+
+      // Mark the next PENDING schedule as PAID
+      const nextSchedule = await tx.paymentSchedule.findFirst({
+        where: {
+          creditAccountId: credit.id,
+          status: "PENDING",
+        },
+        orderBy: { dueDate: "asc" },
+      });
+
+      if (nextSchedule) {
+        await tx.paymentSchedule.update({
+          where: { id: nextSchedule.id },
+          data: { status: "PAID" },
+        });
+      }
+    }
+
+    // Update order status
+    if (credit) {
+      await tx.order.updateMany({
+        where: { id: payment.orderId, status: "PENDING" },
+        data: { status: "ACTIVE" },
+      });
+    } else {
+      await tx.order.updateMany({
+        where: { id: payment.orderId, status: "PENDING" },
+        data: { status: "COMPLETED" },
       });
     }
-  }
 
-  // Update order status
-  if (credit) {
-    // Credit order: activate it (stays ACTIVE until fully paid)
-    await prisma.order.updateMany({
-      where: { id: payment.orderId, status: "PENDING" },
-      data: { status: "ACTIVE" },
-    });
-  } else {
-    // Full payment: straight to COMPLETED
-    await prisma.order.updateMany({
-      where: { id: payment.orderId, status: "PENDING" },
-      data: { status: "COMPLETED" },
-    });
-  }
-
-  return payment;
+    return {
+      id: payment.id,
+      userId: payment.userId,
+      orderId: payment.orderId,
+      amount,
+      status: "SUCCESS" as const,
+      reference: payment.reference,
+      paidAt: payment.paidAt,
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
+    };
+  });
 }
 
 export async function getPaymentsByOrderId(orderId: string, userId: string) {

@@ -11,23 +11,23 @@ export async function getSystemById(id: string, userId: string) {
   return system;
 }
 
-export async function enableSystem(id: string) {
+export async function enableSystem(id: string, actorId: string) {
   const system = await systemRepo.findSystemById(id);
   if (!system) throw new Error("System not found");
   if (system.status === "ACTIVE") throw new Error("System is already active");
-  return systemRepo.updateSystemStatus(id, "ACTIVE", "ENABLE");
+  return systemRepo.updateSystemStatus(id, "ACTIVE", "ENABLE", actorId);
 }
 
-export async function limitSystem(id: string) {
+export async function limitSystem(id: string, actorId: string) {
   const system = await systemRepo.findSystemById(id);
   if (!system) throw new Error("System not found");
   if (system.status === "LIMITED") throw new Error("System is already limited");
-  return systemRepo.updateSystemStatus(id, "LIMITED", "LIMIT");
+  return systemRepo.updateSystemStatus(id, "LIMITED", "LIMIT", actorId);
 }
 
-export async function disableSystem(id: string) {
+export async function disableSystem(id: string, actorId: string) {
   const system = await systemRepo.findSystemById(id);
   if (!system) throw new Error("System not found");
   if (system.status === "DISABLED") throw new Error("System is already disabled");
-  return systemRepo.updateSystemStatus(id, "DISABLED", "DISABLE");
+  return systemRepo.updateSystemStatus(id, "DISABLED", "DISABLE", actorId);
 }
