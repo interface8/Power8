@@ -37,6 +37,23 @@ enum ScheduleStatus {
   OVERDUE
 }
 
+enum PaymentStatus {
+  SUCCESS
+  FAILED
+}
+
+enum SystemStatus {
+  ACTIVE
+  LIMITED
+  DISABLED
+}
+
+enum ControlAction {
+  ENABLE
+  LIMIT
+  DISABLE
+}
+
 // ─── Models ──────────────────────────────────────────────
 
 model Company {
@@ -101,6 +118,9 @@ model Order {
 
   user        User        @relation(fields: [userId], references: [id])
   items       OrderItem[]
+  payments    Payment[]
+  solarSystems  SolarSystem[]
+
 
   credit CreditAccount?
 
@@ -154,6 +174,68 @@ model PaymentSchedule {
   @@map("payment_schedules")
 }
 
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String
+  orderId   String
+  amount    Decimal       @db.Decimal(10, 2)
+  status    PaymentStatus
+  reference String        @unique
+  paidAt    DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  user      User  @relation(fields: [userId], references: [id])
+  order     Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model SolarSystem {
+  id        String       @id @default(cuid())
+  userId    String
+  orderId   String
+  bundleId  String
+  status    SystemStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user      User          @relation(fields: [userId], references: [id])
+  order     Order         @relation(fields: [orderId], references: [id])
+  bundle    ProductBundle @relation(fields: [bundleId], references: [id])
+  logs      SystemControlLog[]
+  savings   UserSaving[]
+
+
+  @@map("solar_systems")
+}
+
+model SystemControlLog {
+  id        String        @id @default(cuid())
+  systemId  String
+  action    ControlAction
+  createdAt DateTime      @default(now())
+
+  system    SolarSystem @relation(fields: [systemId], references: [id])
+
+  @@map("system_control_logs")
+}
+
+
+model UserSaving {
+  id                     String      @id @default(cuid())
+  userId                 String
+  systemId               String
+  estimatedAnnualSavings Decimal?    @db.Decimal(10, 2)
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+
+  user                   User        @relation(fields: [userId], references: [id])
+  system                 SolarSystem @relation(fields: [systemId], references: [id])
+
+  @@map("user_savings")
+}
+
 
 model Cart {
   id        String     @id @default(cuid())
@@ -190,6 +272,8 @@ model ProductBundle {
 
   items            BundleItem[]
   orderItems       OrderItem[]
+  solarSystems     SolarSystem[]
+
 
   @@map("product_bundles")
 }
@@ -222,6 +306,11 @@ model User {
   solarCalculations SolarCalculation[]
   blogs             Blog[]
   orders            Order[]
+  payments          Payment[]
+  solarSystems      SolarSystem[]
+  savings           UserSaving[]
+
+
 
   @@map("users")
 }
