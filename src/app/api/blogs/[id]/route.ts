@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { blogService, updateBlogSchema } from "@/modules/blogs";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermission, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 interface RouteParams {
@@ -22,9 +22,9 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// PUT /api/blogs/:id — update (auth required)
+// PUT /api/blogs/:id — update (admin)
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermission("blogs.update");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -52,9 +52,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// DELETE /api/blogs/:id — delete (auth required)
+// DELETE /api/blogs/:id — delete (admin)
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermission("blogs.delete");
   if (isErrorResponse(guard)) return guard;
 
   try {

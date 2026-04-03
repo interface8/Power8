@@ -25,7 +25,8 @@ export function useCarouselSlides() {
 
   useEffect(() => {
     refetch();
-  }, [refetch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     slides: data ?? [],
