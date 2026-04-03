@@ -75,6 +75,7 @@ export default function ApplianceList({
                     width={40}
                     height={40}
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover border"
+                    unoptimized
                   />
                 )}
                 <div className="flex-1 min-w-0">
