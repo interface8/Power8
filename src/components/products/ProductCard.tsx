@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
 import React from "react";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@/types/products";
+import Link from "next/link";
 
 type Props = {
   product: Product;
@@ -48,7 +49,10 @@ const ProductCard = ({ product, onAddToCart }: Props) => {
         <div className="text-[11px] text-gray-500 mt-2 space-y-1">
           {product.capacity > 0 && <p>Capacity: {product.capacity}</p>}
           {product.warranty > 0 && (
-            <p>Warranty: {product.warranty} {product.warranty === 1 ? "year" : "years"}</p>
+            <p>
+              Warranty: {product.warranty}{" "}
+              {product.warranty === 1 ? "year" : "years"}
+            </p>
           )}
           {product.companyName && <p>Brand: {product.companyName}</p>}
         </div>
@@ -61,7 +65,9 @@ const ProductCard = ({ product, onAddToCart }: Props) => {
           <p className="text-lg font-bold text-orange-500">
             ₦{product.price.toLocaleString()}
           </p>
-          <p className="text-[12px] text-gray-400">Stock: {product.stockQuantity}</p>
+          <p className="text-[12px] text-gray-400">
+            Stock: {product.stockQuantity}
+          </p>
         </div>
 
         {/* Button */}
@@ -73,6 +79,13 @@ const ProductCard = ({ product, onAddToCart }: Props) => {
           <ShoppingCart size={16} />
           {product.stockQuantity === 0 ? "Out of Stock" : "Add to Cart"}
         </button>
+        <Link
+          href={`/products/${product.id}`}
+          className="w-full bg-gray-300 hover:bg-gray-400 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-3 transition"
+        >
+          <ShoppingCart size={16} />
+          View Details
+        </Link>
 
         {/* Bottom spacing */}
         <div className="mt-2" />

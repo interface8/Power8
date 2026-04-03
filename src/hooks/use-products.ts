@@ -42,6 +42,6 @@ export function useProducts(filters?: ProductFilters) {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
+ 
   return { products, loading, error, fetchProducts };
 }
