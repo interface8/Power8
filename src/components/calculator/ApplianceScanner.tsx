@@ -193,6 +193,7 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
             >
               <X size={14} />
             </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
               alt="Appliance label"

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Trash2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,9 +69,11 @@ export default function ApplianceList({
                 className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl border bg-white hover:bg-gray-50 hover:shadow-sm transition-all"
               >
                 {a.imageUrl && (
-                  <img
+                  <Image
                     src={a.imageUrl}
                     alt={a.name}
+                    width={40}
+                    height={40}
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover border"
                   />
                 )}

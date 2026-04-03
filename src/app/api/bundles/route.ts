@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { bundleService, createBundleSchema } from "@/modules/bundles";
-import { requireApiAuth, requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermission, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/bundles — public

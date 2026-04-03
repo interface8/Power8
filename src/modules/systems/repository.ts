@@ -74,6 +74,7 @@ export async function updateSystemStatus(
       data: {
         systemId: id,
         action,
+        actorId,
       },
     });
 

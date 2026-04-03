@@ -28,6 +28,7 @@ export function useTestimonials() {
   // Fetch testimonials on mount
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -55,6 +56,7 @@ export function useTestimonialStats() {
   // Fetch testimonial stats on mount
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
