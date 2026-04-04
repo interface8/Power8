@@ -1,87 +1,58 @@
+import { PaymentProgressCard } from "@/components/dashboard/PaymentProgressCard";
+import { PaymentStatusCard } from "@/components/dashboard/PaymentStatusCard";
+import { QuickActionsCard } from "@/components/dashboard/QuickActionCard";
+import { SystemInfoCard } from "@/components/dashboard/SystemInfoCard";
+import { UpcomingPaymentsCard } from "@/components/dashboard/UpcomingPaymentCard";
+import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { getCurrentUser } from "@/lib/auth";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
-export default async function DashboardPage() {
+
+
+export default async function SolarDashboardPage() {
   const user = await getCurrentUser();
 
+  const systemData = {
+    systemId: "SYS-001",
+    installDate: "2026-01-15",
+    address: "45 Lekki Phase 1, Lagos",
+  };
+
+  const products = [
+    {
+      name: "Solar Panel 300W",
+      qty: 4,
+    },
+    {
+      name: "Inverter 2000W",
+      qty: 1,
+    },
+    {
+      name: "Battery 150Ah",
+      qty: 2,
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard Fatai</h1>
-        <p className="text-muted-foreground">
-          Welcome back, {user?.name}
-        </p>
+    <div className="space-y-10">
+      <WelcomeHeader name={user?.name} />
+
+      <div className="grid gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-8 space-y-6">
+          <SystemInfoCard
+            systemId={systemData.systemId}
+            installDate={systemData.installDate}
+            address={systemData.address}
+            products={products}
+          />
+        </div>
+        <div className="lg:col-span-4 space-y-6">
+          <PaymentStatusCard />
+          <QuickActionsCard/>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Welcome</CardDescription>
-            <CardTitle className="text-lg">{user?.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">{user?.email}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Roles</CardDescription>
-            <CardTitle className="text-lg">
-              {user?.roles.join(", ") || "None assigned"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              {user?.roles.length ?? 0} role(s) assigned
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Permissions</CardDescription>
-            <CardTitle className="text-lg">
-              {user?.permissions.length ?? 0}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              Total active permissions
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Permissions</CardTitle>
-          <CardDescription>
-            All permissions assigned to your account through roles
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {user?.permissions.map((perm) => (
-              <Badge key={perm} variant="secondary">
-                {perm}
-              </Badge>
-            ))}
-            {(!user?.permissions || user.permissions.length === 0) && (
-              <p className="text-sm text-muted-foreground">
-                No permissions assigned.
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <PaymentProgressCard />
+      <UpcomingPaymentsCard />
     </div>
   );
 }
