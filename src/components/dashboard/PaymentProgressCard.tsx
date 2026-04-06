@@ -12,8 +12,8 @@ const paymentProgress = {
 export function PaymentProgressCard() {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-green-950">
+      <CardHeader className="pb-10">
+        <CardTitle className="text-lg sm:text-2xl font-semibold text-green-950">
           Payment progress
         </CardTitle>
       </CardHeader>
@@ -34,22 +34,22 @@ export function PaymentProgressCard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-green-50 rounded-2xl p-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 pt-8 gap-4 md:gap-6">
+          <div className="bg-green-50 rounded-2xl p-6 md:p-7 flex flex-col">
             <p className="text-sm text-muted-foreground">Total Paid</p>
-            <p className="text-2xl font-bold text-green-700 mt-1">
+            <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-auto">
               {paymentProgress.totalPaid}
             </p>
           </div>
-          <div className="bg-orange-50 rounded-2xl p-5">
+          <div className="bg-orange-50 rounded-2xl p-6 md:p-7 flex flex-col">
             <p className="text-sm text-muted-foreground">Remaining Balance</p>
-            <p className="text-2xl font-bold text-orange-500 mt-1">
+            <p className="text-2xl sm:text-3xl font-bold text-orange-600 mt-auto">
               {paymentProgress.remainingBalance}
             </p>
           </div>
-          <div className="bg-blue-50 rounded-2xl p-5">
+          <div className="bg-blue-50 rounded-2xl p-6 md:p-7 flex flex-col">
             <p className="text-sm text-muted-foreground">Total System Cost</p>
-            <p className="text-2xl font-bold text-blue-700 mt-1">
+            <p className="text-2xl sm:text-3xl font-bold text-blue-600 mt-auto">
               {paymentProgress.totalSystemCost}
             </p>
           </div>

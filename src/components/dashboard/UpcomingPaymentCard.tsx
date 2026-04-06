@@ -11,22 +11,23 @@ const upcomingPayments = [
 export function UpcomingPaymentsCard() {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-green-950">
+      <CardHeader className="p-8">
+        <CardTitle className="text-xl sm:text-2xl font-bold text-green-950">
           Upcoming Payments
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-8 pb-8 space-y-3">
+
+      <CardContent className="px-5 sm:px-6 md:px-8 pb-8 space-y-3">
         {upcomingPayments.map((payment) => (
           <div
             key={payment.id}
-            className={`flex items-center justify-between p-5 rounded-2xl border ${
+            className={`flex items-center justify-between p-5 sm:p-6 rounded-2xl border ${
               payment.isDueSoon
-                ? "border-orange-200 bg-orange-50"
+                ? "border-2 border-orange-400 bg-orange-50"
                 : "border-gray-100 bg-white"
             }`}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div>
                 {" "}
                 <Calendar
@@ -37,15 +38,15 @@ export function UpcomingPaymentsCard() {
                 />
               </div>
               <div>
-                <p className="font-medium text-green-950">
+                <p className="font-medium text-md sm:text-xl text-green-950">
                   Payment #{payment.id}
                 </p>
-                <p className="text-sm text-muted-foreground">{payment.date}</p>
+                <p className="text-sm  text-gray-900">{payment.date}</p>
               </div>
             </div>
 
             <div className="text-right">
-              <p className="font-bold text-lg">{payment.amount}</p>
+              <p className="font-semibold text-base sm:text-lg">{payment.amount}</p>
               {payment.isDueSoon && (
                 <Badge className="bg-orange-500 text-white text-xs mt-1">
                   Due Soon

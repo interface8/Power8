@@ -10,13 +10,13 @@ const paymentData = {
 export function PaymentStatusCard() {
   return (
     <Card>
-            <CardHeader className="pb-6">
-              <CardTitle className="text-lg font-semibold text-green-950">
+            <CardHeader className="pb-10">
+              <CardTitle className="text-lg sm:text-xl   text-green-950">
                 Payment Status
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-8 px-8 pb-4">
+            <CardContent className="space-y-8 px-8 pb-6">
               <div className="flex justify-center">
                 <Badge className="bg-green-500 text-white font-bold text-lg px-5 py-2.5 rounded-xl">
                   {paymentData.status}
@@ -24,7 +24,7 @@ export function PaymentStatusCard() {
               </div>
 
               {/* Payment Details */}
-              <div className="space-y-6">
+              <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-muted-foreground">
                     Monthly Payment:
