@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Product, ProductFilters } from "@/types/products";
-import { ca } from "zod/v4/locales";
 import { ProductDto } from "@/modules/products";
 
 export function useProducts(filters?: ProductFilters) {
@@ -53,7 +52,7 @@ export function useProductDetails(productId: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-   const fetchProductDetails = useCallback(async (productId: string) => {
+   const fetchProductDetails = useCallback(async () => {
     setLoading(true);
     setError("");
 
@@ -76,8 +75,8 @@ export function useProductDetails(productId: string) {
    }, [productId]);
 
    useEffect(() => {
-     fetchProductDetails(productId);
-   }, []);
+     fetchProductDetails();
+   }, [fetchProductDetails]);
 
    return { product, loading, error, fetchProductDetails };
 }
