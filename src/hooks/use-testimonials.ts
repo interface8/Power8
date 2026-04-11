@@ -16,18 +16,22 @@ export interface Testimonial {
 }
 
 export function useTestimonials() {
-  const { data, loading, error, refetch, clearError } = useQuery<Testimonial[]>("/api/testimonials", {
-    onSuccess: () => {
-      console.log("Testimonials fetched successfully");
+  const { data, loading, error, refetch, clearError } = useQuery<Testimonial[]>(
+    "/api/testimonials",
+    {
+      onSuccess: () => {
+        console.log("Testimonials fetched successfully");
+      },
+      onError: (error) => {
+        console.error("Failed to fetch testimonials:", error);
+      },
     },
-    onError: (error) => {
-      console.error("Failed to fetch testimonials:", error);
-    },
-  });
+  );
 
   // Fetch testimonials on mount
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -40,21 +44,22 @@ export function useTestimonials() {
 }
 
 export function useTestimonialStats() {
-  const { data, loading, error, refetch, clearError } = useQuery<{ totalTestimonials: number; averageRating: number }>(
-    "/api/testimonials/stats",
-    {
-      onSuccess: () => {
-        console.log("Testimonial stats fetched successfully");
-      },
-      onError: (error) => {
-        console.error("Failed to fetch testimonial stats:", error);
-      },
-    }
-  );
+  const { data, loading, error, refetch, clearError } = useQuery<{
+    totalTestimonials: number;
+    averageRating: number;
+  }>("/api/testimonials/stats", {
+    onSuccess: () => {
+      console.log("Testimonial stats fetched successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to fetch testimonial stats:", error);
+    },
+  });
 
   // Fetch testimonial stats on mount
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

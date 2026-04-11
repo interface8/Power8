@@ -214,6 +214,7 @@ model SystemControlLog {
   id        String        @id @default(cuid())
   systemId  String
   action    ControlAction
+  actorId   String?
   createdAt DateTime      @default(now())
 
   system    SolarSystem @relation(fields: [systemId], references: [id])

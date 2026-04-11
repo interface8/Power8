@@ -6,11 +6,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { TrendingUp, Calculator, ShoppingBag } from "lucide-react";
+import { TrendingUp, Calculator, ShoppingBag, Star } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
 import Image from "next/image";
 import { useCarouselSlides } from "@/hooks/use-carousel";
+import { useTestimonialStats } from "@/hooks/use-testimonials";
 
 const fallbackSlides = [
   {
@@ -41,6 +42,9 @@ export default function Hero() {
           description: s.description ?? "",
         }))
       : fallbackSlides;
+
+  const { stats, loading } = useTestimonialStats();
+
   return (
     <section className="w-full bg-orange-50 py-40">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 xl:grid-cols-2 gap-12 items-center">
@@ -86,8 +90,8 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-center gap-4 sm:gap-8 pt-2  pr-4 pb-4">
             <div className="text-left md:text-left">
-              <p className="text-2xl md:text-xl font-semibold text-gray-800">
-                5,000+
+              <p className="text-2xl md:text-3xl font-semibold text-gray-800">
+                {loading ? "..." : `${stats.totalTestimonials}+`}
               </p>
               <p className="text-sm text-gray-500">Happy Customers</p>
             </div>
@@ -95,16 +99,29 @@ export default function Hero() {
             <div className="hidden md:block h-12 border-l border-gray-300 mx-4"></div>
 
             <div className="text-left md:text-left">
-              <p className="text-2xl md:text-xl font-semibold text-gray-800">
+              <p className="text-2xl md:text-3xl font-semibold text-gray-800">
                 98%
               </p>
               <p className="text-sm text-gray-500">Satisfaction Rate</p>
             </div>
 
             <div className="hidden md:block h-12 border-l border-gray-300 mx-4"></div>
-            <div className="text-left md:text-left flex items-center  justify-start">
-              <p className="text-yellow-500 text-lg">⭐⭐⭐⭐⭐</p>
-              <p className="text-xs text-gray-500 ml-2">(2,847)</p>
+
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-5 h-5 ${
+                    star <= Math.floor(stats.averageRating)
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                />
+              ))}
+
+              <p className="text-xs text-gray-500 ml-2">
+                ({loading ? "..." : stats.totalTestimonials.toLocaleString()})
+              </p>
             </div>
           </div>
         </div>

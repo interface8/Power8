@@ -29,6 +29,24 @@ async function main() {
     // Bundles
     { resource: "bundles", action: "create", description: "Create bundles" },
     { resource: "bundles", action: "update", description: "Update bundles" },
+    // Companies
+    { resource: "companies", action: "create", description: "Create companies" },
+    { resource: "companies", action: "update", description: "Update companies" },
+    { resource: "companies", action: "delete", description: "Delete companies" },
+    // Products
+    { resource: "products", action: "create", description: "Create products" },
+    { resource: "products", action: "update", description: "Update products" },
+    { resource: "products", action: "delete", description: "Delete products" },
+    // Blogs
+    { resource: "blogs", action: "create", description: "Create blogs" },
+    { resource: "blogs", action: "update", description: "Update blogs" },
+    { resource: "blogs", action: "delete", description: "Delete blogs" },
+    // Blog Categories
+    { resource: "blog-categories", action: "create", description: "Create blog categories" },
+    // Product Categories
+    { resource: "product-categories", action: "create", description: "Create product categories" },
+    { resource: "product-categories", action: "update", description: "Update product categories" },
+    { resource: "product-categories", action: "delete", description: "Delete product categories" },
     // Systems
     { resource: "systems", action: "control", description: "Control solar systems" },
   ];

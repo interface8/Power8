@@ -7,12 +7,12 @@ export default function CartNavbar() {
   return (
     <nav className="fixed top-0 left-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <div className="bg-orange-500 p-2 rounded-xl shadow">
             <Sun className="text-white" size={30} />
           </div>
           <span className="text-xl text-orange-600 font-bold">Power - 8</span>
-        </div>
+        </Link>
 
         <div className="hidden md:flex items-center gap-4">
           <Link
