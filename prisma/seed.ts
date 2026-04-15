@@ -478,6 +478,86 @@ const viewerUser = await prisma.user.upsert({
 
   console.log(`  ✅ ${blogDefs.length} blogs created (${blogDefs.filter(b => b.isPublished).length} published)`);
 
+  // ─── 12. Create Testimonials ────────────────────────────────
+  const customerUser = await prisma.user.upsert({
+    where: { email: "customer@power8.dev" },
+    update: {},
+    create: {
+      email: "customer@power8.dev",
+      phone: "+234800000000",
+      password: await hash("customer123", 12),
+      name: "Demo Customer",
+      isActive: true,
+    },
+  });
+
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId: customerUser.id,
+        roleId: customerRole.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: customerUser.id,
+      roleId: customerRole.id,
+    },
+  });
+
+  console.log("  ✅ Demo customer user created (customer@power8.dev / customer123)");
+
+  const testimonialDefs = [
+  {
+    title: "Adeola Ogunlesi",
+    description: "Since installing Power-8, my electricity bills have dropped by 80%. The pay-small-small option made it affordable. Best investment I've made for my home!",
+    rating: 5,
+    imageUrl: "https://randomuser.me/api/portraits/women/1.jpg",
+    userId: customerUser.id,
+  },
+  {
+    title: "Chidi Okonkwo",
+    description: "No more generator noise or fuel costs. My family enjoys 24/7 power and the installation was seamless. Highly recommend Power-8!",
+    rating: 5,
+    imageUrl: "https://randomuser.me/api/portraits/men/2.jpg",
+    userId: customerUser.id,
+  },
+  {
+    title: "Fatima Abubakar",
+    description: "The credit plan made it affordable. I'm saving money every month while helping the environment. Customer service is exceptional!",
+    rating: 4,
+    imageUrl: "https://randomuser.me/api/portraits/women/3.jpg",
+    userId: customerUser.id,
+  },
+  {
+    title: "Oluwaseun Adeyemi",
+    description: "Power-8 transformed my small business. No more power outages affecting my work. The installation team was professional and efficient.",
+    rating: 5,
+    imageUrl: "https://randomuser.me/api/portraits/men/4.jpg",
+    userId: customerUser.id,
+  },
+  {
+    title: "Ngozi Eze",
+    description: "Finally, reliable power! The system works perfectly and the app makes it easy to monitor my usage. Worth every naira.",
+    rating: 5,
+    imageUrl: "https://randomuser.me/api/portraits/women/5.jpg",
+    userId: customerUser.id,
+  },
+  {
+    title: "Ibrahim Musa",
+    description: "Best decision I made. My generator hasn't run in 6 months. The savings have already paid for half the system.",
+    rating: 5,
+    imageUrl: "https://randomuser.me/api/portraits/men/6.jpg",
+    userId: customerUser.id,
+  },
+];
+
+  for (const testimonial of testimonialDefs) {
+    await prisma.testimonial.create({ data: testimonial });
+  }
+
+  console.log(`  ✅ ${testimonialDefs.length} testimonials created`);
+
   console.log("\n🎉 Seed completed successfully!");
 }
 
