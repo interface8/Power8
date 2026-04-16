@@ -24,12 +24,12 @@ export default function TestimonialCard({
   imageUrl,
 }: TestimonialCardProps) {
   return (
-    <Card className=" w-full max-w-[420px] h-full hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden">
-      <CardContent className="pt-10 pb-6 px-7 py-10 ">
+    <Card className="w-full max-w-[420px] h-full hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden flex flex-col">
+      <CardContent className="pt-10 pb-6 px-7 flex-1">
         {/* Quote Icon + Stars */}
-        <div className="flex  mb-15">
+        <div className="flex mb-15">
           <Quote className="text-orange-200 w-9 h-9 shrink-0" />
-          <div className="flex  mt-2">
+          <div className="flex mt-2">
             {[...Array(5)].map((_, index) => (
               <Star
                 key={index}
@@ -44,7 +44,7 @@ export default function TestimonialCard({
         </div>
 
         {/* Testimonial Quote */}
-        <p className="text-gray-700 text-[16px] leading-relaxed mb-8 min-h-30 pb-5">
+        <p className="text-gray-700 text-[16px] leading-relaxed mb-8 pb-5">
           {quote}
         </p>
 
