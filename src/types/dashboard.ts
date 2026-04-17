@@ -1,5 +1,3 @@
-// src/types/dashboard.ts
-
 export interface SolarSystem {
   id: string;
   userId: string;

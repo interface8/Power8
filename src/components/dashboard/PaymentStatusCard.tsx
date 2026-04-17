@@ -12,7 +12,7 @@ interface PaymentData {
 
 interface PaymentStatusCardProps {
   paymentData?: PaymentData;
-  systemStatus?: "ACTIVE" | "LIMITED" | "DISABLED"; // ← New prop
+  systemStatus?: "ACTIVE" | "LIMITED" | "DISABLED"; 
   isLoading?: boolean;
 }
 
@@ -63,7 +63,7 @@ export function PaymentStatusCard({
       case "DISABLED":
         return (
           <Badge className="bg-red-600 text-white font-semibold text-md px-5 py-3 rounded-lg">
-            INACTIVE
+            Failed
           </Badge>
         );
       default:
