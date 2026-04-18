@@ -41,7 +41,7 @@ export default function RelatedProducts({ categoryId, categoryName, currentProdu
 
         // Filter out the current product
         const filtered = (json.data || []).filter(
-          (product: any) => product.id !== currentProductId
+          (product: { id: string }) => product.id !== currentProductId
         );
         
         setProducts(filtered);

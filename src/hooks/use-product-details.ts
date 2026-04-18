@@ -2,19 +2,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { ProductDto } from "@/modules/products";
 
-
-
 export function useProductDetails(productId: string) {  
   const [product, setProduct] = useState<ProductDto | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-   const fetchProductDetails = useCallback(async (productId: string) => {
+  const fetchProductDetails = useCallback(async () => {
     setLoading(true);
     setError("");
 
     try {
-
       const res = await fetch(`/api/products/${productId}`);
       const json = await res.json();
       if (!res.ok) {
@@ -22,18 +19,16 @@ export function useProductDetails(productId: string) {
         return;
       }
       setProduct(json.data as ProductDto);
-
-    }catch {
+    } catch {
       setError("Failed to fetch product details");
-    }finally{
+    } finally {
       setLoading(false);
     }
+  }, [productId]); // ← Keep productId here (it's used inside)
 
-   }, [productId]);
+  useEffect(() => {
+    fetchProductDetails();
+  }, [fetchProductDetails]); // ← Add fetchProductDetails here
 
-   useEffect(() => {
-     fetchProductDetails(productId);
-   }, []);
-
-   return { product, loading, error, fetchProductDetails };
+  return { product, loading, error, fetchProductDetails };
 }
