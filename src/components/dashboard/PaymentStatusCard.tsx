@@ -63,7 +63,7 @@ export function PaymentStatusCard({
       case "DISABLED":
         return (
           <Badge className="bg-red-600 text-white font-semibold text-md px-5 py-3 rounded-lg">
-            Failed
+            INACTIVE
           </Badge>
         );
       default:
