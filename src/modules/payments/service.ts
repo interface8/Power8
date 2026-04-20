@@ -82,8 +82,10 @@ export async function handleWebhook(reference: string) {
       where: { orderId: payment.orderId },
     });
 
+    let newBalance = 0;
+
     if (credit) {
-      const newBalance = credit.balanceRemaining.toNumber() - amount;
+      newBalance = credit.balanceRemaining.toNumber() - amount;
 
       await tx.creditAccount.update({
         where: { id: credit.id },
@@ -112,11 +114,21 @@ export async function handleWebhook(reference: string) {
 
     // Update order status
     if (credit) {
-      await tx.order.updateMany({
-        where: { id: payment.orderId, status: "PENDING" },
-        data: { status: "ACTIVE" },
-      });
+      if (newBalance <= 0) {
+        // Last payment — mark order as COMPLETED
+        await tx.order.updateMany({
+          where: { id: payment.orderId },
+          data: { status: "COMPLETED" },
+        });
+      } else {
+        // First payment — activate the order
+        await tx.order.updateMany({
+          where: { id: payment.orderId, status: "PENDING" },
+          data: { status: "ACTIVE" },
+        });
+      }
     } else {
+      // Full payment — straight to COMPLETED
       await tx.order.updateMany({
         where: { id: payment.orderId, status: "PENDING" },
         data: { status: "COMPLETED" },

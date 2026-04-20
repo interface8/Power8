@@ -310,6 +310,10 @@ model User {
   payments          Payment[]
   solarSystems      SolarSystem[]
   savings           UserSaving[]
+  files          File[]  @relation("UserFiles") 
+  filesCreated   File[]  @relation("FilesCreated")
+  filesModified  File[]  @relation("FilesModified")
+
 
 
 
@@ -441,3 +445,27 @@ model Blog {
 
   @@map("blogs")
 }
+
+model File {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  type         String
+  size         Int
+  url          String
+  pathname     String
+
+  userId       String
+  user         User     @relation("UserFiles", fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+  createdById  String
+  createdBy    User     @relation("FilesCreated", fields: [createdById], references: [id])
+
+  updatedAt    DateTime @updatedAt
+  modifiedById String?
+  modifiedBy   User?    @relation("FilesModified", fields: [modifiedById], references: [id])
+
+  @@map("files")
+}
+
