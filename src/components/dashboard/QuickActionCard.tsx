@@ -20,7 +20,7 @@ export function QuickActionsCard() {
       <CardContent className="px-8 pb-8 space-y-3">
         <Button
           size="lg"
-          className="w-full bg-orange-400 hover:bg-orange-600 text-white font-medium text-base py-4 rounded-lg"
+          className="w-full bg-orange-400 hover:bg-orange-600 text-white font-medium text-base py-4 rounded-lg cursor-pointer"
           onClick={handleMakePayment}
         >
           <CreditCard size={26} /> Make payment
@@ -30,7 +30,7 @@ export function QuickActionsCard() {
         <Button
           variant="outline"
           size="lg"
-          className="w-full bg-green-50 hover:bg-green-100 text-green-950 py-4 text-base font-medium rounded-lg border-gray-300"
+          className="w-full bg-green-50 hover:bg-green-100 text-green-950 py-4 text-base font-medium rounded-lg border-gray-300 cursor-pointer"
         >
           View Payment History
         </Button>
@@ -39,7 +39,7 @@ export function QuickActionsCard() {
         <Button
           variant="outline"
           size="lg"
-          className="w-full bg-green-50 hover:bg-green-100 text-green-950 py-4 text-base font-medium rounded-lg border-gray-300"
+          className="w-full bg-green-50 hover:bg-green-100 text-green-950 py-4 text-base font-medium rounded-lg border-gray-300  cursor-pointer"
         >
           Contact Support
         </Button>
