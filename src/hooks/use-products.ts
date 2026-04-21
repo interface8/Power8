@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Product, ProductFilters } from "@/types/products";
+<<<<<<< HEAD
 
+=======
+import { ProductDto } from "@/modules/products";
+>>>>>>> sprint-02
 
 export function useProducts(filters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([]);
@@ -47,3 +51,39 @@ export function useProducts(filters?: ProductFilters) {
   return { products, loading, error, fetchProducts };
 }
 
+<<<<<<< HEAD
+=======
+export function useProductDetails(productId: string) {  
+  const [product, setProduct] = useState<ProductDto | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+   const fetchProductDetails = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+
+      const res = await fetch(`/api/products/${productId}`);
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.message ?? "Failed to fetch product details");
+        return;
+      }
+      setProduct(json.data as ProductDto);
+
+    }catch {
+      setError("Failed to fetch product details");
+    }finally{
+      setLoading(false);
+    }
+
+   }, [productId]);
+
+   useEffect(() => {
+     fetchProductDetails();
+   }, [fetchProductDetails]);
+
+   return { product, loading, error, fetchProductDetails };
+}
+>>>>>>> sprint-02

@@ -27,7 +27,8 @@ export function useSolarCalculations() {
 
   useEffect(() => {
     refetch();
-  }, [refetch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     calculations: data?.data ?? [],

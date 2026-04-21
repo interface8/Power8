@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { AuthProvider } from "@/components/providers/auth-provider";
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { DashboardNavbar } from "@/components/dashboard/DashboardNavbar";
 
 export default async function DashboardLayout({
   children,
@@ -16,14 +16,15 @@ export default async function DashboardLayout({
   }
 
   return (
-    <AuthProvider user={user}>
-      <div className="flex h-screen bg-muted/40">
-        <DashboardSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <DashboardHeader />
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+    <QueryProvider>
+      <AuthProvider user={user}>
+        <div className="flex h-screen flex-col overflow-hidden">
+          <DashboardNavbar />
+          <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+            {children}
+          </main>
         </div>
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryProvider>
   );
 }

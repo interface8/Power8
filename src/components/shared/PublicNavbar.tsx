@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogIn, Calculator, Sun, ShoppingCart, Star, BookOpen } from "lucide-react";
+import { LogIn, Calculator, Sun, ShoppingCart, Star, BookOpen, Package } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function PublicNavbar() {
@@ -28,7 +28,7 @@ export default function PublicNavbar() {
                 : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-black border border-gray-200"
             }`}
           >
-            <ShoppingCart size={16} />
+            <Package size={16} />
             Products
           </Link>
 
