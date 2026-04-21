@@ -102,8 +102,14 @@ export default function RegisterPage() {
   const isFormValid = !nameError && !emailError && !phoneError && !passwordError && !confirmError && name && email && phone && password && confirmPassword;
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center rounded-xl">
-      <Card className="w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
+    <div 
+      className="min-h-screen w-full flex items-center justify-center rounded-xl bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: "url('/images/power-1.jpg')" }}
+    >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/50" />
+      
+      <Card className="relative z-10 w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
         {/* Back to Home */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-4 pt-4 pb-8">
           <ArrowLeft className="w-7 h-7 mr-4 md:w-6 md:h-6 md:mr-3" />

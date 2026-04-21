@@ -50,8 +50,14 @@ export default function LoginPage() {
   const isFormValid = !emailError && !passwordError && email && password;
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center rounded-xl">
-      <Card className="w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
+    <div 
+      className="min-h-screen w-full  h-full flex items-center justify-center rounded-xl bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: "url('/images/power-7.jpg')" }}
+    >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/50" />
+      
+      <Card className="relative z-10 w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
         {/* Back to Home */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-4 pt-4 pb-8">
           <ArrowLeft className="w-7 h-7 mr-4 md:w-6 md:h-6 md:mr-3"/>
@@ -72,7 +78,7 @@ export default function LoginPage() {
         <h1 className="text-4xl md:text-3xl font-semibold text-center mb-6">
           Welcome Back
         </h1>
-        <p className="text-[18px] md:text-xl md:font-normal text-gray-600 text-center mb-8 md:mb-10">
+        <p className="text-[18px] md:text-xl md:font-normal text-black text-center mb-8 md:mb-10">
           Login to your account
         </p>
 
@@ -88,7 +94,7 @@ export default function LoginPage() {
           <div className="">
             <Label htmlFor="email" className="text-xl">Email Address</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-300" />
               <Input
                 id="email"
                 type="email"
@@ -133,7 +139,7 @@ export default function LoginPage() {
         </form>
 
         {/* Register link */}
-        <div className="mt-4 text-center text-[17px] font-light text-gray-600 pb-6 md:text-[15px] md:font-normal">
+        <div className="mt-4 text-center text-[17px] font-light text-black pb-6 md:text-[15px] md:font-normal">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
