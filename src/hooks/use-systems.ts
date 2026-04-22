@@ -17,7 +17,7 @@ export function useUserSystems() {
   });
 }
 
-// Keep your existing single system hook if you need it later
+// single system hook
 export function useSystem(id: string) {
   return useQuery({
     queryKey: ["systems", id],
