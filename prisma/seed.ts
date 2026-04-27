@@ -26,6 +26,29 @@ async function main() {
     { resource: "permissions", action: "read", description: "View permissions" },
     { resource: "permissions", action: "update", description: "Update permissions" },
     { resource: "permissions", action: "delete", description: "Delete permissions" },
+    // Bundles
+    { resource: "bundles", action: "create", description: "Create bundles" },
+    { resource: "bundles", action: "update", description: "Update bundles" },
+    // Companies
+    { resource: "companies", action: "create", description: "Create companies" },
+    { resource: "companies", action: "update", description: "Update companies" },
+    { resource: "companies", action: "delete", description: "Delete companies" },
+    // Products
+    { resource: "products", action: "create", description: "Create products" },
+    { resource: "products", action: "update", description: "Update products" },
+    { resource: "products", action: "delete", description: "Delete products" },
+    // Blogs
+    { resource: "blogs", action: "create", description: "Create blogs" },
+    { resource: "blogs", action: "update", description: "Update blogs" },
+    { resource: "blogs", action: "delete", description: "Delete blogs" },
+    // Blog Categories
+    { resource: "blog-categories", action: "create", description: "Create blog categories" },
+    // Product Categories
+    { resource: "product-categories", action: "create", description: "Create product categories" },
+    { resource: "product-categories", action: "update", description: "Update product categories" },
+    { resource: "product-categories", action: "delete", description: "Delete product categories" },
+    // Systems
+    { resource: "systems", action: "control", description: "Control solar systems" },
   ];
 
   const permissions = [];
@@ -198,12 +221,15 @@ const viewerUser = await prisma.user.upsert({
   ];
 
   const createdCompanies = [];
+  let companiesCreated = 0;
   for (const company of companiesDefs) {
-    const created = await prisma.company.create({ data: company });
-    createdCompanies.push(created);
+    const existing = await prisma.company.findFirst({ where: { name: company.name } });
+    const record = existing ?? (await prisma.company.create({ data: company }));
+    if (!existing) companiesCreated++;
+    createdCompanies.push(record);
   }
 
-  console.log(`  ✅ ${createdCompanies.length} companies created`);
+  console.log(`  ✅ ${companiesCreated} companies created (skipped ${companiesDefs.length - companiesCreated} existing)`);
 
   // ─── 7. Create Product Categories ────────────────────
   const categoriesDefs = [
@@ -215,12 +241,15 @@ const viewerUser = await prisma.user.upsert({
   ];
 
   const createdCategories = [];
+  let categoriesCreated = 0;
   for (const category of categoriesDefs) {
-    const created = await prisma.productCategory.create({ data: category });
-    createdCategories.push(created);
+    const existing = await prisma.productCategory.findFirst({ where: { name: category.name } });
+    const record = existing ?? (await prisma.productCategory.create({ data: category }));
+    if (!existing) categoriesCreated++;
+    createdCategories.push(record);
   }
 
-  console.log(`  ✅ ${createdCategories.length} product categories created`);
+  console.log(`  ✅ ${categoriesCreated} product categories created (skipped ${categoriesDefs.length - categoriesCreated} existing)`);
 
   // ─── 8. Create Products ──────────────────────────────
   const productsDefs = [
@@ -346,11 +375,15 @@ const viewerUser = await prisma.user.upsert({
     },
   ];
 
+  let productsCreated = 0;
   for (const product of productsDefs) {
+    const existing = await prisma.product.findFirst({ where: { name: product.name } });
+    if (existing) continue;
     await prisma.product.create({ data: product });
+    productsCreated++;
   }
 
-  console.log(`  ✅ ${productsDefs.length} products created`);
+  console.log(`  ✅ ${productsCreated} products created (skipped ${productsDefs.length - productsCreated} existing)`);
 
   // ─── 9. Create Carousel Slides ───────────────────────
   const carouselDefs = [
@@ -377,11 +410,15 @@ const viewerUser = await prisma.user.upsert({
     },
   ];
 
+  let carouselCreated = 0;
   for (const slide of carouselDefs) {
+    const existing = await prisma.carouselSlide.findFirst({ where: { title: slide.title } });
+    if (existing) continue;
     await prisma.carouselSlide.create({ data: slide });
+    carouselCreated++;
   }
 
-  console.log(`  ✅ ${carouselDefs.length} carousel slides created`);
+  console.log(`  ✅ ${carouselCreated} carousel slides created (skipped ${carouselDefs.length - carouselCreated} existing)`);
 
   // ─── 10. Create Blog Categories ──────────────────────
   const blogCategoryDefs = [
@@ -392,12 +429,15 @@ const viewerUser = await prisma.user.upsert({
   ];
 
   const createdBlogCategories = [];
+  let blogCategoriesCreated = 0;
   for (const cat of blogCategoryDefs) {
-    const created = await prisma.blogCategory.create({ data: cat });
-    createdBlogCategories.push(created);
+    const existing = await prisma.blogCategory.findFirst({ where: { name: cat.name } });
+    const record = existing ?? (await prisma.blogCategory.create({ data: cat }));
+    if (!existing) blogCategoriesCreated++;
+    createdBlogCategories.push(record);
   }
 
-  console.log(`  ✅ ${createdBlogCategories.length} blog categories created`);
+  console.log(`  ✅ ${blogCategoriesCreated} blog categories created (skipped ${blogCategoryDefs.length - blogCategoriesCreated} existing)`);
 
   // ─── 11. Create Blogs ────────────────────────────────
   const blogDefs = [
@@ -472,11 +512,15 @@ const viewerUser = await prisma.user.upsert({
     },
   ];
 
+  let blogsCreated = 0;
   for (const blog of blogDefs) {
+    const existing = await prisma.blog.findFirst({ where: { slug: blog.slug } });
+    if (existing) continue;
     await prisma.blog.create({ data: blog });
+    blogsCreated++;
   }
 
-  console.log(`  ✅ ${blogDefs.length} blogs created (${blogDefs.filter(b => b.isPublished).length} published)`);
+  console.log(`  ✅ ${blogsCreated} blogs created (skipped ${blogDefs.length - blogsCreated} existing)`);
 
   // ─── 12. Create Testimonials ────────────────────────────────
   const customerUser = await prisma.user.upsert({

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { productService, updateProductSchema } from "@/modules/products";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermission, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/products/:id
@@ -25,7 +25,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermission("products.update");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -54,7 +54,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermission("products.delete");
   if (isErrorResponse(guard)) return guard;
 
   try {
