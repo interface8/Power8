@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Product, ProductFilters } from "@/types/products";
+
 import { ProductDto } from "@/modules/products";
 
 export function useProducts(filters?: ProductFilters) {
@@ -43,7 +44,7 @@ export function useProducts(filters?: ProductFilters) {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
+ 
   return { products, loading, error, fetchProducts };
 }
 
