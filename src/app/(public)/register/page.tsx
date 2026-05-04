@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-actions";
 
 export default function RegisterPage() {
   const { register, loading, error } = useAuth();
@@ -17,7 +17,7 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  
+
   // Error states
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -35,7 +35,8 @@ export default function RegisterPage() {
   const validateEmail = (email: string) => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return "Enter a valid email (e.g., name@example.com)";
+    if (!emailRegex.test(email))
+      return "Enter a valid email (e.g., name@example.com)";
     return "";
   };
 
@@ -75,11 +76,15 @@ export default function RegisterPage() {
     setPassword(value);
     setPasswordError(validatePassword(value));
     if (confirmPassword) {
-      setConfirmError(confirmPassword !== value ? "Passwords do not match" : "");
+      setConfirmError(
+        confirmPassword !== value ? "Passwords do not match" : "",
+      );
     }
   };
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const value = e.target.value;
     setConfirmPassword(value);
     if (value !== password) {
@@ -99,19 +104,32 @@ export default function RegisterPage() {
     await register({ name, email, phone, password });
   }
 
-  const isFormValid = !nameError && !emailError && !phoneError && !passwordError && !confirmError && name && email && phone && password && confirmPassword;
+  const isFormValid =
+    !nameError &&
+    !emailError &&
+    !phoneError &&
+    !passwordError &&
+    !confirmError &&
+    name &&
+    email &&
+    phone &&
+    password &&
+    confirmPassword;
 
   return (
-    <div 
+    <div
       className="min-h-screen w-full flex items-center justify-center rounded-xl bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: "url('/images/power-1.jpg')" }}
     >
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" />
-      
+
       <Card className="relative z-10 w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
         {/* Back to Home */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-4 pt-4 pb-8">
+        <Link
+          href="/"
+          className="flex items-center justify-center gap-2 mb-4 pt-4 pb-8"
+        >
           <ArrowLeft className="w-7 h-7 mr-4 md:w-6 md:h-6 md:mr-3" />
           <span className="text-xl">Back to Home</span>
         </Link>
@@ -145,7 +163,9 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Full Name */}
           <div className="">
-            <Label htmlFor="name" className="text-xl">Full Name</Label>
+            <Label htmlFor="name" className="text-xl">
+              Full Name
+            </Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <Input
@@ -158,12 +178,16 @@ export default function RegisterPage() {
                 className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
-            {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
+            {nameError && (
+              <p className="text-red-500 text-sm mt-1">{nameError}</p>
+            )}
           </div>
 
           {/* Email */}
           <div className="">
-            <Label htmlFor="email" className="text-xl">Email Address</Label>
+            <Label htmlFor="email" className="text-xl">
+              Email Address
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <Input
@@ -176,12 +200,16 @@ export default function RegisterPage() {
                 className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
-            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+            )}
           </div>
 
           {/* Phone */}
           <div className="">
-            <Label htmlFor="phone" className="text-xl">Phone Number</Label>
+            <Label htmlFor="phone" className="text-xl">
+              Phone Number
+            </Label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <Input
@@ -194,12 +222,16 @@ export default function RegisterPage() {
                 className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
-            {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
+            {phoneError && (
+              <p className="text-red-500 text-sm mt-1">{phoneError}</p>
+            )}
           </div>
 
           {/* Password */}
           <div className="">
-            <Label htmlFor="password" className="text-xl">Password</Label>
+            <Label htmlFor="password" className="text-xl">
+              Password
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <Input
@@ -212,12 +244,16 @@ export default function RegisterPage() {
                 className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
-            {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+            )}
           </div>
 
           {/* Confirm Password */}
           <div className="">
-            <Label htmlFor="confirmPassword" className="text-xl">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-xl">
+              Confirm Password
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <Input
@@ -230,7 +266,9 @@ export default function RegisterPage() {
                 className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
-            {confirmError && <p className="text-red-500 text-sm mt-1">{confirmError}</p>}
+            {confirmError && (
+              <p className="text-red-500 text-sm mt-1">{confirmError}</p>
+            )}
           </div>
 
           {/* Submit Button */}

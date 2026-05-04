@@ -1,41 +1,46 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
-import type { SessionUser } from "@/lib/auth/session";
+import { createContext, useContext, useEffect, useState } from "react";
 
-const AuthContext = createContext<SessionUser | null>(null);
+type User = {
+  name: string;
+  email: string;
+};
 
-export function AuthProvider({
-  user,
-  children,
-}: {
-  user?: SessionUser | null;
-  children: ReactNode;
-}) {
+type AuthContextType = {
+  user: User | null;
+  setUser: (user: User | null) => void;
+};
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+
+      setUser(res.ok ? data.user : null);
+    } catch {
+      setUser(null);
+    }
+  };
+
+  fetchUser();
+}, []);
+
   return (
-    <AuthContext.Provider value={user ?? null}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
-/**
- * Client-side permission check hook.
- * Usage: const canRead = usePermission("users.read");
- */
-export function usePermission(permission: string): boolean {
-  const user = useContext(AuthContext);
-  if (!user) return false;
-  return user.permissions.includes(permission);
-}
-
-/**
- * Client-side role check hook.
- */
-export function useRole(role: string): boolean {
-  const user = useContext(AuthContext);
-  if (!user) return false;
-  return user.roles.includes(role);
-}
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
+};

@@ -11,7 +11,7 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 
 export default function SolarDashboardPage() {
-  const user = useAuth();
+  const {user} = useAuth();
   const { data: systems = [], isLoading: systemsLoading } = useUserSystems();
 
   const {
