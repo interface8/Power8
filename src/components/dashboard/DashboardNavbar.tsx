@@ -77,7 +77,7 @@ export function DashboardNavbar() {
           </div>
 
           <ChevronDown
-            className={`w-4 h-4 text-gray-500 transition-transform ${
+            className={`w-4 h-4 text-gray-500 transition-transform cursor-pointer ${
               open ? "rotate-180" : ""
             }`}
           />
@@ -111,7 +111,7 @@ export function DashboardNavbar() {
 
               <button
                 onClick={() => handleNavigate("/calculator")}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition rounded-lg"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition rounded-lg cursor-pointer"
               >
                 <div className="p-2 bg-orange-50 rounded-lg">
                   <Calculator className="w-4 h-4 text-orange-600" />
@@ -123,7 +123,7 @@ export function DashboardNavbar() {
 
               <button
                 onClick={() => handleNavigate("/shop")}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition rounded-lg"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition rounded-lg cursor-pointer"
               >
                 <div className="p-2 bg-gray-100 rounded-lg">
                   <ShoppingCart className="w-4 h-4 text-gray-600" />
@@ -140,7 +140,7 @@ export function DashboardNavbar() {
             <div className="py-1">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition rounded-lg"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition rounded-lg cursor-pointer"
               >
                 <div className="p-2 bg-red-50 rounded-lg">
                   <LogOut className="w-4 h-4 text-red-600" />

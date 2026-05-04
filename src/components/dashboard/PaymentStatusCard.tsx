@@ -3,8 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface PaymentData {
-  totalPaid: number;
-  totalRemaining: number;
   status?: string;
   monthlyPayment?: string;
   nextDueDate?: string;
@@ -12,7 +10,7 @@ interface PaymentData {
 
 interface PaymentStatusCardProps {
   paymentData?: PaymentData;
-  systemStatus?: "ACTIVE" | "LIMITED" | "DISABLED"; 
+  systemStatus?: "ACTIVE" | "LIMITED" | "DISABLED";
   isLoading?: boolean;
 }
 
@@ -42,8 +40,12 @@ export function PaymentStatusCard({
     );
   }
 
-  const totalPaid = paymentData?.totalPaid || 0;
-  const totalRemaining = paymentData?.totalRemaining || 0;
+  const monthlyPayment = paymentData?.monthlyPayment ?? 0;
+  const nextDueDate = paymentData?.nextDueDate;
+
+  const formattedDate = nextDueDate
+    ? new Date(nextDueDate).toLocaleDateString()
+    : "N/A";
 
   // Determine badge color based on real status
   const getStatusBadge = () => {
@@ -63,13 +65,13 @@ export function PaymentStatusCard({
       case "DISABLED":
         return (
           <Badge className="bg-red-600 text-white font-semibold text-md px-5 py-3 rounded-lg">
-            Failed
+            INACTIVE
           </Badge>
         );
       default:
         return (
           <Badge className="bg-red-600 text-white font-semibold text-md px-5 py-3 rounded-lg">
-           INACTIVE
+            INACTIVE
           </Badge>
         );
     }
@@ -89,20 +91,13 @@ export function PaymentStatusCard({
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">Monthly Payment</p>
-            <p className="text-xl font-bold text-green-950">₦35,000</p>
+            <p className="text-base font-semibold text-green-950"> ₦{monthlyPayment.toLocaleString()}</p>
           </div>
 
           <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">Total Paid</p>
-            <p className="text-xl font-bold text-green-600">
-              ₦{totalPaid.toLocaleString()}
-            </p>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">Remaining Balance</p>
-            <p className="text-xl font-bold text-orange-600">
-              ₦{totalRemaining.toLocaleString()}
+            <p className="text-sm text-muted-foreground">Next Due Date</p>
+            <p className="text-sm font-medium text-green-950">
+              {formattedDate}
             </p>
           </div>
         </div>

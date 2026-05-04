@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // ← ADD THIS
+import { useRouter } from "next/navigation";
 import { useProductDetails } from "@/hooks/use-product-details";
 import { useCart } from "@/hooks/use-cart";
 import { useTestimonialStats } from "@/hooks/use-testimonials";
@@ -20,7 +20,7 @@ export default function ProductDetailPage({
 }: {
   params: { id: string };
 }) {
-  const router = useRouter(); // ← ADD THIS
+  const router = useRouter(); 
   const { product, loading, error } = useProductDetails(params.id);
   const { addToCart } = useCart();
   const {
@@ -90,4 +90,4 @@ export default function ProductDetailPage({
       <ProductDetails product={product} stats={stats} onAddToCart={addToCart} />
     </>
   );
-}
+};

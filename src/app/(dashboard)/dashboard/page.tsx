@@ -6,16 +6,21 @@ import { PaymentStatusCard } from "@/components/dashboard/PaymentStatusCard";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionCard";
 import { PaymentProgressCard } from "@/components/dashboard/PaymentProgressCard";
 import { UpcomingPaymentsCard } from "@/components/dashboard/UpcomingPaymentCard";
-
-import { useUserSystems } from "@/hooks/use-systems";        // ← Correct hook
-import { usePaymentSummary } from "@/hooks/use-dashboard";
+import { useUserSystems } from "@/hooks/use-systems";
 import { useAuth } from "@/components/providers/auth-provider";
+import { useDashboardData } from "@/hooks/use-dashboard-data";
 
 export default function SolarDashboardPage() {
-  const user  = useAuth();                                 // ← Fixed destructuring
+  const user = useAuth();
   const { data: systems = [], isLoading: systemsLoading } = useUserSystems();
-  const { data: paymentData, isLoading: paymentLoading } = usePaymentSummary();
 
+  const {
+    paymentProgress,
+    upcomingPayments,
+    monthlyPayment,
+    nextDueDate,
+    isLoading,
+  } = useDashboardData();
   const currentSystem = systems[0];
 
   const products = currentSystem?.bundleName
@@ -48,19 +53,22 @@ export default function SolarDashboardPage() {
 
         <div className="lg:col-span-4 space-y-6">
           <PaymentStatusCard
-            paymentData={paymentData}
+            paymentData={{ monthlyPayment: monthlyPayment.toString(), nextDueDate }}
             systemStatus={currentSystem?.status}
-            isLoading={paymentLoading}
+            isLoading={isLoading}
           />
           <QuickActionsCard />
         </div>
       </div>
 
       <PaymentProgressCard
-        paymentProgress={paymentData}
-        isLoading={paymentLoading}
+        paymentProgress={paymentProgress}
+        isLoading={isLoading}
       />
-      <UpcomingPaymentsCard />
+      <UpcomingPaymentsCard
+        schedules={upcomingPayments}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
