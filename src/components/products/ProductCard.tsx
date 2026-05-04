@@ -81,7 +81,7 @@ const ProductCard = ({ product, onAddToCart }: Props) => {
         </button>
         <Link
           href={`/products/${product.id}`}
-          className="w-full bg-gray-300 hover:bg-gray-400 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-3 transition"
+          className="w-full bg-gray-400 hover:bg-orange-500 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-3 transition"
         >
           {/* <ShoppingCart size={16} /> */}
           View Details

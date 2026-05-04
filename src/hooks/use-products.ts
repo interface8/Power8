@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Product, ProductFilters } from "@/types/products";
-<<<<<<< HEAD
-
-=======
 import { ProductDto } from "@/modules/products";
->>>>>>> sprint-02
 
 export function useProducts(filters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,8 +47,6 @@ export function useProducts(filters?: ProductFilters) {
   return { products, loading, error, fetchProducts };
 }
 
-<<<<<<< HEAD
-=======
 export function useProductDetails(productId: string) {  
   const [product, setProduct] = useState<ProductDto | null>(null);
   const [loading, setLoading] = useState(false);
@@ -86,4 +80,3 @@ export function useProductDetails(productId: string) {
 
    return { product, loading, error, fetchProductDetails };
 }
->>>>>>> sprint-02
