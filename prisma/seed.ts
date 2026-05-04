@@ -364,8 +364,8 @@ const viewerUser = await prisma.user.upsert({
       stockQuantity: 45,
     },
     {
-      name: "Out of Stock Panel",
-      description: "This product is intentionally out of stock for testing",
+      name: "400W Mono Solar Panel",
+      description: "Premium monocrystalline panel for commercial installations",
       categoryId: createdCategories[0].id,
       companyId: createdCompanies[0].id,
       price: 50000,

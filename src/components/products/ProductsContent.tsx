@@ -12,6 +12,8 @@ interface ProductsContentProps {
   companies: Company[];
   onAddToCart: (productId: string, quantity?: number) => Promise<boolean>;
   fetchProducts: (filters?: ProductFilters) => Promise<void>;
+  hasMore?: boolean;
+  loadMore?: () => void;
 }
 
 export default function ProductsContent({
@@ -21,6 +23,8 @@ export default function ProductsContent({
   companies,
   onAddToCart,
   fetchProducts,
+  hasMore = false,
+  loadMore,
 }: ProductsContentProps) {
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -67,6 +71,25 @@ export default function ProductsContent({
         onCompanyChange={setCompanyId}
       />
       <ProductList products={products} loading={loading} onAddToCart={onAddToCart} />
+
+      {/* Load More Button */}
+      {!loading && hasMore && loadMore && (
+        <div className="flex justify-center mt-12 mb-12">
+          <button
+            onClick={loadMore}
+            className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition"
+          >
+            Load More Products
+          </button>
+        </div>
+      )}
+      
+      {/* End of products message */}
+      {!loading && !hasMore && products.length > 0 && (
+        <div className="text-center mt-12 text-gray-500">
+          You&apos;ve reached the end
+        </div>
+      )}
     </>
   );
 }

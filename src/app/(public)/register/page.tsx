@@ -18,14 +18,12 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
-  // Error states
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
 
-  // Validation functions
   const validateName = (name: string) => {
     if (!name) return "Full name is required";
     if (name.length < 2) return "Name must be at least 2 characters";
@@ -51,7 +49,6 @@ export default function RegisterPage() {
     return "";
   };
 
-  // Real-time handlers
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value);
@@ -103,21 +100,21 @@ export default function RegisterPage() {
 
   return (
     <div 
-      className="min-h-screen w-full flex items-center justify-center rounded-xl bg-cover bg-center bg-no-repeat relative"
+      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: "url('/images/power-1.jpg')" }}
     >
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" />
       
-      <Card className="relative z-10 w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
+      <Card className="relative z-10 w-full mx-4 my-4 p-4 md:p-6 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%]">
         {/* Back to Home */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-4 pt-4 pb-8">
+        <Link href="/" className="flex items-center justify-center gap-2 mb-2 pt-2 pb-4">
           <ArrowLeft className="w-7 h-7 mr-4 md:w-6 md:h-6 md:mr-3" />
           <span className="text-xl">Back to Home</span>
         </Link>
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8 md:mb-10">
+        <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
           <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-2xl shadow-lg">
             <Sun className="w-14 h-14 md:w-12 md:h-12 text-white" />
           </div>
@@ -127,23 +124,20 @@ export default function RegisterPage() {
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl md:text-3xl font-semibold text-center mb-6">
+        <h1 className="text-4xl md:text-3xl font-semibold text-center mb-3">
           Create Account
         </h1>
-        <p className="text-[18px] md:text-xl md:font-normal text-gray-600 text-center mb-8 md:mb-10">
+        <p className="text-[18px] md:text-xl md:font-normal text-gray-600 text-center mb-4 md:mb-6">
           Enter your information to get started
         </p>
 
-        {/* Error */}
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name */}
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="">
             <Label htmlFor="name" className="text-xl">Full Name</Label>
             <div className="relative">
@@ -155,13 +149,12 @@ export default function RegisterPage() {
                 value={name}
                 onChange={handleNameChange}
                 required
-                className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
+                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
             {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
           </div>
 
-          {/* Email */}
           <div className="">
             <Label htmlFor="email" className="text-xl">Email Address</Label>
             <div className="relative">
@@ -173,13 +166,12 @@ export default function RegisterPage() {
                 value={email}
                 onChange={handleEmailChange}
                 required
-                className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
+                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
             {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
 
-          {/* Phone */}
           <div className="">
             <Label htmlFor="phone" className="text-xl">Phone Number</Label>
             <div className="relative">
@@ -191,13 +183,12 @@ export default function RegisterPage() {
                 value={phone}
                 onChange={handlePhoneChange}
                 required
-                className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
+                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
             {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
           </div>
 
-          {/* Password */}
           <div className="">
             <Label htmlFor="password" className="text-xl">Password</Label>
             <div className="relative">
@@ -209,13 +200,12 @@ export default function RegisterPage() {
                 value={password}
                 onChange={handlePasswordChange}
                 required
-                className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
+                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
             {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
           </div>
 
-          {/* Confirm Password */}
           <div className="">
             <Label htmlFor="confirmPassword" className="text-xl">Confirm Password</Label>
             <div className="relative">
@@ -227,24 +217,22 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
                 required
-                className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50 rounded-xl"
+                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
               />
             </div>
             {confirmError && <p className="text-red-500 text-sm mt-1">{confirmError}</p>}
           </div>
 
-          {/* Submit Button */}
           <Button
             type="submit"
             disabled={!isFormValid || loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl py-8 rounded-xl mb-6 md:py-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl py-4 rounded-xl mb-3 md:py-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
 
-        {/* Login link */}
-        <div className="mt-2 text-center text-[17px] font-light text-gray-600 pb-4 md:text-[15px] md:font-normal">
+        <div className="mt-1 text-center text-[17px] font-light text-gray-600 pb-2 md:text-[15px] md:font-normal">
           Already have an account?{" "}
           <Link
             href="/login"

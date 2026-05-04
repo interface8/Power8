@@ -51,7 +51,7 @@ export default function LoginPage() {
 
   return (
     <div 
-      className="min-h-screen w-full  h-full flex items-center justify-center rounded-xl bg-cover bg-center bg-no-repeat relative"
+      className="min-h-screen w-full  h-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
       {/* Dark overlay */}

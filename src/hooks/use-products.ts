@@ -33,6 +33,7 @@ export function useProducts(filters?: ProductFilters) {
       }
 
       setProducts(json.data ?? []);
+
     } catch {
       setError("Failed to fetch products");
     } finally {
