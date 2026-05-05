@@ -77,18 +77,18 @@ export function DashboardNavbar() {
       <div className="flex items-center">
        <Link
           href="/products"
-          className="relative flex items-center px-2 py-2  rounded-lg hover:bg-green-50 transition"
+          className="relative flex items-center px-2 py-1 rounded-lg hover:bg-green-100 hover:shadow-lg transition"
         >
-          <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="p-2 bg-blue-50 rounded-lg">
             <Package className="w-4 h-4 text-blue-600 " />
           </div>
         </Link>
 
         <Link
           href="/cart"
-          className="relative flex items-center px-2 py-2  rounded-lg hover:bg-green-50 transition"
+          className="relative flex items-center px-2 py-1 rounded-lg hover:bg-green-100 hover:shadow-lg transition"
         >
-          <div className="p-2 bg-green-100 rounded-lg">
+          <div className="p-2 bg-green-50 rounded-lg">
             <ShoppingCart className="w-4 h-4 text-green-600 " />
           </div>
 
@@ -106,9 +106,9 @@ export function DashboardNavbar() {
             className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2"
           >
             {/* Avatar */}
-            <div className="relative w-8 h-8 rounded-full bg-orange-800 ring-2 ring-orange-600 text-white flex items-center justify-center font-semibold text-lg">
+            <div className="relative w-8 h-8 rounded-full bg-green-800 ring-1 ring-green-600 text-white flex items-center justify-center font-semibold text-lg">
               {initials}
-              <User className="absolute -bottom-1 -right-1 w-4 h-4 bg-white text-orange-700 rounded-full p-0.5 shadow" />
+              <User className="absolute -bottom-1 -right-1 w-4 h-4 bg-white text-green-700 rounded-full p-0.5 shadow" />
             </div>
 
             <ChevronDown

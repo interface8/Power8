@@ -9,10 +9,11 @@ import { useCart } from "../providers/cart-providers";
 
 type Props = {
   product: Product;
+  onAddToCart: (productId: string, quantity?: number) => Promise<boolean>;
 };
 
 const ProductCard = ({ product }: Props) => {
-  const { addToCart } = useCart(); 
+  const { addToCart } = useCart();
   const [loading, setLoading] = useState(false);
 
   const handleAddToCart = async () => {
@@ -111,4 +112,3 @@ const ProductCard = ({ product }: Props) => {
 };
 
 export default ProductCard;
-

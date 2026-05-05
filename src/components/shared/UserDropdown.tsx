@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  User,
   ChevronDown,
   Calculator,
   LogOut,
   Star,
   Package,
   BookOpen,
+  LayoutDashboard,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -62,17 +62,17 @@ export function UserDropdown({
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-2 py-2 cursor-pointer"
+        className="flex items-center gap-2 px-3 py-2 cursor-pointer bg-green-50 rounded-lg hover:bg-green-100"
       >
         <div
-          className={`relative rounded-full bg-orange-800 ring-2 ring-orange-600 text-white flex items-center justify-center font-semibold  ${
-            mobile ? "w-9 h-9 text-sm" : "w-8 h-8"
+          className={`relative rounded-full bg-green-950 ring-1 ring-green-600 text-white flex items-center justify-center font-semibold  ${
+            mobile ? "w-7 h-7 text-sm" : "w-7 h-7"
           }`}
         >
           {initials}
-
-          <User className="absolute -bottom-1 -right-1 w-4 h-4 bg-white text-orange-700 rounded-full p-0.5 shadow" />
         </div>
+
+        <p className="hidden sm:block font-medium text-gray-900 truncate">{user?.name}</p>
 
         <ChevronDown
           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
@@ -105,6 +105,18 @@ export function UserDropdown({
             <p className="px-4 pb-1 text-xs font-semibold text-green-950 uppercase tracking-wider">
               Actions
             </p>
+
+            <button
+              onMouseDown={() => navigate("/dashboard")}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition rounded-lg cursor-pointer"
+            >
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <LayoutDashboard className="w-4 h-4 text-gray-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-800">
+                Dashboard
+              </span>
+            </button>
 
             <button
               onMouseDown={() => navigate("/calculator")}

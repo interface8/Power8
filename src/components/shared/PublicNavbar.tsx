@@ -8,9 +8,10 @@ import {
   ShoppingCart,
   Star,
   BookOpen,
-  LayoutDashboard,
   Package,
   Box,
+  Menu,
+  X,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -22,6 +23,7 @@ export default function PublicNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, setUser } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -69,7 +71,7 @@ export default function PublicNavbar() {
                     : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-black border border-gray-200"
                 }`}
               >
-                <Package size={16} />
+                <Package size={16} className="text-blue-600" />
                 Products
               </Link>
 
@@ -77,14 +79,14 @@ export default function PublicNavbar() {
                 href="/cart"
                 className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition ${
                   pathname === "/cart"
-                    ? "bg-green-200 text-black"
-                    : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-black"
+                    ? "bg-green-200 text-gray-800"
+                    : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-gray-800"
                 }`}
               >
-                <ShoppingCart size={16} />
+                <ShoppingCart size={16} className="text-green-600" />
                 Cart
                 {count > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  <span className="relative bg-orange-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                     {count}
                   </span>
                 )}
@@ -116,9 +118,9 @@ export default function PublicNavbar() {
 
               <Link
                 href="/calculator"
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 bg-green-50 text-black rounded-lg hover:bg-green-200 hover:shadow-lg transition"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 bg-green-50 text-gray-800 rounded-lg hover:bg-green-200 hover:shadow-lg transition"
               >
-                <Calculator size={16} />
+                <Calculator size={16} className="text-orange-600" />
                 Calculator
               </Link>
 
@@ -131,38 +133,43 @@ export default function PublicNavbar() {
               </Link>
             </>
           ) : (
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Link
                 href="/products"
-                className="flex items-center px-2.5 py-2.5 rounded-full hover:bg-green-50 transition"
+                className={`flex items-center gap-1 px-3 py-1 rounded-lg transition ${
+                  pathname.startsWith("/products")
+                    ? "bg-green-200"
+                    : "bg-green-50 hover:bg-green-100 hover:shadow-lg"
+                }`}
               >
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2">
                   <Package className="w-4 h-4 text-blue-600" />
                 </div>
+                <span className="text-gray-800 text-sm font-medium">
+                  Products
+                </span>
               </Link>
 
               <Link
                 href="/cart"
-                className="relative flex items-center px-2.5 py-2.5 rounded-full hover:bg-green-50 transition"
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition ${
+                  pathname === "/cart"
+                    ? "bg-green-200"
+                    : "bg-green-50 hover:bg-green-100 hover:shadow-lg"
+                }`}
               >
-                <div className="p-2 bg-green-100 rounded-lg">
+                <div className="p-2">
                   <ShoppingCart className="w-4 h-4 text-green-600" />
                 </div>
 
-                {count > 0 && (
-                  <span className="absolute top-1 -right-1 bg-orange-500 text-white text-xs min-w-4.5 h-4.5 px-1 flex items-center justify-center rounded-lg shadow">
-                    {count}
-                  </span>
-                )}
-              </Link>
-
-              <Link
-                href="/dashboard"
-                className="flex items-center px-2.5 py-2.5 rounded-full hover:bg-green-50 transition"
-              >
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <LayoutDashboard className="w-4 h-4 text-orange-600" />
-                </div>
+                <span className="text-gray-800 text-sm font-medium flex items-center gap-2">
+                  Cart
+                  {count > 0 && (
+                    <span className="bg-orange-500 text-white text-xs min-w-4.5 h-4.5 px-1 flex items-center justify-center rounded-md">
+                      {count}
+                    </span>
+                  )}
+                </span>
               </Link>
 
               {/* User */}
@@ -178,67 +185,114 @@ export default function PublicNavbar() {
         </div>
 
         {/* MOBILE */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex md:hidden items-center gap-2 relative">
           {!user ? (
             <>
               <Link
                 href="/products"
-                className="bg-green-50 p-1.5 md:p-2 rounded-md border"
+                className={`p-2 rounded-md border ${
+                  pathname.startsWith("/products")
+                    ? "bg-green-200"
+                    : "bg-green-50 hover:bg-green-100 hover:shadow-lg"
+                }`}
               >
-                <Box className="w-5 h-5 md:w-7 md:h-7" />
+                <Box className="w-4 h-4 text-blue-600" />
+              </Link>
+
+              <Link
+                href="/login"
+                className="bg-green-800 hover:bg-green-900 text-white p-2 rounded-md"
+              >
+                <LogIn className="w-4 h-4" />
+              </Link>
+
+              <button
+                onClick={() => setMenuOpen((prev) => !prev)}
+                className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md"
+              >
+                {menuOpen ? <X size={15} /> : <Menu size={15} />}
+              </button>
+
+              {menuOpen && (
+                <div className="absolute top-12 right-0 w-56 bg-orange-50 border border-orange-100 rounded-xl shadow-lg p-3 space-y-2 z-50">
+                  <Link
+                    href="/cart"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-100 transition"
+                  >
+                    <ShoppingCart className="text-green-600" size={18} />
+                    <span className="text-gray-800 text-sm font-medium">
+                      Cart
+                    </span>
+
+                    {count > 0 && (
+                      <span className="ml-auto text-xs bg-orange-500 text-white px-2 py-0.5 rounded">
+                        {count}
+                      </span>
+                    )}
+                  </Link>
+
+                  <Link
+                    href="/blogs"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-100 transition"
+                  >
+                    <BookOpen className="text-yellow-600" size={18} />
+                    <span className="text-gray-800 text-sm font-medium">
+                      Blogs
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/calculator"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-100 transition"
+                  >
+                    <Calculator className="text-orange-600" size={18} />
+                    <span className="text-gray-800 text-sm font-medium">
+                      Calculator
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/testimonial"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-100 transition"
+                  >
+                    <Star className="text-amber-600" size={18} />
+                    <span className="text-gray-800 text-sm font-medium">
+                      Testimonials
+                    </span>
+                  </Link>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <Link
+                href="/products"
+                className={`p-2 rounded-md  hover:bg-green-100 hover:shadow-lg ${
+                  pathname.startsWith("/products")
+                    ? "bg-green-200"
+                    : "bg-green-50"
+                }`}
+              >
+                <Package className="w-5 h-5 text-blue-600" />
               </Link>
 
               <Link
                 href="/cart"
-                className="relative bg-green-50 p-1.5 md:p-2 rounded-md"
+                className={`relative p-2 rounded-md  hover:bg-green-100 hover:shadow-lg ${
+                  pathname === "/cart" ? "bg-green-200" : "bg-green-50"
+                }`}
               >
-                <ShoppingCart className="w-5 h-5 md:w-7 md:h-7" />
+                <ShoppingCart className="w-5 h-5 text-green-600" />
 
                 {count > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                     {count}
                   </span>
                 )}
-              </Link>
-
-              <Link
-                href="/blogs"
-                className="border-2 border-orange-400 p-1.5 md:p-2 rounded-md"
-              >
-                <BookOpen className="w-5 h-5 md:w-7 md:h-7" />
-              </Link>
-
-              <Link
-                href="/calculator"
-                className="bg-green-50 p-1.5 md:p-2 rounded-md border"
-              >
-                <Calculator className="w-5 h-5 md:w-7 md:h-7" />
-              </Link>
-
-              <Link
-                href="/login"
-                className="bg-green-950 text-white p-1.5 md:p-2 rounded-md"
-              >
-                <LogIn className="w-5 h-5 md:w-7 md:h-7" />
-              </Link>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/cart"
-                className="relative p-2 bg-green-100 rounded-md"
-              >
-                <ShoppingCart className="w-5 h-5 text-green-600" />
-
-                {count > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs min-w-4.5 h-4.5 px-1 flex items-center justify-center rounded-full">
-                    {count}
-                  </span>
-                )}
-              </Link>
-
-              <Link href="/dashboard" className="p-2 bg-orange-50 rounded-md">
-                <LayoutDashboard className="w-5 h-5 text-orange-600" />
               </Link>
 
               <UserDropdown
@@ -249,7 +303,7 @@ export default function PublicNavbar() {
                 handleLogout={handleLogout}
                 mobile
               />
-            </div>
+            </>
           )}
         </div>
       </div>

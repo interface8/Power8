@@ -36,7 +36,6 @@ const Cart = () => {
     router.push("/checkout");
   };
 
-  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -55,19 +54,19 @@ const Cart = () => {
           </h1>
 
           <div className="bg-white border rounded-xl py-18 px-6 flex flex-col items-center text-center shadow-sm">
-            <ShoppingBag size={80} className="text-gray-400 mb-6" />
+            <ShoppingBag size={70} className="text-gray-400 mb-6" />
 
-            <h2 className="text-xl font-semibold text-green-950 mb-4">
+            <h2 className="text-xl font-semibold text-green-950 mb-6">
               Your cart is empty
             </h2>
 
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-12">
               Add some products to get started
             </p>
 
             <Link
               href="/products"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md text-sm font-medium transition"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md text-sm font-medium transition"
             >
               Browse Products
             </Link>
@@ -123,10 +122,7 @@ const Cart = () => {
                           onClick={async () => {
                             if (item.quantity <= 1) return;
                             setUpdatingId(item.id);
-                            await updateCartItem(
-                              item.id,
-                              item.quantity - 1
-                            );
+                            await updateCartItem(item.id, item.quantity - 1);
                             setUpdatingId(null);
                           }}
                           disabled={item.quantity <= 1 || isUpdating}
@@ -143,10 +139,7 @@ const Cart = () => {
                         <button
                           onClick={async () => {
                             setUpdatingId(item.id);
-                            await updateCartItem(
-                              item.id,
-                              item.quantity + 1
-                            );
+                            await updateCartItem(item.id, item.quantity + 1);
                             setUpdatingId(null);
                           }}
                           disabled={isUpdating}
@@ -190,13 +183,17 @@ const Cart = () => {
 
               <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-gray-700">
                 <div className="flex justify-between">
-                  <span className="text-xl font-light">Subtotal</span>
-                  <span>₦{subtotal.toLocaleString()}</span>
+                  <span className="text-md">Subtotal</span>
+                  <span className="text-gray-800 font-medium">
+                    ₦{subtotal.toLocaleString()}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>VAT (7.5%)</span>
-                  <span>₦{vat.toLocaleString()}</span>
+                  <span className="text-md">VAT (7.5%)</span>
+                  <span className="text-gray-800 font-medium">
+                    ₦{vat.toLocaleString()}
+                  </span>
                 </div>
 
                 <div className="border-t pt-3 flex justify-between font-bold">
@@ -209,10 +206,16 @@ const Cart = () => {
 
               {/* CHECKOUT */}
               <button
-                onClick={handleCheckout}
-                className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg flex justify-center items-center gap-2"
+                onClick={() => {
+                  if (!user) {
+                    router.push("/login");
+                  } else {
+                    handleCheckout();
+                  }
+                }}
+                className="w-full mt-12 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg flex justify-center items-center gap-2"
               >
-                Proceed to Checkout
+                {user ? "Proceed to Checkout" : "Login to Proceed"}
                 <ArrowRight size={16} />
               </button>
 
@@ -221,11 +224,9 @@ const Cart = () => {
                   Please login to continue
                 </p>
               )}
-                  {/* Payment Options */}
+              {/* Payment Options */}
               <div className="mt-6 border-t pt-4">
-                <h4 className="text-sm font-semibold mb-2">
-                  Payment Options
-                </h4>
+                <h4 className="text-sm font-semibold mb-2">Payment Options</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>✓ Full Payment</li>
                   <li>✓ Pay Small Small (Installments)</li>

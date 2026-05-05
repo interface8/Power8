@@ -7,7 +7,7 @@ import { QuickActionsCard } from "@/components/dashboard/QuickActionCard";
 import { PaymentProgressCard } from "@/components/dashboard/PaymentProgressCard";
 import { UpcomingPaymentsCard } from "@/components/dashboard/UpcomingPaymentCard";
 import { useUserSystems } from "@/hooks/use-systems";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuth, } from "@/components/providers/auth-provider";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 
 export default function SolarDashboardPage() {

@@ -17,18 +17,16 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  
   const validateEmail = (email: string) => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email))
-      return "Enter a valid email (e.g., name@example.com)";
+    if (!emailRegex.test(email)) return "Enter a valid email";
     return "";
   };
 
   const validatePassword = (password: string) => {
     if (!password) return "Password is required";
-    if (password.length < 8) return "Password must be at least 8 characters";
+    if (password.length < 8) return "Minimum 8 characters";
     return "";
   };
 
@@ -53,95 +51,95 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
+      className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative"
       style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      <Card className="relative z-10 w-full mx-4 my-8 p-6 md:p-8 flex flex-col bg-white rounded-3xl md:w-[30%]">
-        {/* Back */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-6">
-          <ArrowLeft className="w-6 h-6" />
-          <span>Back to Home</span>
+      <Card className="relative z-10 w-full max-w-md p-6 md:p-8 rounded-2xl shadow-xl bg-white/95">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
         </Link>
 
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow-lg">
-            <Sun className="w-12 h-12 text-white" />
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow">
+            <Sun className="w-8 h-8 text-white" />
           </div>
-          <span className="text-3xl font-semibold text-orange-600">
-            Power - 8
-          </span>
+          <span className="text-xl font-semibold text-orange-600">Power-8</span>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-2xl font-semibold text-center mb-2">
+        <h1 className="text-2xl md:text-3xl font-semibold text-center mb-2">
           Welcome Back
         </h1>
-        <p className="text-gray-600 text-center mb-6">Login to your account</p>
+        <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
+          Login to your account
+        </p>
 
-        {/* Error */}
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <div>
-            <Label>Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Label htmlFor="email">Email</Label>
+            <div className="relative mt-1">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
+                id="email"
                 type="email"
+                placeholder="your@email.com"
                 value={email}
                 onChange={handleEmailChange}
-                className="pl-10"
-                placeholder="your@email.com"
+                className="pl-10 h-12 bg-gray-50"
               />
             </div>
-            {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
-          </div>
-
-          {/* Password */}
-          <div>
-            <Label>Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <Input
-                type="password"
-                value={password}
-                onChange={handlePasswordChange}
-                className="pl-10"
-                placeholder="••••••••"
-              />
-            </div>
-            {passwordError && (
-              <p className="text-red-500 text-sm">{passwordError}</p>
+            {emailError && (
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
             )}
           </div>
 
-          {/* Submit */}
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={handlePasswordChange}
+                className="pl-10 h-12 bg-gray-50"
+              />
+            </div>
+            {passwordError && (
+              <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+            )}
+          </div>
+
           <Button
             type="submit"
             disabled={!isFormValid || loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+            className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
           >
             {loading ? "Signing in..." : "Login"}
           </Button>
         </form>
 
-        {/* Register */}
-        <div className="text-center mt-4 text-sm">
+        <p className="text-center text-sm text-gray-600 mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-orange-500">
-            Register here
+          <Link
+            href="/register"
+            className="text-orange-500 hover:text-orange-600 font-medium"
+          >
+            Register
           </Link>
-        </div>
+        </p>
       </Card>
     </div>
   );

@@ -14,7 +14,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-export default function ProductDetailsPage({ params }: { params: { id: string } }) {
+export default function ProductDetailsPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const { product, loading, error } = useProductDetails(params.id);
   const { stats, loading: statsLoading } = useTestimonialStats();
@@ -35,7 +39,9 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 text-lg mb-2">{error || "Product not found"}</p>
+          <p className="text-red-600 text-lg mb-2">
+            {error || "Product not found"}
+          </p>
           <a href="/products" className="text-orange-500 hover:underline">
             ← Back to Products
           </a>
@@ -47,35 +53,52 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
   return (
     <div className="min-h-screen bg-[#FFFAEC] ">
       <div className="w-full mx-auto ">
-        
         {/* Breadcrumb using shadcn/ui components */}
-        <div className="mb-4 bg-[#FFFEFB] py-4 md:py-6 px-8 md:px-24 border-b border-gray-400/20 pb-4" >
+        <div className="mb-4 bg-[#FFFEFB] py-4 md:py-6 px-8 md:px-24 border-b border-gray-400/20 pb-4">
           <Breadcrumb>
             <BreadcrumbList className="gap-3 md:gap-4">
               <BreadcrumbItem>
-                <BreadcrumbLink onClick={() => router.push("/")} className="text-xl font-medium">
+                <BreadcrumbLink
+                  onClick={() => router.push("/")}
+                  className="text-xl font-medium"
+                >
                   Home
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="[&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-5 md:[&>svg]:h-5" />
               <BreadcrumbItem>
-                <BreadcrumbLink onClick={() => router.push("/products")} className="text-xl font-medium">
+                <BreadcrumbLink
+                  onClick={() => router.push("/products")}
+                  className="text-xl font-medium"
+                >
                   Products
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="[&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-5 md:[&>svg]:h-5"/>
+              <BreadcrumbSeparator className="[&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-5 md:[&>svg]:h-5" />
               <BreadcrumbItem>
-                <BreadcrumbPage className="text-xl font-[330]">{product.name}</BreadcrumbPage>
+                <BreadcrumbPage className="text-xl font-[330]">
+                  {product.name}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
 
         {/* Product Details */}
-        <ProductDetails 
+        <ProductDetails
           product={product}
           stats={stats}
-          onAddToCart={addToCart}
+          onAddToCart={(productId, quantity) =>
+            addToCart(
+              {
+                productId,
+                productName: product.name,
+                price: product.price,
+                productImage: product.imageUrl ?? "", // fallback if missing
+              },
+              quantity,
+            )
+          }
         />
       </div>
     </div>
