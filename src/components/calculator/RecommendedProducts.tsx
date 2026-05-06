@@ -51,49 +51,103 @@ export default function RecommendedProducts({ results, config }: Props) {
   // One hook per section — panels, inverters, batteries
   const panels = useProducts(
     categoryMap["Solar Panels"]
-      ? { categoryId: categoryMap["Solar Panels"], minCapacity: requirements["Solar Panels"] }
+      ? {
+          categoryId: categoryMap["Solar Panels"],
+          minCapacity: requirements["Solar Panels"],
+        }
       : undefined,
   );
   const inverters = useProducts(
     categoryMap["Inverters"]
-      ? { categoryId: categoryMap["Inverters"], minCapacity: requirements["Inverters"] }
+      ? {
+          categoryId: categoryMap["Inverters"],
+          minCapacity: requirements["Inverters"],
+        }
       : undefined,
   );
   const batteries = useProducts(
     categoryMap["Batteries"]
-      ? { categoryId: categoryMap["Batteries"], minCapacity: requirements["Batteries"] }
+      ? {
+          categoryId: categoryMap["Batteries"],
+          minCapacity: requirements["Batteries"],
+        }
       : undefined,
   );
 
   // Re-fetch when category IDs become available
   useEffect(() => {
     if (categoryMap["Solar Panels"]) {
-      panels.fetchProducts({ categoryId: categoryMap["Solar Panels"], minCapacity: requirements["Solar Panels"] });
+      panels.fetchProducts({
+        categoryId: categoryMap["Solar Panels"],
+        minCapacity: requirements["Solar Panels"],
+      });
     }
     if (categoryMap["Inverters"]) {
-      inverters.fetchProducts({ categoryId: categoryMap["Inverters"], minCapacity: requirements["Inverters"] });
+      inverters.fetchProducts({
+        categoryId: categoryMap["Inverters"],
+        minCapacity: requirements["Inverters"],
+      });
     }
     if (categoryMap["Batteries"]) {
-      batteries.fetchProducts({ categoryId: categoryMap["Batteries"], minCapacity: requirements["Batteries"] });
+      batteries.fetchProducts({
+        categoryId: categoryMap["Batteries"],
+        minCapacity: requirements["Batteries"],
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryMap, requirements]);
 
   const sections = [
-    { label: "Solar Panels", catName: "Solar Panels", data: panels, min: requirements["Solar Panels"] },
-    { label: "Inverters", catName: "Inverters", data: inverters, min: requirements["Inverters"] },
-    { label: "Batteries", catName: "Batteries", data: batteries, min: requirements["Batteries"] },
+    {
+      label: "Solar Panels",
+      catName: "Solar Panels",
+      data: panels,
+      min: requirements["Solar Panels"],
+    },
+    {
+      label: "Inverters",
+      catName: "Inverters",
+      data: inverters,
+      min: requirements["Inverters"],
+    },
+    {
+      label: "Batteries",
+      catName: "Batteries",
+      data: batteries,
+      min: requirements["Batteries"],
+    },
   ];
 
-  const handleAddToCart = async (productId: string, quantity = 1): Promise<boolean> => {
-    try {
-      await addToCart(productId, quantity);
-      return true;
-    } catch {
-      return false;
-    }
-  };
+ const handleAddToCart = async (
+  productId: string,
+  quantity = 1,
+): Promise<boolean> => {
+  try {
+    const allProducts = [
+      ...panels.products,
+      ...inverters.products,
+      ...batteries.products,
+    ];
 
+    const product = allProducts.find((p) => p.id === productId);
+
+    if (!product) return false;
+
+    await addToCart(
+      {
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        productImage: product.imageUrl ?? "",
+      },
+      quantity,
+    );
+
+    return true;
+  } catch {
+    return false;
+  }
+};
   const hasAny = sections.some((s) => s.data.products.length > 0);
   const allLoading = sections.every((s) => s.data.loading);
 
@@ -128,7 +182,8 @@ export default function RecommendedProducts({ results, config }: Props) {
               <h3 className="text-lg font-semibold text-gray-700">
                 {label}{" "}
                 <span className="text-sm font-normal text-gray-400">
-                  (≥&thinsp;{min.toLocaleString()}{catName === "Batteries" ? " Ah" : " W"})
+                  (≥&thinsp;{min.toLocaleString()}
+                  {catName === "Batteries" ? " Ah" : " W"})
                 </span>
               </h3>
               {catId && (

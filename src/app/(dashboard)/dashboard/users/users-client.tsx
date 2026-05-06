@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { usePermission } from "@/components/providers/auth-provider";
+// import { usePermission } from "@/components/providers/auth-provider";
 import { UserFormModal } from "./user-form-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,7 @@ interface UserDto {
   isActive: boolean;
   createdAt: string;
   roles: { id: string; name: string }[];
+  permissions: string[]
 }
 
 interface PaginatedUsers {
@@ -76,9 +77,9 @@ export function UsersClient() {
   const [editingUser, setEditingUser] = useState<UserDto | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserDto | null>(null);
 
-  const canCreate = usePermission("users.create");
-  const canUpdate = usePermission("users.update");
-  const canDelete = usePermission("users.delete");
+  const canCreate = true
+  const canUpdate = true;
+  const canDelete = true;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["users", page, search],

@@ -1,22 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { Minus, Plus, Trash2, ArrowRight, Loader2, ShoppingBag } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  Trash2,
+  ArrowRight,
+  Loader2,
+  ShoppingBag,
+} from "lucide-react";
 import Link from "next/link";
-import type { Cart as CartType } from "@/types/products";
+import { useCart } from "../providers/cart-providers";
+import { useAuth } from "../providers/auth-provider";
+import { useRouter } from "next/navigation";
 
-interface CartProps {
-  cart: CartType;
-  loading: boolean;
-  onUpdateItem: (itemId: string, quantity: number) => Promise<boolean>;
-  onRemoveItem: (itemId: string) => Promise<boolean>;
-}
+const Cart = () => {
+  const { cart, loading, updateCartItem, removeCartItem } = useCart();
+  const { user } = useAuth();
+  const router = useRouter();
 
-const Cart = ({ cart, loading, onUpdateItem, onRemoveItem }: CartProps) => {
-  const items = cart.items;
-  const subtotal = cart.total;
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const items = cart?.items ?? [];
+  const subtotal = cart?.total ?? 0;
   const vat = subtotal * 0.075;
   const total = subtotal + vat;
+
+  const handleCheckout = () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    router.push("/checkout");
+  };
 
   if (loading) {
     return (
@@ -26,37 +44,29 @@ const Cart = ({ cart, loading, onUpdateItem, onRemoveItem }: CartProps) => {
     );
   }
 
+  //EMPTY CART
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 flex flex-col justify-start items-center pt-12 sm:pt-16">
+      <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 flex flex-col items-center pt-12 sm:pt-16">
         <div className="w-full max-w-7xl">
           <h1 className="text-2xl sm:text-3xl font-bold text-green-950 mb-6">
             Shopping Cart
           </h1>
 
-          <div
-            className="bg-white border border-gray-200 rounded-xl 
-                    py-18 px-6 sm:px-10 
-                    flex flex-col items-center justify-center text-center
-                    shadow-sm"
-          >
-            <div className="mb-8 text-gray-400">
-              <ShoppingBag size={80} strokeWidth={1.5} />
-            </div>
+          <div className="bg-white border rounded-xl py-18 px-6 flex flex-col items-center text-center shadow-sm">
+            <ShoppingBag size={70} className="text-gray-400 mb-6" />
 
-            <h2 className="text-base sm:text-2xl font-semibold text-green-950 mb-6">
+            <h2 className="text-xl font-semibold text-green-950 mb-6">
               Your cart is empty
             </h2>
 
-            <p className="text-base text-gray-700 mt-1 mb-6">
+            <p className="text-gray-600 mb-12">
               Add some products to get started
             </p>
 
             <Link
               href="/products"
-              className="w-full max-w-auto bg-orange-500 hover:bg-orange-600 
-                   text-white py-3 rounded-md 
-                   text-sm font-medium transition"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md text-sm font-medium transition"
             >
               Browse Products
             </Link>
@@ -67,135 +77,159 @@ const Cart = ({ cart, loading, onUpdateItem, onRemoveItem }: CartProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-3 py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 mt-3 py-6 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold text-green-950 mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-green-950 mb-6">
           Shopping Cart
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
-          {/* LEFT: Cart Items */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 hover:shadow transition-shadow"
-              >
-                {/* Product Image */}
-                <div className="relative w-full sm:w-28 md:w-32 h-44 sm:h-32 border border-orange-200 rounded-lg overflow-hidden shrink-0">
-                  <Image
-                    src={item.productImage || "/images/product-1.jpg"}
-                    alt={item.productName}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-4">
+            {items.map((item) => {
+              const isUpdating = updatingId === item.id;
 
-                {/* Main content */}
-                <div className="flex-1 flex flex-col">
-                  <h3 className="text-base sm:text-lg font-semibold text-green-950 mb-1">
-                    {item.productName}
-                  </h3>
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-xl shadow-sm border p-4 flex flex-col sm:flex-row gap-4 transition-all"
+                >
+                  {/* IMAGE */}
+                  <div className="relative w-full sm:w-28 h-32 border rounded-lg overflow-hidden">
+                    <Image
+                      src={item.productImage || "/images/product-1.jpg"}
+                      alt={item.productName || "Product"}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
 
-                  <p className="text-lg font-bold text-orange-500 mb-3 sm:mb-4">
-                    ₦{item.price.toLocaleString()}
-                  </p>
+                  {/* DETAILS */}
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="font-semibold text-green-950">
+                      {item.productName || "Unnamed Product"}
+                    </h3>
 
-                  {/* Quantity + Remove */}
-                  <div className="flex items-center gap-4 sm:gap-6 mt-auto">
-                    <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                    <p className="text-orange-500 font-bold mt-1">
+                      ₦{(item.price ?? 0).toLocaleString()}
+                    </p>
+
+                    {/* CONTROLS */}
+                    <div className="flex items-center gap-4 mt-auto">
+                      <div className="flex items-center border rounded-md overflow-hidden">
+                        {/* MINUS */}
+                        <button
+                          onClick={async () => {
+                            if (item.quantity <= 1) return;
+                            setUpdatingId(item.id);
+                            await updateCartItem(item.id, item.quantity - 1);
+                            setUpdatingId(null);
+                          }}
+                          disabled={item.quantity <= 1 || isUpdating}
+                          className="px-3 py-1 hover:bg-green-200 disabled:opacity-50"
+                        >
+                          <Minus size={16} />
+                        </button>
+
+                        <span className="px-4 text-sm font-medium">
+                          {item.quantity}
+                        </span>
+
+                        {/* PLUS */}
+                        <button
+                          onClick={async () => {
+                            setUpdatingId(item.id);
+                            await updateCartItem(item.id, item.quantity + 1);
+                            setUpdatingId(null);
+                          }}
+                          disabled={isUpdating}
+                          className="px-3 py-1 hover:bg-green-200 disabled:opacity-50"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+
+                      {/* REMOVE */}
                       <button
-                        onClick={() => onUpdateItem(item.id, item.quantity - 1)}
-                        className="px-3 py-1.5 hover:bg-green-200 rounded-lg transition-colors"
-                        disabled={item.quantity <= 1}
+                        onClick={async () => {
+                          setUpdatingId(item.id);
+                          await removeCartItem(item.id);
+                          setUpdatingId(null);
+                        }}
+                        disabled={isUpdating}
+                        className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm disabled:opacity-50"
                       >
-                        <Minus size={16} />
-                      </button>
-
-                      <span className="px-4 py-1.5 min-w-10 text-center text-sm font-medium">
-                        {item.quantity}
-                      </span>
-
-                      <button
-                        onClick={() => onUpdateItem(item.id, item.quantity + 1)}
-                        className="px-3 py-1.5 hover:bg-green-200 rounded-lg transition-colors"
-                      >
-                        <Plus size={16} />
+                        <Trash2 size={16} />
+                        Remove
                       </button>
                     </div>
+                  </div>
 
-                    <button
-                      onClick={() => onRemoveItem(item.id)}
-                      className="flex items-center gap-1.5 text-red-600 hover:bg-green-200 text-sm font-medium transition-colors"
-                    >
-                      <Trash2 size={16} />
-                      Remove
-                    </button>
+                  {/* SUBTOTAL */}
+                  <div className="font-bold text-green-950 text-lg">
+                    ₦{(item.subtotal ?? 0).toLocaleString()}
                   </div>
                 </div>
-
-                {/* Subtotal per item */}
-                <div className="text-right font-bold text-green-950 text-lg sm:text-xl mt-3 sm:mt-0 sm:min-w-30">
-                  ₦{item.subtotal.toLocaleString()}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {/* RIGHT: Order Summary */}
+          {/* RIGHT */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 lg:sticky lg:top-6">
+            <div className="bg-white rounded-lg  sm:rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 lg:sticky  lg:top-6">
               <h3 className="text-lg sm:text-xl font-bold text-green-950 mb-12">
                 Order Summary
               </h3>
 
               <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-gray-700">
-                <div className="flex mt-8 justify-between">
-                  <span>Subtotal</span>
-                  <span className="text-green-950 font-semibold">
+                <div className="flex justify-between">
+                  <span className="text-md">Subtotal</span>
+                  <span className="text-gray-800 font-medium">
                     ₦{subtotal.toLocaleString()}
                   </span>
                 </div>
+
                 <div className="flex justify-between">
-                  <span>VAT (7.5%)</span>
-                  <span className="text-green-950 font-semibold">
+                  <span className="text-md">VAT (7.5%)</span>
+                  <span className="text-gray-800 font-medium">
                     ₦{vat.toLocaleString()}
                   </span>
                 </div>
-                <div className="border-t border-gray-200 pt-4 mt-2">
-                  <div className="flex justify-between text-lg sm:text-lg font-bold text-green-950">
-                    <span>Total</span>
-                    <span className="text-orange-600 text-2xl">
-                      ₦{total.toLocaleString()}
-                    </span>
-                  </div>
+
+                <div className="border-t pt-3 flex justify-between font-bold">
+                  <span>Total</span>
+                  <span className="text-orange-600 text-xl">
+                    ₦{total.toLocaleString()}
+                  </span>
                 </div>
               </div>
 
-              <button className="flex justify-center items-center gap-3 w-full mt-15 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition shadow-sm hover:shadow active:scale-[0.98]">
-                Proceed to Checkout
+              {/* CHECKOUT */}
+              <button
+                onClick={() => {
+                  if (!user) {
+                    router.push("/login");
+                  } else {
+                    handleCheckout();
+                  }
+                }}
+                className="w-full mt-12 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg flex justify-center items-center gap-2"
+              >
+                {user ? "Proceed to Checkout" : "Login to Proceed"}
                 <ArrowRight size={16} />
               </button>
 
-              <p className="text-center text-xs sm:text-sm text-gray-500 mt-4">
-                Please{" "}
-                <span className="text-orange-600 font-medium">login</span> to
-                continue
-              </p>
-
+              {!user && (
+                <p className="text-sm text-center mt-3 text-gray-500">
+                  Please login to continue
+                </p>
+              )}
               {/* Payment Options */}
-              <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-gray-200">
-                <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
-                  Payment Options
-                </h4>
-                <ul className="space-y-2 text-sm sm:text-base text-gray-700">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-600">✓</span> Full Payment
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-600">✓</span> Pay Small Small
-                    (Installments)
-                  </li>
+              <div className="mt-6 border-t pt-4">
+                <h4 className="text-sm font-semibold mb-2">Payment Options</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>✓ Full Payment</li>
+                  <li>✓ Pay Small Small (Installments)</li>
                 </ul>
               </div>
             </div>
