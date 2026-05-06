@@ -1,114 +1,158 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Cart } from "@/types/products";
-import { toast } from "sonner";
 
-const emptyCart: Cart = { cartId: null, userId: "", items: [], total: 0 };
+const STORAGE_KEY = "guest_cart";
+
+const emptyCart: Cart = {
+  cartId: null,
+  userId: "",
+  items: [],
+  total: 0,
+};
+
+type AddToCartInput = {
+  productId: string;
+  productName: string;
+  price: number;
+  productImage: string;
+};
 
 export function useCart() {
   const [cart, setCart] = useState<Cart>(emptyCart);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [loading] = useState(false);
 
-  const fetchCart = useCallback(async () => {
-    setLoading(true);
-    setError("");
+  const isAddingRef = useRef(false); // prevent multiple calls
 
-    try {
-      const res = await fetch("/api/cart");
-      const json = await res.json();
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          setCart(emptyCart);
-          return;
-        }
-        setError(json.message ?? "Failed to fetch cart");
-        return;
-      }
-
-      setCart(json.data ?? emptyCart);
-    } catch {
-      setError("Failed to fetch cart");
-    } finally {
-      setLoading(false);
+  //Load cart
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      setCart(JSON.parse(stored));
     }
   }, []);
 
-  const addToCart = useCallback(async (productId: string, quantity: number = 1) => {
-    setError("");
+  const persist = (data: Cart) => {
+    setCart(data);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  };
 
-    try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, quantity }),
+  // ADD TO CART
+  const addToCart = useCallback(
+    async (product: AddToCartInput, quantity = 1) => {
+      if (isAddingRef.current) return false;
+      isAddingRef.current = true;
+
+      try {
+        setCart((prev) => {
+          const existing = prev.items.find(
+            (i) => i.productId === product.productId,
+          );
+
+          let updatedItems;
+
+          if (existing) {
+            updatedItems = prev.items.map((item) =>
+              item.productId === product.productId
+                ? {
+                    ...item,
+                    quantity: item.quantity + quantity,
+                    subtotal: (item.quantity + quantity) * item.price,
+                  }
+                : item,
+            );
+          } else {
+            updatedItems = [
+              ...prev.items,
+              {
+                id: product.productId,
+                productId: product.productId,
+                productName: product.productName,
+                productImage: product.productImage,
+                price: product.price,
+                quantity,
+                subtotal: product.price * quantity,
+              },
+            ];
+          }
+
+          const total = updatedItems.reduce(
+            (acc, item) => acc + item.quantity * item.price,
+            0,
+          );
+
+          const newCart = { ...prev, items: updatedItems, total };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(newCart));
+
+          return newCart;
+        });
+
+        return true;
+      } finally {
+        isAddingRef.current = false;
+      }
+    },
+    [],
+  );
+
+  // UPDATE CART ITEM
+  const updateCartItem = useCallback(
+    async (itemId: string, quantity: number) => {
+      if (quantity < 1) return false;
+
+      setCart((prev) => {
+        const updatedItems = prev.items.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                quantity,
+                subtotal: quantity * item.price,
+              }
+            : item,
+        );
+
+        const total = updatedItems.reduce(
+          (acc, item) => acc + item.quantity * item.price,
+          0,
+        );
+
+        const newCart = { ...prev, items: updatedItems, total };
+        persist(newCart);
+
+        return newCart;
       });
-      const json = await res.json();
 
-      if (!res.ok) {
-        if (res.status === 401) {
-          toast.error("Please login to add items to cart");
-          return false;
-        }
-        toast.error(json.message ?? "Failed to add to cart");
-        return false;
-      }
-
-      setCart(json.data ?? emptyCart);
-      toast.success("Product added to cart");
       return true;
-    } catch {
-      toast.error("Failed to add to cart");
-      return false;
-    }
-  }, []);
+    },
+    [],
+  );
 
-  const updateCartItem = useCallback(async (itemId: string, quantity: number) => {
-    setError("");
-
-    try {
-      const res = await fetch(`/api/cart/${itemId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity }),
-      });
-      const json = await res.json();
-
-      if (!res.ok) {
-        toast.error(json.message ?? "Failed to update cart");
-        return false;
-      }
-
-      setCart(json.data ?? emptyCart);
-      return true;
-    } catch {
-      toast.error("Failed to update cart");
-      return false;
-    }
-  }, []);
-
+  //  REMOVE CART ITEM
   const removeCartItem = useCallback(async (itemId: string) => {
-    setError("");
+    setCart((prev) => {
+      const updatedItems = prev.items.filter((i) => i.id !== itemId);
 
-    try {
-      const res = await fetch(`/api/cart/${itemId}`, {
-        method: "DELETE",
-      });
-      const json = await res.json();
+      const total = updatedItems.reduce(
+        (acc, item) => acc + item.quantity * item.price,
+        0,
+      );
 
-      if (!res.ok) {
-        toast.error(json.message ?? "Failed to remove item");
-        return false;
-      }
+      const newCart = { ...prev, items: updatedItems, total };
+      persist(newCart);
 
-      setCart(json.data ?? emptyCart);
-      toast.success("Item removed from cart");
-      return true;
-    } catch {
-      toast.error("Failed to remove item");
-      return false;
-    }
+      return newCart;
+    });
+
+    return true;
   }, []);
 
-  return { cart, loading, error, fetchCart, addToCart, updateCartItem, removeCartItem };
+  const count = cart.items.reduce((acc, i) => acc + i.quantity, 0);
+
+  return {
+    cart,
+    loading,
+    addToCart,
+    updateCartItem,
+    removeCartItem,
+    count,
+  };
 }
