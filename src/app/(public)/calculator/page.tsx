@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Sun, Zap, Camera, ArrowDown, Save, Loader2, Download } from "lucide-react";
+import {
+  Sun,
+  Zap,
+  Camera,
+  ArrowDown,
+  Save,
+  Loader2,
+  Download,
+  ShoppingCart,
+} from "lucide-react";
 import ApplianceScanner from "@/components/calculator/ApplianceScanner";
 import ApplianceList from "@/components/calculator/ApplianceList";
 import SystemConfig from "@/components/calculator/SystemConfig";
@@ -11,7 +20,9 @@ import { calculateSolar } from "@/lib/solar-calculator";
 import { Button } from "@/components/ui/button";
 import { useSaveSolarCalculation } from "@/hooks/use-solar-calculations";
 import { useAuth } from "@/components/providers/auth-provider";
+import { useCart } from "@/components/providers/cart-providers";
 import type { Appliance, SolarConfig } from "@/types/solar";
+import type { RecommendedBundle } from "@/components/calculator/RecommendedProducts";
 
 export default function CalculatorPage() {
   const [appliances, setAppliances] = useState<Appliance[]>([]);
@@ -42,15 +53,42 @@ export default function CalculatorPage() {
     setAppliances((prev) => prev.filter((a) => a.id !== id));
   };
 
-  const user = useAuth();
+  const { user } = useAuth();
   const { save, loading: saving } = useSaveSolarCalculation();
   const [savedId, setSavedId] = useState<string | null>(null);
+  const { addToCart } = useCart();
+  const [recommendedBundle, setRecommendedBundle] =
+    useState<RecommendedBundle | null>(null);
+  const [addingBundle, setAddingBundle] = useState(false);
+  const [bundleAdded, setBundleAdded] = useState(false);
 
   const handleSave = async () => {
     const result = await save({ appliances, config });
     if (result.data) {
       const data = result.data as { data: { id: string } };
       setSavedId(data.data.id);
+    }
+  };
+
+  const handleAddBundleToCart = async () => {
+    if (!recommendedBundle || addingBundle) return;
+
+    setAddingBundle(true);
+    try {
+      for (const item of recommendedBundle.items) {
+        await addToCart(
+          {
+            productId: item.product.id,
+            productName: item.product.name,
+            price: item.product.price,
+            productImage: item.product.imageUrl ?? "",
+          },
+          item.quantity,
+        );
+      }
+      setBundleAdded(true);
+    } finally {
+      setAddingBundle(false);
     }
   };
 
@@ -151,7 +189,34 @@ export default function CalculatorPage() {
               </div>
             )}
 
-            <RecommendedProducts results={results} config={config} />
+            {/* Add recommended products to cart (works for guests too) */}
+            <div className="mt-4 flex gap-3">
+              <Button
+                onClick={handleAddBundleToCart}
+                disabled={!recommendedBundle || addingBundle || bundleAdded}
+                className="bg-green-700 hover:bg-green-800 text-white shadow-md"
+              >
+                {addingBundle ? (
+                  <Loader2 className="animate-spin mr-2" size={16} />
+                ) : (
+                  <ShoppingCart className="mr-2" size={16} />
+                )}
+                {bundleAdded
+                  ? "Added to Cart!"
+                  : addingBundle
+                    ? "Adding..."
+                    : "Add Recommended to Cart"}
+              </Button>
+            </div>
+
+            <RecommendedProducts
+              results={results}
+              config={config}
+              onBundleChange={(bundle) => {
+                setRecommendedBundle(bundle);
+                setBundleAdded(false);
+              }}
+            />
           </div>
         )}
       </div>
