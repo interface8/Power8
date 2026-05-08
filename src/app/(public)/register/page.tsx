@@ -18,11 +18,6 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
@@ -54,46 +49,6 @@ export default function RegisterPage() {
     return "";
   };
 
-<<<<<<< HEAD
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setName(value);
-    setNameError(validateName(value));
-  };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    setEmailError(validateEmail(value));
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPhone(value);
-    setPhoneError(validatePhone(value));
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPassword(value);
-    setPasswordError(validatePassword(value));
-    if (confirmPassword) {
-      setConfirmError(confirmPassword !== value ? "Passwords do not match" : "");
-    }
-  };
-
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setConfirmPassword(value);
-    if (value !== password) {
-      setConfirmError("Passwords do not match");
-    } else {
-      setConfirmError("");
-    }
-  };
-
-=======
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -118,26 +73,6 @@ export default function RegisterPage() {
     !confirmError;
 
   return (
-<<<<<<< HEAD
-    <div 
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: "url('/images/power-1.jpg')" }}
-    >
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" />
-      
-      <Card className="relative z-10 w-full mx-4 my-4 p-4 md:p-6 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%]">
-        {/* Back to Home */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-2 pt-2 pb-4">
-          <ArrowLeft className="w-7 h-7 mr-4 md:w-6 md:h-6 md:mr-3" />
-          <span className="text-xl">Back to Home</span>
-        </Link>
-
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
-          <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-2xl shadow-lg">
-            <Sun className="w-14 h-14 md:w-12 md:h-12 text-white" />
-=======
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10 bg-cover bg-center relative"
       style={{ backgroundImage: "url('/images/power-1.jpg')" }}
@@ -156,25 +91,15 @@ export default function RegisterPage() {
         <div className="flex items-center justify-center gap-2 mb-6">
           <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow-md">
             <Sun className="w-8 h-8 text-white" />
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
           </div>
           <span className="text-2xl font-bold bg-linear-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
             Power - 8
           </span>
         </div>
 
-<<<<<<< HEAD
-        {/* Heading */}
-        <h1 className="text-4xl md:text-3xl font-semibold text-center mb-3">
-          Create Account
-        </h1>
-        <p className="text-[18px] md:text-xl md:font-normal text-gray-600 text-center mb-4 md:mb-6">
-          Enter your information to get started
-=======
         <h1 className="text-2xl font-semibold text-center">Create Account</h1>
         <p className="text-gray-500 text-center mb-6 text-sm">
           Fill in your details to get started
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
         </p>
 
         {error && (
@@ -183,34 +108,20 @@ export default function RegisterPage() {
           </Alert>
         )}
 
-<<<<<<< HEAD
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="">
-            <Label htmlFor="name" className="text-xl">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-=======
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
           <div>
             <Label>Full Name</Label>
             <div className="relative mt-1">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               <Input
                 value={name}
-<<<<<<< HEAD
-                onChange={handleNameChange}
-                required
-                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
-=======
                 onChange={(e) => {
                   setName(e.target.value);
                   setNameError(validateName(e.target.value));
                 }}
                 className="pl-10 h-11 bg-gray-50"
                 placeholder="John Doe"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               />
             </div>
             {nameError && (
@@ -218,31 +129,18 @@ export default function RegisterPage() {
             )}
           </div>
 
-<<<<<<< HEAD
-          <div className="">
-            <Label htmlFor="email" className="text-xl">Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-=======
           <div>
             <Label>Email</Label>
             <div className="relative mt-1">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               <Input
                 value={email}
-<<<<<<< HEAD
-                onChange={handleEmailChange}
-                required
-                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
-=======
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setEmailError(validateEmail(e.target.value));
                 }}
                 className="pl-10 h-11 bg-gray-50"
                 placeholder="you@example.com"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               />
             </div>
             {emailError && (
@@ -250,31 +148,18 @@ export default function RegisterPage() {
             )}
           </div>
 
-<<<<<<< HEAD
-          <div className="">
-            <Label htmlFor="phone" className="text-xl">Phone Number</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-=======
           <div>
             <Label>Phone</Label>
             <div className="relative mt-1">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               <Input
                 value={phone}
-<<<<<<< HEAD
-                onChange={handlePhoneChange}
-                required
-                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
-=======
                 onChange={(e) => {
                   setPhone(e.target.value);
                   setPhoneError(validatePhone(e.target.value));
                 }}
                 className="pl-10 h-11 bg-gray-50"
                 placeholder="+234..."
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               />
             </div>
             {phoneError && (
@@ -282,31 +167,18 @@ export default function RegisterPage() {
             )}
           </div>
 
-<<<<<<< HEAD
-          <div className="">
-            <Label htmlFor="password" className="text-xl">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-=======
           <div>
             <Label>Password</Label>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               <Input
                 type="password"
                 value={password}
-<<<<<<< HEAD
-                onChange={handlePasswordChange}
-                required
-                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
-=======
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setPasswordError(validatePassword(e.target.value));
                 }}
                 className="pl-10 h-11 bg-gray-50"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               />
             </div>
             {passwordError && (
@@ -314,25 +186,13 @@ export default function RegisterPage() {
             )}
           </div>
 
-<<<<<<< HEAD
-          <div className="">
-            <Label htmlFor="confirmPassword" className="text-xl">Confirm Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-=======
           <div>
             <Label>Confirm Password</Label>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               <Input
                 type="password"
                 value={confirmPassword}
-<<<<<<< HEAD
-                onChange={handleConfirmPasswordChange}
-                required
-                className="pl-12 py-5 text-2xl font-light md:py-3 md:text-lg md:font-normal bg-blue-50 rounded-xl"
-=======
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
                   setConfirmError(
@@ -340,7 +200,6 @@ export default function RegisterPage() {
                   );
                 }}
                 className="pl-10 h-11 bg-gray-50"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
               />
             </div>
             {confirmError && (
@@ -351,21 +210,13 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={!isFormValid || loading}
-<<<<<<< HEAD
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl py-4 rounded-xl mb-3 md:py-4 disabled:opacity-50 disabled:cursor-not-allowed"
-=======
             className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
           >
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
 
-<<<<<<< HEAD
-        <div className="mt-1 text-center text-[17px] font-light text-gray-600 pb-2 md:text-[15px] md:font-normal">
-=======
         <p className="text-sm text-center text-gray-500 mt-6">
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
           Already have an account?{" "}
           <Link href="/login" className="text-orange-500 font-medium">
             Sign in

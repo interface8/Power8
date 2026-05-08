@@ -50,13 +50,8 @@ export default function LoginPage() {
   const isFormValid = !emailError && !passwordError && email && password;
 
   return (
-<<<<<<< HEAD
-    <div 
-      className="min-h-screen w-full  h-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
-=======
     <div
       className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
       style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />

@@ -102,11 +102,7 @@ const ProductCard = ({ product }: Props) => {
 
         <Link
           href={`/products/${product.id}`}
-<<<<<<< HEAD
-          className="w-full bg-gray-400 hover:bg-gray-600 text-white text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mt-3 transition"
-=======
           className="w-full bg-gray-300 hover:bg-gray-400 text-white text-sm py-2.5 rounded-lg flex items-center justify-center mt-3"
->>>>>>> 073202a4896a73a04043bd70ec3b037481975814
         >
           View Details
         </Link>
