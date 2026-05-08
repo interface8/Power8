@@ -1,82 +1,122 @@
-// "use client";
-
-// import { createContext, useContext, type ReactNode } from "react";
-// import type { SessionUser } from "@/lib/auth/session";
-
-// const AuthContext = createContext<SessionUser | null>(null);
-
-// export function AuthProvider({
-//   user,
-//   children,
-// }: {
-//   user: SessionUser | null;
-//   children: ReactNode;
-// }) {
-//   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
-// }
-
-// export function useAuth() {
-//   return useContext(AuthContext);
-// }
-
-// /**
-//  * Client-side permission check hook.
-//  * Usage: const canRead = usePermission("users.read");
-//  */
-// export function usePermission(permission: string): boolean {
-//   const user = useContext(AuthContext);
-//   if (!user) return false;
-//   return user.permissions.includes(permission);
-// }
-
-// /**
-//  * Client-side role check hook.
-//  */
-// export function useRole(role: string): boolean {
-//   const user = useContext(AuthContext);
-//   if (!user) return false;
-//   return user.roles.includes(role);
-// }
-
-
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
-import type { SessionUser } from "@/lib/auth/session";
+import { createContext, useContext, useEffect, useState } from "react";
 
-const AuthContext = createContext<SessionUser | null>(null);
+/* ================= TYPES ================= */
 
-export function AuthProvider({
-  user,
-  children,
-}: {
-  user?: SessionUser | null;
-  children: ReactNode;
-}) {
-  return <AuthContext.Provider value={user ?? null}>{children}</AuthContext.Provider>;
+type User = {
+  name: string;
+  email: string;
+  permissions: string[];
+};
+
+type RegisterInput = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+};
+
+type AuthContextType = {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  hasPermission: (permission: string) => boolean;
+
+  register: (data: RegisterInput) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+};
+
+/* ================= CONTEXT ================= */
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+/* ================= PROVIDER ================= */
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /* ===== PERMISSION CHECK ===== */
+  const hasPermission = (permission: string) => {
+    if (!user) return false;
+    return user.permissions?.includes(permission);
+  };
+
+  /* ===== FETCH CURRENT USER ===== */
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+
+        setUser(res.ok ? data.user : null);
+      } catch {
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  /* ===== REGISTER ===== */
+  const register = async (data: RegisterInput) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message || "Registration failed");
+      }
+
+      setUser(result.user);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        hasPermission,
+        register,
+        loading,
+        error,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+/* ================= HOOKS ================= */
 
-/**
- * Client-side permission check hook.
- * Usage: const canRead = usePermission("users.read");
- */
-export function usePermission(permission: string): boolean {
-  const user = useContext(AuthContext);
-  if (!user) return false;
-  return user.permissions.includes(permission);
-}
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
+};
 
-/**
- * Client-side role check hook.
- */
-export function useRole(role: string): boolean {
-  const user = useContext(AuthContext);
-  if (!user) return false;
-  return user.roles.includes(role);
-}
-
-
+export const usePermission = (permission: string) => {
+  const { hasPermission } = useAuth();
+  return hasPermission(permission);
+};

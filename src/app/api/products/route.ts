@@ -4,7 +4,7 @@ import {
   productFiltersSchema,
   createProductSchema,
 } from "@/modules/products";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermission, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/products — list with filters 
@@ -23,9 +23,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/products — create
+// POST /api/products — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermission("products.create");
   if (isErrorResponse(guard)) return guard;
 
   try {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface UseApiOptions {
   onSuccess?: () => void;
@@ -9,16 +9,16 @@ export function useApi<T = unknown>() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  const fetchData = async (
+  const fetchData = useCallback(async (
     url: string,
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<{ data: T | null; error: string | null }> => {
     setError("");
     setLoading(true);
 
     try {
       const res = await fetch(url, options);
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
         const errorMessage = data.message ?? "Request failed";
@@ -28,15 +28,17 @@ export function useApi<T = unknown>() {
 
       return { data, error: null };
     } catch (err) {
-      const errorMessage = "Something went wrong" + (err instanceof Error ? `: ${err.message}` : "");
+      const errorMessage =
+        "Something went wrong" +
+        (err instanceof Error ? `: ${err.message}` : "");
       setError(errorMessage);
       return { data: null, error: errorMessage };
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const clearError = () => setError("");
+  const clearError = useCallback(() => setError(""), []);
 
   return {
     fetchData,
@@ -49,17 +51,19 @@ export function useApi<T = unknown>() {
 export function useQuery<T = unknown>(url: string, options?: UseApiOptions) {
   const [data, setData] = useState<T | null>(null);
   const { fetchData, loading, error, clearError } = useApi<T>();
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
-  const refetch = async () => {
+  const refetch = useCallback(async () => {
     const result = await fetchData(url);
     if (result.data) {
       setData(result.data);
-      options?.onSuccess?.();
+      optionsRef.current?.onSuccess?.();
     } else if (result.error) {
-      options?.onError?.(result.error);
+      optionsRef.current?.onError?.(result.error);
     }
     return result;
-  };
+  }, [fetchData, url]);
 
   return {
     data,
@@ -71,14 +75,14 @@ export function useQuery<T = unknown>(url: string, options?: UseApiOptions) {
 }
 
 export function useMutation<TData = unknown, TVariables = unknown>(
-  options?: UseApiOptions
+  options?: UseApiOptions,
 ) {
   const { fetchData, loading, error, clearError } = useApi<TData>();
 
   const mutate = async (
     url: string,
     data?: TVariables,
-    method: "POST" | "PUT" | "PATCH" | "DELETE" = "POST"
+    method: "POST" | "PUT" | "PATCH" | "DELETE" = "POST",
   ) => {
     const result = await fetchData(url, {
       method,

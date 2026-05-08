@@ -28,7 +28,7 @@ export default function Footer() {
           </Link>
 
           <Link
-            href="/testimonials"
+            href="/testimonial"
             className="hover:text-orange-400 transition"
           >
             Testimonials
