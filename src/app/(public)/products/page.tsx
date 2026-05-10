@@ -21,7 +21,21 @@ export default function ProductsPage() {
         loading={loading}
         categories={categories}
         companies={companies}
-        onAddToCart={addToCart}
+        onAddToCart={(productId, quantity = 1) => {
+          const product = products.find((p) => p.id === productId);
+
+          if (!product) return Promise.resolve(false);
+
+          return addToCart(
+            {
+              productId: product.id,
+              productName: product.name,
+              price: product.price,
+              productImage: product.imageUrl ?? "",
+            },
+            quantity
+          );
+        }}
         fetchProducts={fetchProducts}
         pagination={pagination}
       />

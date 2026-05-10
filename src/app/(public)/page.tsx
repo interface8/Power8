@@ -1,4 +1,3 @@
-import Navbar from "@/components/homepage/navbar/Navbar";
 import Hero from "@/components/homepage/hero/Hero";
 import WhyChooseUs from "@/components/homepage/whychooseus/WhyChooseUs";
 import Footer from "@/components/homepage/footer/Footer";
@@ -9,13 +8,12 @@ import CTA from "@/components/homepage/CTA/CTA";
 export default function Home() {
   return (
     <>
-      <Navbar />
       <Hero />
       <WhyChooseUs />
       <HowItWorks />
       <TestimonialPrev />
       <CTA />
       <Footer />
-    </>
+      </>
   );
 }

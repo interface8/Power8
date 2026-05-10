@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuthActions } from "@/hooks/use-auth-actions";
 
 export default function LoginPage() {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error } = useAuthActions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -20,13 +20,13 @@ export default function LoginPage() {
   const validateEmail = (email: string) => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return "Enter a valid email (e.g., name@example.com)";
+    if (!emailRegex.test(email)) return "Enter a valid email";
     return "";
   };
 
   const validatePassword = (password: string) => {
     if (!password) return "Password is required";
-    if (password.length < 8) return "Password must be at least 8 characters";
+    if (password.length < 8) return "Minimum 8 characters";
     return "";
   };
 
@@ -50,104 +50,96 @@ export default function LoginPage() {
   const isFormValid = !emailError && !passwordError && email && password;
 
   return (
-    <div 
-      className="min-h-screen w-full  h-full flex items-center justify-center rounded-xl bg-cover bg-center bg-no-repeat relative"
+    <div
+      className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative"
       style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" />
-      
-      <Card className="relative z-10 w-full mx-4 my-8 p-6 md:p-8 md:font-semibold gap-0 flex flex-col bg-white rounded-3xl md:w-[30%] md:my-12">
-        {/* Back to Home */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-4 pt-4 pb-8">
-          <ArrowLeft className="w-7 h-7 mr-4 md:w-6 md:h-6 md:mr-3"/>
-          <span className="text-lg">Back to Home</span>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+      <Card className="relative z-10 w-full max-w-md p-6 md:p-8 rounded-2xl shadow-xl bg-white/95">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
         </Link>
 
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8 md:mb-10">
-          <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow-lg">
-            <Sun className="w-14 h-14 md:w-12 md:h-12 text-white" />
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow">
+            <Sun className="w-8 h-8 text-white" />
           </div>
-          <span className="text-4xl md:text-4xl font-semibold bg-linear-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-            Power - 8
-          </span>
+          <span className="text-xl font-semibold text-orange-600">Power-8</span>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-4xl md:text-3xl font-semibold text-center mb-6">
+        <h1 className="text-2xl md:text-3xl font-semibold text-center mb-2">
           Welcome Back
         </h1>
-        <p className="text-[18px] md:text-xl md:font-normal text-black text-center mb-8 md:mb-10">
+        <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
           Login to your account
         </p>
 
-        {/* Error */}
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="">
-            <Label htmlFor="email" className="text-xl">Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-300" />
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <div className="relative mt-1">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 id="email"
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onChange={handleEmailChange}
-                required
-                className="pl-12 py-7 text-2xl font-light md:py-5 md:text-lg md:font-normal bg-blue-50"
+                className="pl-10 h-12 bg-gray-50"
               />
             </div>
             {emailError && (
-              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              <p className="text-red-500 text-xs mt-1">{emailError}</p>
             )}
           </div>
 
-          <div className="">
-            <Label htmlFor="password" className="text-xl">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={handlePasswordChange}
-                required
-                className="pl-12 py-7 mb-4 md:py-5 bg-blue-50"
+                className="pl-10 h-12 bg-gray-50"
               />
             </div>
             {passwordError && (
-              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+              <p className="text-red-500 text-xs mt-1">{passwordError}</p>
             )}
           </div>
 
           <Button
             type="submit"
             disabled={!isFormValid || loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl py-8 rounded-xl mb-8 md:py-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
           >
             {loading ? "Signing in..." : "Login"}
           </Button>
         </form>
 
-        {/* Register link */}
-        <div className="mt-4 text-center text-[17px] font-light text-black pb-6 md:text-[15px] md:font-normal">
+        <p className="text-center text-sm text-gray-600 mt-6">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="text-orange-500 hover:text-orange-600 font-medium text-[19px] md:text-[16px]"
+            className="text-orange-500 hover:text-orange-600 font-medium"
           >
-            Register here
+            Register
           </Link>
-        </div>
+        </p>
       </Card>
     </div>
   );

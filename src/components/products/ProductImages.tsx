@@ -13,7 +13,7 @@ export default function ProductImages({ images }: ProductImagesProps) {
   return (
     <div className="flex flex-col gap-4 w-full">
       {/* Main Image - Full width on mobile, 90% on desktop */}
-      <div className="relative h-[300px] md:h-[380px] bg-gray-100 rounded-xl overflow-hidden w-full md:w-[90%] md:mx-auto mb-4">
+      <div className="relative h-75 md:h-95 bg-gray-100 rounded-xl overflow-hidden w-full md:w-[90%] md:mx-auto mb-4">
         <Image
           src={selectedImage}
           alt="Product image"
