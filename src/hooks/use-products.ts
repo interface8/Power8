@@ -3,10 +3,16 @@ import type { Product, ProductFilters } from "@/types/products";
 
 import { ProductDto } from "@/modules/products";
 
+interface Pagination {
+  total: number;
+  totalPages: number;
+}
+
 export function useProducts(filters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pagination, setPagination] = useState<Pagination>({ total: 0, totalPages: 0 });
 
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
@@ -18,8 +24,10 @@ export function useProducts(filters?: ProductFilters) {
     if (f?.categoryId) params.set("categoryId", f.categoryId);
     if (f?.companyId) params.set("companyId", f.companyId);
     if (f?.minCapacity != null) params.set("minCapacity", String(f.minCapacity));
+    params.set("page", String(f?.page ?? 1));
+    params.set("limit", "12");
 
-    const url = `/api/products${params.toString() ? `?${params}` : ""}`;
+    const url = `/api/products?${params}`;
 
     setLoading(true);
     setError("");
@@ -34,6 +42,7 @@ export function useProducts(filters?: ProductFilters) {
       }
 
       setProducts(json.data ?? []);
+      setPagination({ total: json.total ?? 0, totalPages: json.totalPages ?? 0 });
     } catch {
       setError("Failed to fetch products");
     } finally {
@@ -45,7 +54,7 @@ export function useProducts(filters?: ProductFilters) {
     fetchProducts();
   }, [fetchProducts]);
  
-  return { products, loading, error, fetchProducts };
+  return { products, loading, error, fetchProducts, pagination };
 }
 
 export function useProductDetails(productId: string) {  

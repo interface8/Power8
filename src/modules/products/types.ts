@@ -36,4 +36,13 @@ export interface ProductFilters {
   categoryId?: string;
   companyId?: string;
   minCapacity?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedProducts {
+  products: ProductDto[];
+  total: number;
+  page: number;
+  totalPages: number;
 }
