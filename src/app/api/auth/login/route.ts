@@ -28,7 +28,12 @@ export async function POST(request: NextRequest) {
       return errorResponse("Invalid email or password", 401);
     }
 
-    const token = await signJwt({ sub: user.id, email: user.email });
+    // after
+    const roleNames =
+      user.roles?.map((ur: { role: { name: string } }) => ur.role.name) ?? [];
+    const role = roleNames.includes("admin") ? "admin" : undefined;
+    const token = await signJwt({ sub: user.id, email: user.email, role });
+
     await setAuthCookie(token);
 
     return jsonResponse({
