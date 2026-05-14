@@ -13,6 +13,7 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       )}
 
+      {/* Happy Customers */}
       <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
         <div className="text-3xl sm:text-4xl font-bold mb-6 lg:text-5xl tracking-widest text-orange-600">
           {loading ? "Loading..." : stats.totalTestimonials}
@@ -22,17 +23,19 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       </div>
 
+      {/* System installed */}
       <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
-        <div className="text-3xl sm:text-4xl font-semibold mb-6  lg:text-5xl tracking-widest text-orange-600">
-          {loading ? "Loading..." : (stats.averageRating?.toFixed(1) ?? 0)}
+        <div className="text-3xl sm:text-4xl font-semibold mb-6 lg:text-5xl tracking-widest text-orange-600">
+          {loading ? "Loading..." : "0"}
         </div>
-        <div className="text-sm sm:text-base text-gray-500  font-normal lg:text-xl pt-6">
+        <div className="text-sm sm:text-base text-gray-500 font-normal lg:text-xl pt-6">
           System installed
         </div>
       </div>
 
+      {/* Total Savings */}
       <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
-        <div className="text-3xl sm:text-4xl font-semibold mb-6 lg:text-5xl  text-orange-600">
+        <div className="text-3xl sm:text-4xl font-semibold mb-6 lg:text-5xl text-orange-600">
           ₦2.8B+
         </div>
         <div className="text-sm sm:text-base text-gray-500 font-normal lg:text-xl pt-6">
@@ -40,11 +43,12 @@ export default function StatsSummary({ stats, loading, error }: StatsSummaryProp
         </div>
       </div>
 
+      {/* Customer Satisfaction - uses averageRating */}
       <div className="text-center py-6 md:py-8 rounded-xl shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-[#F05700]/10 bg-white max-w-100">
-        <div className="text-4xl sm:text-4xl font-semibold mb-6  lg:text-5xl tracking-widest text-orange-600">
-          98%
+        <div className="text-4xl sm:text-4xl font-semibold mb-6 lg:text-5xl tracking-widest text-orange-600">
+          {loading ? "Loading..." : (stats.averageRating?.toFixed(1) ?? 0)}
         </div>
-        <div className="text-sm sm:text-base text-gray-500  font-normal lg:text-xl pt-6">
+        <div className="text-sm sm:text-base text-gray-500 font-normal lg:text-xl pt-6">
           Customer Satisfaction
         </div>
       </div>
