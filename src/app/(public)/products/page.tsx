@@ -9,7 +9,7 @@ import { useProductCategories } from "@/hooks/use-product-categories";
 import { useCart } from "@/hooks/use-cart";
 
 export default function ProductsPage() {
-  const { products, loading, fetchProducts } = useProducts();
+  const { products, loading, fetchProducts, pagination } = useProducts();
   const { companies } = useCompanies();
   const { categories } = useProductCategories();
   const { addToCart } = useCart();
@@ -52,6 +52,7 @@ export default function ProductsPage() {
         fetchProducts={fetchProducts}
         hasMore={hasMore}
         loadMore={loadMore}
+        pagination={pagination}
       />
     </div>
   );

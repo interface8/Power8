@@ -55,7 +55,7 @@ export default function ApplianceScanner({ onAdd }: ApplianceScannerProps) {
         setWatts(String(result.extractedWatts));
       }
 
-      // Auto-fill from detected category
+      // Auto-fill from detected categoryyyy
       if (result.detectedCategory) {
         const profile = detectCategory(result.detectedCategory);
         if (profile) {

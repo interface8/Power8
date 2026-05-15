@@ -20,4 +20,6 @@ export const productFiltersSchema = z.object({
   categoryId: z.string().optional(),
   companyId: z.string().optional(),
   minCapacity: z.coerce.number().int().min(0).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(12),
 });
