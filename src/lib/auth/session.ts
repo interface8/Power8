@@ -7,6 +7,7 @@ import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "./constants";
 export interface JwtPayload {
   sub: string; // userId
   email: string;
+  role?: string;
   iat?: number;
   exp?: number;
 }
