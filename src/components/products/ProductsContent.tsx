@@ -36,6 +36,14 @@ export default function ProductsContent({
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
   const triggerFetch = useCallback(
     (s: string, catId: string, compId: string, p: number) => {
       fetchProducts({
