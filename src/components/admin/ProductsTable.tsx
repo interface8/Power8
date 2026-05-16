@@ -42,7 +42,7 @@ export default function ProductsTable() {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px]">
+        <table className="w-full min-w-175">
           <thead className="bg-gray-50">
             <tr className="text-left">
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">
