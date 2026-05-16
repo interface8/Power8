@@ -8,5 +8,13 @@ export async function GET() {
     return errorResponse("Unauthorized", 401);
   }
 
-  return jsonResponse({ user });
+  return jsonResponse({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      roles: user.roles,
+      permissions: user.permissions,
+    },
+  });
 }
