@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useProductDetails } from "@/hooks/use-product-details";
+import { useCart } from "@/components/providers/cart-providers";
 import { useTestimonialStats } from "@/hooks/use-testimonials";
-import { useCart } from "@/hooks/use-cart";
 import ProductDetails from "@/components/products/ProductDetails";
 import {
   Breadcrumb,
@@ -21,8 +22,12 @@ export default function ProductDetailsPage({
 }) {
   const router = useRouter();
   const { product, loading, error } = useProductDetails(params.id);
-  const { stats, loading: statsLoading } = useTestimonialStats();
   const { addToCart } = useCart();
+  const {
+    stats,
+    loading: statsLoading,
+    error: statsError,
+  } = useTestimonialStats();
 
   if (loading || statsLoading) {
     return (
@@ -35,32 +40,31 @@ export default function ProductDetailsPage({
     );
   }
 
-  if (error || !product) {
+  if (error || statsError || !product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 text-lg mb-2">
             {error || "Product not found"}
           </p>
-          <a href="/products" className="text-orange-500 hover:underline">
+          <Link href="/products" className="text-orange-500 hover:underline">
             ← Back to Products
-          </a>
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFAEC] ">
-      <div className="w-full mx-auto ">
-        {/* Breadcrumb using shadcn/ui components */}
-        <div className="mb-4 bg-[#FFFEFB] py-4 md:py-6 px-8 md:px-24 border-b border-gray-400/20 pb-4">
+    <div className="min-h-screen bg-[#FFFAEC]">
+      <div className="w-full mx-auto">
+        <div className="mb-4 bg-[#FFFEFB] py-4 md:py-6 px-8 md:px-24 border-b border-gray-400/20 mt-8">
           <Breadcrumb>
             <BreadcrumbList className="gap-3 md:gap-4">
               <BreadcrumbItem>
                 <BreadcrumbLink
                   onClick={() => router.push("/")}
-                  className="text-xl font-medium"
+                  className="text-xl font-medium cursor-pointer hover:text-orange-500 transition"
                 >
                   Home
                 </BreadcrumbLink>
@@ -69,7 +73,7 @@ export default function ProductDetailsPage({
               <BreadcrumbItem>
                 <BreadcrumbLink
                   onClick={() => router.push("/products")}
-                  className="text-xl font-medium"
+                  className="text-xl font-medium cursor-pointer hover:text-orange-500 transition"
                 >
                   Products
                 </BreadcrumbLink>
@@ -84,21 +88,21 @@ export default function ProductDetailsPage({
           </Breadcrumb>
         </div>
 
-        {/* Product Details */}
         <ProductDetails
           product={product}
           stats={stats}
-          onAddToCart={(productId, quantity) =>
-            addToCart(
+          onAddToCart={(productId, quantity) => {
+            console.log("Add to Cart clicked:", { productId, quantity, productName: product.name });
+            return addToCart(
               {
                 productId,
                 productName: product.name,
                 price: product.price,
-                productImage: product.imageUrl ?? "", // fallback if missing
+                productImage: product.imageUrl ?? "",
               },
               quantity,
-            )
-          }
+            );
+          }}
         />
       </div>
     </div>

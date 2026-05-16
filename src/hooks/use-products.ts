@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Product, ProductFilters } from "@/types/products";
-
 import { ProductDto } from "@/modules/products";
 
 interface Pagination {
@@ -42,6 +41,7 @@ export function useProducts(filters?: ProductFilters) {
       }
 
       setProducts(json.data ?? []);
+
       setPagination({ total: json.total ?? 0, totalPages: json.totalPages ?? 0 });
     } catch {
       setError("Failed to fetch products");

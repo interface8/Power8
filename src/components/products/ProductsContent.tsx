@@ -17,6 +17,8 @@ interface ProductsContentProps {
   companies: Company[];
   onAddToCart: (productId: string, quantity?: number) => Promise<boolean>;
   fetchProducts: (filters?: ProductFilters) => Promise<void>;
+  hasMore?: boolean;
+  loadMore?: () => void;
   pagination: Pagination;
 }
 
@@ -27,6 +29,8 @@ export default function ProductsContent({
   companies,
   onAddToCart,
   fetchProducts,
+  hasMore = false,
+  loadMore,
   pagination,
 }: ProductsContentProps) {
   const [search, setSearch] = useState("");
