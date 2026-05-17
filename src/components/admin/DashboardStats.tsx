@@ -1,67 +1,105 @@
+"use client";
+
 import {
   DollarSign,
-  ShoppingCart,
-  Package,
   Users,
+  ShoppingCart,
+  AlertTriangle,
+  Package,
+  Boxes,
 } from "lucide-react";
 
-const stats = [
-  {
-    title: "Revenue",
-    value: "₦450,000",
-    icon: DollarSign,
-    color: "text-green-600",
-    bg: "bg-green-100",
-  },
-  {
-    title: "Orders",
-    value: "1,245",
-    icon: ShoppingCart,
-    color: "text-orange-600",
-    bg: "bg-orange-100",
-  },
-  {
-    title: "Products",
-    value: "320",
-    icon: Package,
-    color: "text-blue-600",
-    bg: "bg-blue-100",
-  },
-  {
-    title: "Users",
-    value: "2,430",
-    icon: Users,
-    color: "text-purple-600",
-    bg: "bg-purple-100",
-  },
-];
+import StatCard from "./StatCard";
+import { useAdminStats } from "@/hooks/use-admin-stats";
+import DashboardStatsSkeleton from "./DashboardStatsSkeleton";
+import DashboardErrorState from "./DashboardErrorState";
+
+const currencyFormatter = new Intl.NumberFormat("en-NG", {
+  style: "currency",
+  currency: "NGN",
+  maximumFractionDigits: 0,
+});
 
 export default function DashboardStats() {
+  const { data, loading, error, refetch } = useAdminStats();
+
+  if (loading) {
+    return <DashboardStatsSkeleton />;
+  }
+
+  if (error || !data) {
+    return (
+      <DashboardErrorState
+        message={error || "Failed to load dashboard statistics"}
+        onRetry={refetch}
+      />
+    );
+  }
+
+  const stats = [
+    {
+      title: "Total Revenue",
+      value: currencyFormatter.format(data.totalRevenue),
+      icon: DollarSign,
+      iconColor: "text-green-600",
+      iconBg: "bg-green-100",
+    },
+
+    {
+      title: "Active Users",
+      value: data.activeUsers,
+      icon: Users,
+      iconColor: "text-purple-600",
+      iconBg: "bg-purple-100",
+    },
+
+    {
+      title: "Total Orders",
+      value: data.totalOrders,
+      icon: ShoppingCart,
+      iconColor: "text-orange-600",
+      iconBg: "bg-orange-100",
+    },
+
+    {
+      title: "Overdue Payments",
+      value: data.overduePaymentSchedules,
+      icon: AlertTriangle,
+      iconColor: "text-red-600",
+      iconBg: "bg-red-100",
+      warning: true,
+    },
+
+    {
+      title: "In Stock Products",
+      value: data.inStockProducts,
+      icon: Boxes,
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-100",
+    },
+
+    {
+      title: "Out Of Stock",
+      value: data.outOfStockProducts,
+      icon: Package,
+      iconColor: "text-red-600",
+      iconBg: "bg-red-100",
+      warning: true,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
       {stats.map((stat) => (
-        <div
+        <StatCard
           key={stat.title}
-          className="bg-white border border-gray-200 rounded-2xl p-5"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">
-                {stat.title}
-              </p>
-
-              <h3 className="text-2xl font-bold text-gray-900 mt-2">
-                {stat.value}
-              </h3>
-            </div>
-
-            <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}
-            >
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
-            </div>
-          </div>
-        </div>
+          title={stat.title}
+          value={stat.value}
+          icon={stat.icon}
+          iconColor={stat.iconColor}
+          iconBg={stat.iconBg}
+          warning={stat.warning}
+        />
       ))}
     </div>
   );
