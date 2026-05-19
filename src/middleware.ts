@@ -4,6 +4,7 @@ import { jwtVerify } from "jose";
 const AUTH_COOKIE_NAME = "power8_token";
 const PUBLIC_ROUTES = ["/login", "/register", "/forgot-password"];
 const PROTECTED_ROUTE_PREFIX = "/dashboard";
+const ADMIN_ROUTE_PREFIX = "/admin";
 
 function getSecret() {
   const secret = process.env.JWT_SECRET;
@@ -32,6 +33,20 @@ export async function middleware(request: NextRequest) {
     try {
       const { payload } = await jwtVerify(token, getSecret());
       isAuthenticated = !!payload.sub;
+      if (pathname.startsWith("/admin")) {
+        if (!payload?.sub) {
+          const loginUrl = new URL("/login", request.url);
+          loginUrl.searchParams.set("callbackUrl", pathname);
+          return NextResponse.redirect(loginUrl);
+        }
+
+        if ((payload as { role?: string }).role !== "admin") {
+          return NextResponse.json(
+            { error: "forbidden", message: "Admin access required." },
+            { status: 403 },
+          );
+        }
+      }
 
       // Attach user info to headers for downstream use
       const response = NextResponse.next();
@@ -52,6 +67,11 @@ export async function middleware(request: NextRequest) {
 
   // ─── Protect dashboard routes ─────────────────────────
   if (!isAuthenticated && pathname.startsWith(PROTECTED_ROUTE_PREFIX)) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+  if (!isAuthenticated && pathname.startsWith(ADMIN_ROUTE_PREFIX)) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
