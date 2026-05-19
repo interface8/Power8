@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { ProductDto, CreateProductInput, UpdateProductInput, ProductFilters } from "./types";
+import type { ProductDto, CreateProductInput, UpdateProductInput, ProductFilters, PaginatedProducts } from "./types";
 
 const productWithRelations = {
   include: {
@@ -44,29 +44,41 @@ function toProductDto(product: {
   };
 }
 
-export async function findProducts(filters: ProductFilters = {}): Promise<ProductDto[]> {
-  const { search, categoryId, companyId, minCapacity } = filters;
+export async function findProducts(filters: ProductFilters = {}): Promise<PaginatedProducts> {
+  const { search, categoryId, companyId, minCapacity, page = 1, limit = 12 } = filters;
 
-  const products = await prisma.product.findMany({
-    where: {
-      isActive: true,
-      ...(categoryId ? { categoryId } : {}),
-      ...(companyId ? { companyId } : {}),
-      ...(minCapacity != null ? { capacity: { gte: minCapacity } } : {}),
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" } },
-              { description: { contains: search, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    ...productWithRelations,
-  });
+  const where = {
+    isActive: true,
+    ...(categoryId ? { categoryId } : {}),
+    ...(companyId ? { companyId } : {}),
+    ...(minCapacity != null ? { capacity: { gte: minCapacity } } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { description: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
 
-  return products.map(toProductDto);
+  const [rows, total] = await prisma.$transaction([
+    prisma.product.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      ...productWithRelations,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return {
+    products: rows.map(toProductDto),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function findProductById(id: string): Promise<ProductDto | null> {
