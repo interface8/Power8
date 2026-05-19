@@ -76,7 +76,7 @@ export async function getAdminStats(
       customerName: o.user.name,
       customerEmail: o.user.email,
       totalAmount: o.totalAmount.toNumber(),
-      paymentType: o.paymentType as "FULL" | "CREDIT",
+      paymentType: o.paymentType,
       orderStatus: o.status,
       createdAt: o.createdAt,
       updatedAt: o.updatedAt,

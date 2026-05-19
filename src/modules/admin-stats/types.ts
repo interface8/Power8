@@ -1,3 +1,5 @@
+import { OrderStatus, PaymentType } from "@prisma/client";
+
 export type AdminStatsDto = {
   totalRegisteredUsers: number;
   activeCreditAccounts: number;
@@ -17,8 +19,8 @@ export type AdminStatsDto = {
     customerName: string;
     customerEmail: string;
     totalAmount: number;
-    paymentType: "FULL" | "CREDIT";
-    orderStatus: string;
+    paymentType: PaymentType
+    orderStatus: OrderStatus;
     createdAt: Date;
     updatedAt: Date;
   }>;
