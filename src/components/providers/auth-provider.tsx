@@ -8,6 +8,7 @@ type User = {
   name: string;
   email: string;
   permissions: string[];
+  roles: string[];
 };
 
 type RegisterInput = {

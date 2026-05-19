@@ -124,7 +124,7 @@ export async function handleWebhook(reference: string) {
         // First payment — activate the order
         await tx.order.updateMany({
           where: { id: payment.orderId, status: "PENDING" },
-          data: { status: "ACTIVE" },
+          data: { status: "PROCESSING" },
         });
       }
     } else {

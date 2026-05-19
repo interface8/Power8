@@ -7,15 +7,20 @@ import {
 import { requireApiPermission, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
-// GET /api/products — list with filters 
+// GET /api/products — list with filters
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const filters = productFiltersSchema.parse(
       Object.fromEntries(searchParams),
     );
-    const products = await productService.listProducts(filters);
-    return jsonResponse({ data: products });
+    const result = await productService.listProducts(filters);
+    return jsonResponse({
+      data: result.products,
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages,
+    });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Failed to fetch products";
