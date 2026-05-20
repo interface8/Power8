@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  DollarSign,
-  Users,
-  ShoppingCart,
-  AlertTriangle,
-  Package,
-  Boxes,
-} from "lucide-react";
+import { Users, AlertTriangle, CircleDollarSign, Power } from "lucide-react";
 
 import StatCard from "./StatCard";
 import { useAdminStats } from "@/hooks/use-admin-stats";
@@ -40,25 +33,25 @@ export default function DashboardStats() {
     {
       title: "Total Revenue",
       value: currencyFormatter.format(data.totalRevenue),
-      icon: DollarSign,
-      iconColor: "text-green-600",
+      icon: CircleDollarSign,
+      iconColor: "text-green-600 border-green-700",
       iconBg: "bg-green-100",
     },
 
     {
-      title: "Active Users",
-      value: data.activeUsers,
+      title: "Registered Users",
+      value: data.totalRegisteredUsers,
       icon: Users,
       iconColor: "text-purple-600",
       iconBg: "bg-purple-100",
     },
 
     {
-      title: "Total Orders",
-      value: data.totalOrders,
-      icon: ShoppingCart,
-      iconColor: "text-orange-600",
-      iconBg: "bg-orange-100",
+      title: "Active Credit Accounts",
+      value: data.activeCreditAccounts,
+      icon: Power,
+      iconColor: "text-green-700",
+      iconBg: "bg-green-100",
     },
 
     {
@@ -71,19 +64,11 @@ export default function DashboardStats() {
     },
 
     {
-      title: "In Stock Products",
-      value: data.inStockProducts,
-      icon: Boxes,
-      iconColor: "text-blue-600",
-      iconBg: "bg-blue-100",
-    },
-
-    {
-      title: "Out Of Stock",
-      value: data.outOfStockProducts,
-      icon: Package,
-      iconColor: "text-red-600",
-      iconBg: "bg-red-100",
+      title: `Low Stock (< ${data.lowStockProducts.threshold})`,
+      value: data.lowStockProducts.count,
+      icon: AlertTriangle,
+      iconColor: "text-red-500",
+      iconBg: "bg-gray-100",
       warning: true,
     },
   ];

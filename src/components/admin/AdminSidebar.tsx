@@ -159,6 +159,7 @@ import {
   Settings,
   X,
   Sun,
+  HomeIcon,
 } from "lucide-react";
 
 const links = [
@@ -214,10 +215,7 @@ interface Props {
   setOpen: (open: boolean) => void;
 }
 
-export default function AdminSidebar({
-  open,
-  setOpen,
-}: Props) {
+export default function AdminSidebar({ open, setOpen }: Props) {
   const pathname = usePathname();
 
   return (
@@ -243,23 +241,20 @@ export default function AdminSidebar({
       >
         {/* Logo */}
         <div className="h-16 border-b border-white px-6 flex items-center justify-between">
-          <Link
-            href="/admin/dashboard"
-            className="flex items-center gap-2"
-          >
+          <Link href="/admin/dashboard" className="flex items-center gap-2">
             <div className="bg-orange-500 p-2 rounded-lg">
               <Sun className="w-5 h-5 text-white" />
             </div>
 
-            <span className="font-bold text-lg">
-              Power-8
-            </span>
+            <span className="font-bold text-lg">Power-8</span>
           </Link>
 
-          <button
-            onClick={() => setOpen(false)}
-            className="lg:hidden"
-          >
+          <Link href="/">
+            {" "}
+            <HomeIcon className="w-5 h-5" />
+          </Link>
+
+          <button onClick={() => setOpen(false)} className="lg:hidden">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -286,9 +281,7 @@ export default function AdminSidebar({
               >
                 <link.icon className="w-5 h-5" />
 
-                <span className="text-sm font-medium">
-                  {link.name}
-                </span>
+                <span className="text-sm font-medium">{link.name}</span>
               </Link>
             );
           })}

@@ -74,7 +74,7 @@ export default function AdminHeader({ setOpen }: Props) {
       <div className="flex items-center gap-3 sm:gap-5">
         {/* View Store */}
         <Link
-          href="/"
+          href="/products"
           target="_blank"
           className="hidden md:flex items-center gap-1.5 text-sm text-gray-600 hover:text-orange-600 transition-colors"
         >
