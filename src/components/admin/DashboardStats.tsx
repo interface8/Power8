@@ -1,11 +1,20 @@
-"use client";
+import {
+  DollarSign,
+  Users,
+  ShoppingCart,
+  AlertTriangle,
+  Package,
+  Boxes,
+  CreditCard,
+} from "lucide-react";
 
-import { Users, AlertTriangle, CircleDollarSign, Power } from "lucide-react";
+import { AdminStats } from "@/types/admin";
 
 import StatCard from "./StatCard";
-import { useAdminStats } from "@/hooks/use-admin-stats";
-import DashboardStatsSkeleton from "./DashboardStatsSkeleton";
-import DashboardErrorState from "./DashboardErrorState";
+
+interface DashboardStatsProps {
+  stats: AdminStats;
+}
 
 const currencyFormatter = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -13,77 +22,89 @@ const currencyFormatter = new Intl.NumberFormat("en-NG", {
   maximumFractionDigits: 0,
 });
 
-export default function DashboardStats() {
-  const { data, loading, error, refetch } = useAdminStats();
-
-  if (loading) {
-    return <DashboardStatsSkeleton />;
-  }
-
-  if (error || !data) {
-    return (
-      <DashboardErrorState
-        message={error || "Failed to load dashboard statistics"}
-        onRetry={refetch}
-      />
-    );
-  }
-
-  const stats = [
+export default function DashboardStats({ stats }: DashboardStatsProps) {
+  const cards = [
     {
       title: "Total Revenue",
-      value: currencyFormatter.format(data.totalRevenue),
-      icon: CircleDollarSign,
-      iconColor: "text-green-600 border-green-700",
+      value: currencyFormatter.format(stats.totalRevenue),
+      icon: DollarSign,
+      iconColor: "text-green-600",
       iconBg: "bg-green-100",
     },
 
     {
       title: "Registered Users",
-      value: data.totalRegisteredUsers,
+      value: stats.totalRegisteredUsers,
       icon: Users,
       iconColor: "text-purple-600",
       iconBg: "bg-purple-100",
     },
 
     {
+      title: "Total Orders",
+      value: stats.totalOrders,
+      icon: ShoppingCart,
+      iconColor: "text-orange-600",
+      iconBg: "bg-orange-100",
+    },
+
+    {
       title: "Active Credit Accounts",
-      value: data.activeCreditAccounts,
-      icon: Power,
-      iconColor: "text-green-700",
-      iconBg: "bg-green-100",
+      value: stats.activeCreditAccounts,
+      icon: CreditCard,
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-100",
     },
 
     {
       title: "Overdue Payments",
-      value: data.overduePaymentSchedules,
+      value: stats.overduePaymentSchedules,
       icon: AlertTriangle,
-      iconColor: "text-red-600",
-      iconBg: "bg-red-100",
-      warning: true,
+      iconColor:
+        stats.overduePaymentSchedules > 0 ? "text-red-600" : "text-green-600",
+      iconBg: stats.overduePaymentSchedules > 0 ? "bg-red-100" : "bg-green-100",
+      warning: stats.overduePaymentSchedules > 0,
     },
 
     {
-      title: `Low Stock (< ${data.lowStockProducts.threshold})`,
-      value: data.lowStockProducts.count,
-      icon: AlertTriangle,
-      iconColor: "text-red-500",
-      iconBg: "bg-gray-100",
-      warning: true,
+      title: "In Stock Products",
+      value: stats.products.inStock,
+      icon: Boxes,
+      iconColor: "text-emerald-600",
+      iconBg: "bg-emerald-100",
+    },
+
+    {
+      title: "Out Of Stock",
+      value: stats.products.outOfStock,
+      icon: Package,
+      iconColor: "text-red-600",
+      iconBg: "bg-red-100",
+      warning: stats.products.outOfStock > 0,
+    },
+
+    {
+      title: "Low Stock Products",
+      value: stats.products.lowStock,
+      icon: Package,
+      iconColor:
+        stats.products.lowStock > 0 ? "text-yellow-600" : "text-green-600",
+      iconBg: stats.products.lowStock > 0 ? "bg-yellow-100" : "bg-green-100",
+      warning: stats.products.lowStock > 0,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-      {stats.map((stat) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-5">
+      {cards.map((card) => (
         <StatCard
-          key={stat.title}
-          title={stat.title}
-          value={stat.value}
-          icon={stat.icon}
-          iconColor={stat.iconColor}
-          iconBg={stat.iconBg}
-          warning={stat.warning}
+          key={card.title}
+          title={card.title}
+          value={card.value}
+          icon={card.icon}
+          iconColor={card.iconColor}
+          iconBg={card.iconBg}
+          warning={card.warning}
         />
       ))}
     </div>

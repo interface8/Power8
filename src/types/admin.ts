@@ -1,29 +1,22 @@
-// export interface RecentOrder {
-//   id: string;
-//   customerName: string;
-//   amount: number;
-//   paymentType: string;
-//   status: string;
-//   createdAt: string;
-// }
+export interface RecentOrder {
+  id: string;
+  customerName: string;
+  customerEmail: string;
 
-// export interface AdminStats {
-//   totalRevenue: number;
-//   activeUsers: number;
-//   overduePaymentSchedules: number;
-//   totalOrders: number;
+  totalAmount: number;
 
-//   inStockProducts: number;
-//   outOfStockProducts: number;
+  paymentType: string;
 
-//   lowStockProduct?: number;
+  orderStatus: string;
 
-//   recentOrders: RecentOrder[];
-// }
+  createdAt: string;
+  updatedAt: string;
+}
 
-export interface LowStockProducts {
-  threshold: number;
-  count: number;
+export interface AdminProductsStats {
+  inStock: number;
+  outOfStock: number;
+  lowStock: number;
 }
 
 export interface AdminStats {
@@ -35,5 +28,9 @@ export interface AdminStats {
 
   totalRevenue: number;
 
-  lowStockProducts: LowStockProducts;
+  totalOrders: number;
+
+  products: AdminProductsStats;
+
+  recentOrders: RecentOrder[];
 }

@@ -1,31 +1,3 @@
-// "use client";
-
-// import AdminHeader from "@/components/admin/AdminHeader";
-// import AdminSidebar from "@/components/admin/AdminSidebar";
-// import { useState } from "react";
-
-// export default function AdminLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   const [open, setOpen] = useState(false);
-
-//   return (
-//     <div className="min-h-screen bg-gray-100 flex">
-//       {/* Sidebar */}
-//       <AdminSidebar open={open} setOpen={setOpen} />
-
-//       {/* Main Content */}
-//       <div className="flex-1 flex flex-col">
-//         <AdminHeader setOpen={setOpen} />
-//       <main className="p-4 sm:p-6 lg:p-8">{children}</main>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 "use client";
 
 import { useState } from "react";

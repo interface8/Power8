@@ -1,33 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import type { AdminStatsDto } from "./types";
 
-<<<<<<< HEAD
-export async function getAdminStats(lowStockThreshold: number): Promise<AdminStatsDto> {
-=======
 export async function getAdminStats(
   lowStockThreshold: number,
 ): Promise<AdminStatsDto> {
   const recentTake = 10;
 
->>>>>>> sprint-03
   const [
     totalRegisteredUsers,
     activeCreditAccounts,
     overduePaymentSchedules,
     revenueAgg,
-<<<<<<< HEAD
-    lowStockCount,
-  ] = await Promise.all([
-    prisma.user.count(),
-
-    prisma.creditAccount.count({
-      where: { status: "ACTIVE" },
-    }),
-
-    prisma.paymentSchedule.count({
-      where: { status: "OVERDUE" },
-    }),
-=======
 
     totalOrders,
 
@@ -42,19 +25,12 @@ export async function getAdminStats(
     prisma.creditAccount.count({ where: { status: "ACTIVE" } }),
 
     prisma.paymentSchedule.count({ where: { status: "OVERDUE" } }),
->>>>>>> sprint-03
 
     prisma.payment.aggregate({
       where: { status: "SUCCESS" },
       _sum: { amount: true },
     }),
 
-<<<<<<< HEAD
-    prisma.product.count({
-      where: {
-        stockQuantity: { lte: lowStockThreshold },
-        isActive: true, 
-=======
     prisma.order.count(),
 
     // Products buckets:
@@ -79,7 +55,6 @@ export async function getAdminStats(
       take: recentTake,
       include: {
         user: { select: { name: true, email: true } },
->>>>>>> sprint-03
       },
     }),
   ]);
@@ -91,14 +66,6 @@ export async function getAdminStats(
     activeCreditAccounts,
     overduePaymentSchedules,
     totalRevenue,
-<<<<<<< HEAD
-    lowStockProducts: {
-      threshold: lowStockThreshold,
-      count: lowStockCount,
-    },
-  };
-}
-=======
 
     totalOrders,
 
@@ -116,4 +83,3 @@ export async function getAdminStats(
     })),
   };
 }
->>>>>>> sprint-03
