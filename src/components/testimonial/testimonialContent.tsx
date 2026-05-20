@@ -5,6 +5,7 @@ import StatsSummary from "./StatsSummary";
 import TestimonialCard from "./testimonialCard";
 import CTASection from "./CTASection";
 import type { Testimonial } from "@/hooks/use-testimonials";
+import TestimonialForm from "./TestimonialForm";
 
 interface TestimonialContentProps {
   testimonials: Testimonial[];
@@ -103,8 +104,8 @@ export default function TestimonialContent({
                 key={testimonial.id}
                 rating={String(testimonial.rating)}
                 quote={testimonial.description}
-                name={testimonial.user.name}
-                role="Small Business Owner"
+                name={testimonial.title}
+                role={testimonial.role || "Customer"}
                 location="Lagos, Nigeria"
                 system=""
                 savings=""
@@ -123,6 +124,10 @@ export default function TestimonialContent({
           <p className="text-xl text-gray-600">No testimonials yet.</p>
         </div>
       )}
+
+      <div className="px-4 sm:px-6 lg:px-8">
+        <TestimonialForm />
+      </div>
 
       <div className="flex justify-center items-center pb-24 mt-16">
         <CTASection />

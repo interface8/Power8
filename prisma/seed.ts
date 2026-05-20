@@ -364,8 +364,8 @@ const viewerUser = await prisma.user.upsert({
       stockQuantity: 45,
     },
     {
-      name: "Out of Stock Panel",
-      description: "This product is intentionally out of stock for testing",
+      name: "400W Mono Solar Panel",
+      description: "Premium monocrystalline panel for commercial installations",
       categoryId: createdCategories[0].id,
       companyId: createdCompanies[0].id,
       price: 50000,
@@ -551,13 +551,15 @@ const viewerUser = await prisma.user.upsert({
 
   console.log("  ✅ Demo customer user created (customer@power8.dev / customer123)");
 
-  const testimonialDefs = [
+const testimonialDefs = [
   {
     title: "Adeola Ogunlesi",
     description: "Since installing Power-8, my electricity bills have dropped by 80%. The pay-small-small option made it affordable. Best investment I've made for my home!",
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/women/1.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Chidi Okonkwo",
@@ -565,6 +567,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/men/2.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Fatima Abubakar",
@@ -572,6 +576,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 4,
     imageUrl: "https://randomuser.me/api/portraits/women/3.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Oluwaseun Adeyemi",
@@ -579,6 +585,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/men/4.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Ngozi Eze",
@@ -586,6 +594,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/women/5.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Ibrahim Musa",
@@ -593,6 +603,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/men/6.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
 ];
 

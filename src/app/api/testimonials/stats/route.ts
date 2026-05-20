@@ -10,22 +10,19 @@
 import { NextResponse } from "next/server";
 import { testimonialsService } from "@/modules/testimonials";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const stats = await testimonialsService.getTestimonialStats();
-    console.log("API Stats:", stats);
     return NextResponse.json(stats);
-  } catch (error) {
-    console.error("Error fetching testimonial stats:", error);
+  } catch {
     return NextResponse.json(
       {
-        error: "Failed to fetch testimonial stats",
-        message:
-          process.env.NODE_ENV === "development"
-            ? (error as Error).message
-            : undefined,
+        totalTestimonials: 0,
+        averageRating: 0,
       },
-      { status: 500 },
+      { status: 200 },
     );
   }
 }
