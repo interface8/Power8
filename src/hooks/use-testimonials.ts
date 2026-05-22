@@ -9,6 +9,7 @@ export interface Testimonial {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  location?: string;
   imageUrl?: string;
   role?: string;
   user: {

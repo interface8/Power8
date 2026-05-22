@@ -23,6 +23,7 @@ export async function createTestimonial(data: {
   description: string;
   role?: string | null;
   rating?: number;
+   location?: string | null; 
   imageUrl?: string | null;
   userId: string;
 }) {
@@ -33,6 +34,7 @@ export async function createTestimonial(data: {
       role: data.role || null,
       rating: data.rating || null,
       imageUrl: data.imageUrl || null, 
+      location: data.location || null,
       status: "pending",
       userId: data.userId,
     },
