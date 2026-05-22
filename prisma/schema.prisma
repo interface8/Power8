@@ -307,6 +307,7 @@ model Testimonial {
   userId      String
   rating      Int?
   imageUrl    String?
+  location    String?
   role        String?
   status      String   @default("pending")
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
