@@ -22,6 +22,11 @@ const nextConfig = {
         hostname: 'images.rawpixel.com',  // ← ADD THIS
         pathname: '/**',
       },
+      {
+  protocol: 'https',
+  hostname: '**.public.blob.vercel-storage.com',
+  pathname: '/**',
+}
     ],
   },
 };

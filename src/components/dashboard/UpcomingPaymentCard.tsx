@@ -47,7 +47,7 @@ export function UpcomingPaymentsCard({
           sorted.map((payment, index) => {
             const dueDate = new Date(payment.dueDate);
 
-            // ✅ Due soon logic (within 3 days)
+            // Due soon logic (within 3 days)
             const isDueSoon =
               dueDate.getTime() - Date.now() < 3 * 24 * 60 * 60 * 1000;
 
@@ -80,7 +80,7 @@ export function UpcomingPaymentsCard({
 
                 <div className="text-right">
                   <p className="font-semibold text-base sm:text-lg">
-                    ₦{payment.amount.toLocaleString()}
+                    ₦{Number(payment.amount || 0).toLocaleString()}
                   </p>
 
                   {isDueSoon && (

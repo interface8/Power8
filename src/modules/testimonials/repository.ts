@@ -23,6 +23,7 @@ export async function createTestimonial(data: {
   description: string;
   role?: string | null;
   rating?: number;
+  imageUrl?: string | null;
   userId: string;
 }) {
   return prisma.testimonial.create({
@@ -30,7 +31,8 @@ export async function createTestimonial(data: {
       title: data.title,
       description: data.description,
       role: data.role || null,
-      rating: data.rating || null, 
+      rating: data.rating || null,
+      imageUrl: data.imageUrl || null, 
       status: "pending",
       userId: data.userId,
     },

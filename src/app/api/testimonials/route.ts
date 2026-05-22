@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, role, rating, message } = body;  // ← ADD rating here
+    const { name, role, rating, message, imageUrl } = body;
 
     // Validation
     if (!name || name.trim().length < 2) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!rating || rating < 1 || rating > 5) {  // ← ADD rating validation
+    if (!rating || rating < 1 || rating > 5) {
       return NextResponse.json(
         { error: "Rating is required (1-5 stars)" },
         { status: 400 }
@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
       title: name,
       description: message,
       role: role || null,
-      rating: rating,  // ← ADD rating here
+      rating: rating,
+      imageUrl: imageUrl || null,  // ← ADD THIS
       userId: guard.id,
     });
 
