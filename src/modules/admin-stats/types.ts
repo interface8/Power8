@@ -9,7 +9,7 @@ export type AdminStatsDto = {
   totalOrders: number;
 
   products: {
-    inStock: number;
+    inStock: number; 
     outOfStock: number;
     lowStock: number;
   };
