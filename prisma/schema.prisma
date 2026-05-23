@@ -45,6 +45,7 @@ enum AdminAuditAction {
   ORDER_STATUS_UPDATED
   ORDER_PAYMENT_STATUS_UPDATED
   ORDER_SHIPPING_STATUS_UPDATED
+  USER_STATUS_UPDATED
 }
 
 enum ItemType {
@@ -102,6 +103,7 @@ model ProductCategory {
   name        String
   description String?
   sort        Int
+  isActive Boolean @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   products    Product[]

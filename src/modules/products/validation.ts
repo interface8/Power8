@@ -23,3 +23,22 @@ export const productFiltersSchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
   limit: z.coerce.number().int().min(1).max(100).optional().default(12),
 });
+
+export const adminProductFiltersSchema = z.object({
+  search: z.string().optional(),
+  categoryId: z.string().optional(),
+  companyId: z.string().optional(),
+  minCapacity: z.coerce.number().int().min(0).optional(),
+
+  isActive: z.coerce.boolean().optional(),
+
+  stockStatus: z.enum(["IN_STOCK", "OUT_OF_STOCK", "LOW_STOCK"]).optional(),
+  lowStockThreshold: z.coerce.number().int().min(0).optional().default(5),
+
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export const updateProductStockSchema = z.object({
+  stockQuantity: z.number().int().min(0, "Stock cannot be negative"),
+});
