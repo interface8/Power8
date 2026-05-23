@@ -1,8 +1,9 @@
 "use client";
 
 import { useAuth } from "@/components/providers/auth-provider";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MessageCircle,
   CheckCircle,
@@ -10,6 +11,8 @@ import {
   Send,
   Shield,
   Star,
+  Upload,
+  X,
 } from "lucide-react";
 
 export default function TestimonialForm() {
@@ -19,9 +22,18 @@ export default function TestimonialForm() {
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [imageUrl, setImageUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; message?: string; rating?: string }>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const validate = () => {
     const newErrors: { name?: string; message?: string; rating?: string } = {};
@@ -42,9 +54,58 @@ export default function TestimonialForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image size must be less than 2MB");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file");
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setImageUrl(data.url);
+      } else {
+        alert("Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setImageUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
 
     setIsLoading(true);
 
@@ -59,6 +120,7 @@ export default function TestimonialForm() {
           role: role,
           rating: rating,
           message: message,
+          imageUrl: imageUrl || null,
         }),
       });
 
@@ -67,12 +129,13 @@ export default function TestimonialForm() {
       if (!response.ok) {
         throw new Error(data.error || "Submission failed");
       }
-
+      
       setIsSubmitted(true);
       setName("");
       setRole("");
       setRating(0);
       setMessage("");
+      setImageUrl("");
     } catch (error) {
       alert(error instanceof Error ? error.message : "Something went wrong");
     } finally {
@@ -88,7 +151,7 @@ export default function TestimonialForm() {
         </p>
         <Link
           href="/login"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg inline-block text-lg font-bold"
+          className="bg-linear-to-br from-orange-500 to-amber-300 hover:bg-orange-600 text-white px-8 py-3 rounded-lg inline-block text-lg font-bold"
         >
           Login to Submit
         </Link>
@@ -110,6 +173,20 @@ export default function TestimonialForm() {
       </div>
     );
   }
+
+  const getCharWarning = () => {
+    if (message.length >= 480 && message.length < 500) {
+      return "⚠️ Approaching character limit (500 max)";
+    }
+    if (message.length >= 500) {
+      return "❌ Character limit exceeded! Please shorten your message.";
+    }
+    return null;
+  };
+
+  const charWarning = getCharWarning();
+  const isNearLimit = message.length >= 480 && message.length < 500;
+  const isOverLimit = message.length >= 500;
 
   return (
     <div className="mt-12">
@@ -169,6 +246,50 @@ export default function TestimonialForm() {
               </div>
             </div>
 
+            {/* Image Upload */}
+            <div>
+              <label className="block text-lg font-bold text-gray-700 mb-2">
+                Profile Picture (Optional)
+              </label>
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"
+                >
+                  <Upload className="w-5 h-5" />
+                  {isUploading ? "Uploading..." : "Upload Image"}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                {imageUrl && mounted && (
+                  <div className="relative inline-block">
+                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500">
+                      <Image
+                        src={imageUrl}
+                        alt="Profile preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-0.5 shadow-md z-10"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Star Rating Section */}
             <div>
               <label className="block text-lg font-bold text-gray-700 mb-2">
@@ -211,8 +332,11 @@ export default function TestimonialForm() {
                   rows={6}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-5 py-4 pb-10 border rounded-lg focus:ring-orange-500 focus:border-orange-500 text-lg font-semibold placeholder:font-bold resize-none"
+                  className={`w-full px-5 py-4 pb-10 border rounded-lg focus:ring-orange-500 focus:border-orange-500 text-lg font-semibold placeholder:font-bold resize-none ${
+                    isOverLimit ? "border-red-500" : isNearLimit ? "border-yellow-500" : ""
+                  }`}
                   placeholder="Tell us about your experience..."
+                  maxLength={500}
                 />
                 <div className="absolute bottom-3 right-3">
                   <p
@@ -222,6 +346,11 @@ export default function TestimonialForm() {
                   </p>
                 </div>
               </div>
+              {charWarning && (
+                <p className={`text-sm font-medium mt-1 ${isOverLimit ? "text-red-500" : "text-yellow-600"}`}>
+                  {charWarning}
+                </p>
+              )}
               {errors.message && (
                 <p className="text-red-500 text-sm font-medium mt-1">
                   {errors.message}
@@ -245,8 +374,10 @@ export default function TestimonialForm() {
             <div className="flex justify-start pt-4">
               <button
                 type="submit"
-                disabled={isLoading}
-                className="bg-linear-to-br from-orange-500 to-amber-300 hover:bg-orange-600 text-white py-4 px-8 rounded-lg font-bold text-lg transition-all duration-150 active:scale-95 active:shadow-md disabled:opacity-50 flex items-center gap-2"
+                disabled={isLoading || isOverLimit}
+                className={`bg-linear-to-br from-orange-500 to-amber-300 hover:bg-orange-600 text-white py-4 px-8 rounded-lg font-bold text-lg transition-all duration-150 active:scale-95 active:shadow-md disabled:opacity-50 flex items-center gap-2 ${
+                  isAnimating ? "animate-bounce" : ""
+                }`}
               >
                 <Send className="w-5 h-5" />
                 {isLoading ? "Submitting..." : "Submit Testimonial"}

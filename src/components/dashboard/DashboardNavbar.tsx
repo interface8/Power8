@@ -12,6 +12,7 @@ import {
   Sun,
   ArrowLeft,
   Package,
+  LayoutDashboard,
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "../providers/cart-providers";
@@ -158,11 +159,11 @@ export function DashboardNavbar() {
 
                 {user?.roles?.includes("admin") && (
                   <button
-                    onClick={() => handleNavigate("/admin")}
+                    onClick={() => handleNavigate("/admin/dashboard")}
                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 rounded-lg"
                   >
                     <div className="p-2 bg-purple-100 rounded-lg">
-                      <span className="w-4 h-4 block" />
+                      <LayoutDashboard className="w-4 h-4 text-purple-600 " />
                     </div>
                     <span className="text-sm font-medium text-gray-800">
                       Admin Dashboard
