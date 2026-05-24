@@ -54,6 +54,15 @@ interface CategoryFormData {
   sort: number;
 }
 
+interface DeletedCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  sort: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function CategoriesPage() {
   const { categories, loading, error, fetchCategories } = useProductCategories();
   
@@ -141,10 +150,44 @@ export default function CategoriesPage() {
     }
   };
 
+  const undoDelete = async (deletedCategory: DeletedCategory, toastId: string | number) => {
+    try {
+      const res = await fetch("/api/product-categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: deletedCategory.name,
+          description: deletedCategory.description,
+          sort: deletedCategory.sort,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to restore category");
+      }
+
+      await fetchCategories();
+      toast.dismiss(toastId);
+      toast.success(`Category "${deletedCategory.name}" restored`);
+    } catch {
+      toast.error("Failed to restore category");
+    }
+  };
+
   const handleDelete = async () => {
     if (!deletingCategory) return;
 
     setIsSubmitting(true);
+
+    // Store category data for potential undo
+    const deletedData: DeletedCategory = {
+      id: deletingCategory.id,
+      name: deletingCategory.name,
+      description: deletingCategory.description,
+      sort: deletingCategory.sort,
+      createdAt: deletingCategory.createdAt,
+      updatedAt: deletingCategory.updatedAt,
+    };
 
     try {
       const res = await fetch(`/api/product-categories/${deletingCategory.id}`, {
@@ -156,9 +199,24 @@ export default function CategoriesPage() {
         throw new Error(data.message || "Failed to delete category");
       }
 
-      toast.success("Category deleted successfully");
       await fetchCategories();
       setDeletingCategory(null);
+      
+      // Show undo toast
+      toast.custom((t) => (
+        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-[300px]">
+          <span className="text-sm">Category {deletedData.name} deleted</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => undoDelete(deletedData, t)}
+            className="h-8 text-orange-600 border-orange-300 hover:bg-orange-50"
+          >
+            Undo
+          </Button>
+        </div>
+      ), { duration: 5000 });
+      
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     } finally {

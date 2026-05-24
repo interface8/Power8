@@ -233,11 +233,11 @@ const viewerUser = await prisma.user.upsert({
 
   // ─── 7. Create Product Categories ────────────────────
   const categoriesDefs = [
-    { name: "Solar Panels", description: "Photovoltaic solar panels", sort: 1 },
-    { name: "Inverters", description: "Power inverters for solar systems", sort: 2 },
-    { name: "Batteries", description: "Energy storage batteries", sort: 3 },
-    { name: "Charge Controllers", description: "Solar charge controllers", sort: 4 },
-    { name: "Accessories", description: "Cables, connectors, and mounting equipment", sort: 5 },
+    { name: "Solar Panels", description: "Photovoltaic solar panels", sort: 1},
+    { name: "Inverters", description: "Power inverters for solar systems", sort: 2},
+    { name: "Batteries", description: "Energy storage batteries", sort: 3},
+    { name: "Charge Controllers", description: "Solar charge controllers", sort: 4},
+    { name: "Accessories", description: "Cables, connectors, and mounting equipment", sort: 5},
   ];
 
   const createdCategories = [];

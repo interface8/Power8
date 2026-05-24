@@ -25,6 +25,7 @@ model ProductCategory {
   name        String
   description String?
   sort        Int
+  // isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   products    Product[]
