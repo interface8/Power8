@@ -61,6 +61,9 @@ export async function findProducts(filters: ProductFilters = {}): Promise<Pagina
           ],
         }
       : {}),
+       category: {
+      isActive: true,
+    },
   };
 
   const [rows, total] = await prisma.$transaction([

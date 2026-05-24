@@ -30,6 +30,7 @@ export interface ProductCategory {
   name: string;
   description: string | null;
   sort: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
