@@ -37,3 +37,15 @@ export async function deleteCategory(id: string) {
   }
   return categoryRepo.deleteCategory(id);
 }
+
+export async function deleteCategoryAdmin(id: string) {
+  if (!(await categoryRepo.categoryExists(id))) {
+    throw new Error("Category not found");
+  }
+
+  if (await categoryRepo.categoryHasProducts(id)) {
+    throw new Error("Category has products");
+  }
+
+  return categoryRepo.deleteCategory(id);
+}

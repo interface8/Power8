@@ -24,3 +24,10 @@ export async function updateBundle(id: string, input: UpdateBundleInput) {
   }
   return bundleRepo.updateBundle(id, input);
 }
+
+export async function deleteBundle(id: string) {
+  if (!(await bundleRepo.bundleExists(id))) {
+    throw new Error("Bundle not found");
+  }
+  return bundleRepo.deleteBundle(id);
+}
