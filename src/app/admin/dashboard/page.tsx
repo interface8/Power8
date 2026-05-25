@@ -1,14 +1,14 @@
 "use client";
 
-import DashboardStats from "@/components/admin/DashboardStats";
-import RecentOrdersTable from "@/components/admin/RecentOrdersTable";
-import DashboardStatsSkeleton from "@/components/admin/DashboardStatsSkeleton";
+import DashboardStats from "@/components/admin/dashboard/DashboardStats";
+import RecentOrdersTable from "@/components/admin/dashboard/RecentOrdersTable";
+import DashboardStatsSkeleton from "@/components/admin/dashboard/DashboardStatsSkeleton";
 import { useAdminStats } from "@/hooks/use-admin-stats";
 import { useAuth } from "@/components/providers/auth-provider";
 
 export default function DashboardPage() {
   const { data, loading, error, refetch } = useAdminStats();
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   if (loading) {
     return <DashboardStatsSkeleton />;
@@ -39,7 +39,10 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
 
-        <p className="text-gray-500 mt-1">Welcome back, {user?.name ||"Administrator"}. Here&apos;s an overview of your store.</p>
+        <p className="text-gray-500 mt-1">
+          Welcome back, {user?.name || "Administrator"}. Here&apos;s an overview
+          of your store.
+        </p>
       </div>
 
       {/* Stats */}
