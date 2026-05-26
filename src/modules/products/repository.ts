@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import type { ProductDto, CreateProductInput, UpdateProductInput, ProductFilters, PaginatedProducts } from "./types";
+import type { ProductDto, CreateProductInput, UpdateProductInput, ProductFilters, AdminProductFilters, PaginatedProducts } from "./types";
+import type { Prisma } from "@prisma/client";
 
 const productWithRelations = {
   include: {
@@ -121,4 +122,85 @@ export async function findProductByName(name: string): Promise<ProductDto | null
     ...productWithRelations,
   });
   return product ? toProductDto(product) : null;
+}
+
+export async function findProductsAdmin(
+  filters: AdminProductFilters = {},
+): Promise<PaginatedProducts> {
+  const {
+    search,
+    categoryId,
+    companyId,
+    minCapacity,
+    isActive,
+    stockStatus,
+    lowStockThreshold = 5,
+    page = 1,
+    limit = 20,
+  } = filters;
+
+  const where: Prisma.ProductWhereInput = {
+    ...(isActive !== undefined ? { isActive } : {}),
+    ...(categoryId ? { categoryId } : {}),
+    ...(companyId ? { companyId } : {}),
+    ...(minCapacity != null ? { capacity: { gte: minCapacity } } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+
+  if (stockStatus === "OUT_OF_STOCK") where.stockQuantity = { lte: 0 };
+  if (stockStatus === "LOW_STOCK") where.stockQuantity = { gt: 0, lte: lowStockThreshold };
+  if (stockStatus === "IN_STOCK") where.stockQuantity = { gt: lowStockThreshold };
+
+  const [rows, total] = await prisma.$transaction([
+    prisma.product.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      ...productWithRelations,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return {
+    products: rows.map(toProductDto),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
+export async function updateProductStock(id: string, stockQuantity: number): Promise<ProductDto> {
+  const product = await prisma.product.update({
+    where: { id },
+    data: { stockQuantity },
+    ...productWithRelations,
+  });
+  return toProductDto(product);
+}
+
+
+export async function isProductReferencedInOrders(productId: string): Promise<boolean> {
+  const count = await prisma.orderItem.count({ where: { productId } });
+  return count > 0;
+}
+
+export async function softDeleteProduct(id: string): Promise<ProductDto> {
+  const product = await prisma.product.update({
+    where: { id },
+    data: { isActive: false },
+    ...productWithRelations,
+  });
+  return toProductDto(product);
+}
+
+export async function hardDeleteProduct(id: string): Promise<void> {
+  await prisma.product.delete({ where: { id } });
 }

@@ -1,3 +1,5 @@
+export type ProductStockStatus = "IN_STOCK" | "OUT_OF_STOCK" | "LOW_STOCK";
+
 export interface ProductDto {
   id: string;
   name: string;
@@ -45,4 +47,10 @@ export interface PaginatedProducts {
   total: number;
   page: number;
   totalPages: number;
+}
+
+export interface AdminProductFilters extends ProductFilters {
+  isActive?: boolean;
+  stockStatus?: ProductStockStatus;
+  lowStockThreshold?: number;
 }

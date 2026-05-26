@@ -120,3 +120,10 @@ export async function findBundleByName(name: string): Promise<BundleDto | null> 
   });
   return bundle ? toBundleDto(bundle) : null;
 }
+
+export async function deleteBundle(id: string): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    await tx.bundleItem.deleteMany({ where: { bundleId: id } });
+    await tx.productBundle.delete({ where: { id } });
+  });
+}
