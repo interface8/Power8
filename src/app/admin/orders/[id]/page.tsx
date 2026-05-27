@@ -39,15 +39,10 @@ export default function AdminOrderDetailsPage() {
     action: () => void;
   }>({ isOpen: false, title: "", message: "", action: () => {} });
 
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  const showToast = (message: string, type: "success" | "error") =>
-    setToast({ message, type });
-  const closeModal = () =>
-    setModalConfig((prev) => ({ ...prev, isOpen: false }));
+  const showToast = (message: string, type: "success" | "error") => setToast({ message, type });
+  const closeModal = () => setModalConfig((prev) => ({ ...prev, isOpen: false }));
 
   const handleUpdateOrderStatus = (status: OrderStatus) => {
     setModalConfig({
@@ -57,10 +52,7 @@ export default function AdminOrderDetailsPage() {
       action: async () => {
         try {
           await updateOrderStatusMutation.mutateAsync({ id: orderId, status });
-          showToast(
-            `Order status updated to ${status.replace("_", " ")}`,
-            "success",
-          );
+          showToast(`Order status updated to ${status.replace("_", " ")}`, "success");
           refetch();
         } catch {
           showToast("Failed to update order status", "error");
@@ -79,10 +71,7 @@ export default function AdminOrderDetailsPage() {
       action: async () => {
         try {
           await updatePaymentMutation.mutateAsync({ id: orderId, status });
-          showToast(
-            `Payment status updated to ${status.replace("_", " ")}`,
-            "success",
-          );
+          showToast(`Payment status updated to ${status.replace("_", " ")}`, "success");
           refetch();
         } catch {
           showToast("Failed to update payment status", "error");
@@ -93,18 +82,9 @@ export default function AdminOrderDetailsPage() {
     });
   };
 
-  const handleUpdateShippingStatus = async (
-    status: ShippingStatus,
-    trackingNumber?: string,
-    shippingProvider?: string,
-  ) => {
+  const handleUpdateShippingStatus = async (status: ShippingStatus, trackingNumber?: string, shippingProvider?: string) => {
     try {
-      await updateShippingMutation.mutateAsync({
-        id: orderId,
-        status,
-        trackingNumber,
-        shippingProvider,
-      });
+      await updateShippingMutation.mutateAsync({ id: orderId, status, trackingNumber, shippingProvider });
       showToast(`Shipping status updated to ${status}`, "success");
       refetch();
     } catch {
@@ -117,14 +97,8 @@ export default function AdminOrderDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen -mt-3 sm:-mt-6 bg-gray-50 p-1 sm:p-2 md:p-6">
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+    <div className="w-full">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
@@ -132,17 +106,11 @@ export default function AdminOrderDetailsPage() {
         onConfirm={modalConfig.action}
         title={modalConfig.title}
         message={modalConfig.message}
-        isLoading={
-          updateOrderStatusMutation.isPending || updatePaymentMutation.isPending
-        }
+        isLoading={updateOrderStatusMutation.isPending || updatePaymentMutation.isPending}
       />
 
-      <div className="max-w-7xl mx-auto">
-        <OrderHeader
-          orderId={order.id}
-          orderStatus={order.orderStatus}
-          createdAt={order.createdAt}
-        />
+      <div className="space-y-4 sm:space-y-6">
+        <OrderHeader orderId={order.id} orderStatus={order.orderStatus} createdAt={order.createdAt} />
 
         <OrderSummary
           customerName={order.customer.name}
@@ -170,24 +138,23 @@ export default function AdminOrderDetailsPage() {
 
           <PaymentStatusControl
             currentStatus={order.paymentStatus}
-            paymentType={order.paymentType} // ← Add this
+            paymentType={order.paymentType}
             totalAmount={order.totalAmount}
             totalPaid={order.payment.totalPaid}
             onUpdateStatus={handleUpdatePaymentStatus}
             isLoading={updatePaymentMutation.isPending}
           />
 
-          <ShippingControl
-            currentStatus={order.shipping.status}
-            trackingNumber={order.shipping.trackingNumber}
-            shippingProvider={order.shipping.shippingProvider}
-            canUpdate={
-              order.orderStatus === "CONFIRMED" ||
-              order.orderStatus === "PROCESSING"
-            }
-            onUpdateStatus={handleUpdateShippingStatus}
-            isLoading={updateShippingMutation.isPending}
-          />
+          <div className="lg:col-span-2">
+            <ShippingControl
+              currentStatus={order.shipping.status}
+              trackingNumber={order.shipping.trackingNumber}
+              shippingProvider={order.shipping.shippingProvider}
+              canUpdate={order.orderStatus === "CONFIRMED" || order.orderStatus === "PROCESSING"}
+              onUpdateStatus={handleUpdateShippingStatus}
+              isLoading={updateShippingMutation.isPending}
+            />
+          </div>
         </div>
       </div>
     </div>

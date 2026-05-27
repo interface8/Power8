@@ -8,10 +8,12 @@ import { OrdersFilters } from "@/components/admin/orders/orders-overview/OrdersF
 import { OrdersPagination } from "@/components/admin/orders/orders-overview/OrdersPagination";
 import OrdersTable from "@/components/admin/orders/orders-overview/OrderTable";
 import OrdersTableSkeleton from "@/components/admin/orders/orders-overview/OrdersTableSkeleton";
+import OrdersStats from "@/components/admin/orders/orders-overview/OrdersStats";
 import {
   toOrderStatus,
   toPaymentType,
   toPaymentStatus,
+  isShippingOrder,
 } from "@/components/admin/orders/orders-overview/ordersUtils";
 
 export default function AdminOrdersPage() {
@@ -37,8 +39,23 @@ export default function AdminOrdersPage() {
   const { data, isLoading } = useOrders(filters);
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-1 sm:p-2 max-w-500 mx-auto -mt-6">
+    <div className="space-y-4 sm:space-y-6">
       <OrdersHeader />
+
+      <OrdersStats
+        totalOrders={data?.pagination.total ?? 0}
+        totalShipped={
+          data?.data.filter((order) => isShippingOrder(order.shippingStatus))
+            .length ?? 0
+        }
+        totalFullPayment={
+          data?.data.filter((order) => order.paymentType === "FULL").length ?? 0
+        }
+        totalCreditPayment={
+          data?.data.filter((order) => order.paymentType === "CREDIT").length ??
+          0
+        }
+      />
 
       <OrdersFilters
         search={search}

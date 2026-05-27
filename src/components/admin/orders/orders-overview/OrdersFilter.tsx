@@ -1,10 +1,18 @@
 "use client";
 
-import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import {
   orderStatusOptions,
-  paymentTypeOptions,
   paymentStatusOptions,
+  paymentTypeOptions,
 } from "./ordersUtils";
 
 interface FilterOption {
@@ -27,32 +35,85 @@ interface FilterSelectProps {
   value: string;
   onChange: (value: string) => void;
   options: FilterOption[];
-  icon?: React.ComponentType<{ className?: string }>;
+  placeholder: string;
 }
 
 function FilterSelect({
   value,
   onChange,
   options,
-  icon: Icon,
+  placeholder,
 }: FilterSelectProps) {
+  const selectedOption = options.find((option) => option.value === value);
+
   return (
-    <div className="relative">
-      {Icon && (
-        <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-      )}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`h-11 sm:h-12 w-full sm:w-auto min-w-35 appearance-none rounded-xl border border-gray-200 bg-white pl-10 pr-8 text-sm text-gray-700 outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100 hover:border-gray-300`}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="
+            flex h-12 w-full min-w-45
+            items-center justify-between gap-3
+            rounded-2xl border border-gray-200
+            bg-white px-4
+            text-sm font-medium text-gray-700
+            shadow-sm transition-all duration-200
+            hover:border-orange-300
+            hover:bg-orange-50/40
+            focus:outline-none
+            focus:ring-4
+            focus:ring-orange-100
+            active:scale-[0.99]
+          "
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="truncate">
+              {selectedOption?.label || placeholder}
+            </span>
+          </div>
+
+          <ChevronDown className="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200" />
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="start"
+        sideOffset={8}
+        className="
+          z-50 w-55
+          rounded-2xl border border-gray-200
+          bg-white p-2 shadow-2xl
+        "
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
+        {options.map((option) => {
+          const isActive = value === option.value;
+
+          return (
+            <DropdownMenuItem
+              key={option.value}
+              onClick={() => onChange(option.value)}
+              className={`
+                flex cursor-pointer
+                items-center justify-between
+                rounded-xl px-3 py-3
+                text-sm font-medium
+                transition-all duration-150
+
+                ${
+                  isActive
+                    ? "bg-orange-100 text-orange-700"
+                    : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                }
+              `}
+            >
+              <span>{option.label}</span>
+
+              {isActive && <Check className="h-4 w-4" />}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -67,39 +128,69 @@ export function OrdersFilters({
   onPaymentStatusChange,
 }: OrdersFiltersProps) {
   return (
-    <div className="rounded-xl sm:rounded-2xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm">
-      <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
+    <div className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
         {/* Search */}
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
           <input
             type="text"
-            placeholder="Search by customer name or order ID..."
+            placeholder="Search customer or order ID..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="h-11 sm:h-12 w-full rounded-xl border border-gray-200 bg-white pl-11 pr-4 text-sm text-gray-700 placeholder:text-gray-400 outline-none transition-all focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+            className="
+              h-12 w-full rounded-2xl border border-gray-200
+              bg-white pl-11 pr-4 text-sm text-gray-700
+              placeholder:text-gray-400
+              outline-none transition-all duration-200
+              hover:border-gray-300
+              focus:border-orange-400
+              focus:ring-4 focus:ring-orange-100
+            "
           />
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2 sm:gap-3">
+        <div
+          className="
+    grid w-full grid-cols-1 gap-3
+    sm:grid-cols-2
+    lg:grid-cols-4
+    xl:w-auto
+  "
+        >
+          <div
+            className="
+              flex h-12 items-center gap-2
+              rounded-2xl border border-gray-200
+              bg-gray-50 px-4
+              text-sm font-medium text-gray-600
+            "
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Filters
+          </div>
+
           <FilterSelect
             value={status}
             onChange={onStatusChange}
             options={orderStatusOptions}
-            icon={SlidersHorizontal}
+            placeholder="Order Status"
           />
+
           <FilterSelect
             value={paymentType}
             onChange={onPaymentTypeChange}
             options={paymentTypeOptions}
-            icon={ChevronDown}
+            placeholder="Payment Type"
           />
+
           <FilterSelect
             value={paymentStatus}
             onChange={onPaymentStatusChange}
             options={paymentStatusOptions}
-            icon={ChevronDown}
+            placeholder="Payment Status"
           />
         </div>
       </div>

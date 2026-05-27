@@ -3,22 +3,16 @@
 import { useAuth } from "../../providers/auth-provider";
 
 import { HeaderBreadcrumb } from "./shared/HeaderBreadcrumb";
-
 import { HeaderProfile } from "./shared/HeaderProfile";
-
 import { HeaderRoleBadge } from "./shared/HeaderRoleBadge";
-
 import { HeaderStoreButton } from "./shared/HeaderStoreButton";
-
 import { MobileMenuButton } from "./shared/MobileMenuButton";
 
 interface Props {
   setOpen: (open: boolean) => void;
 }
 
-export default function AdminHeader({
-  setOpen,
-}: Props) {
+export default function AdminHeader({ setOpen }: Props) {
   const { user } = useAuth();
 
   return (
@@ -44,9 +38,7 @@ export default function AdminHeader({
             items-center gap-3 lg:gap-5
           "
         >
-          <MobileMenuButton
-            setOpen={setOpen}
-          />
+          <MobileMenuButton setOpen={setOpen} />
 
           <div className="hidden h-8 w-px bg-gray-200 lg:block" />
 
@@ -63,12 +55,11 @@ export default function AdminHeader({
         >
           <HeaderStoreButton />
 
-          <HeaderRoleBadge
-            role={user?.roles?.[0]}
-          />
+          <HeaderRoleBadge role={user?.roles?.[0]} />
 
           <HeaderProfile
             name={user?.name}
+            email={user?.email}
           />
         </div>
       </div>

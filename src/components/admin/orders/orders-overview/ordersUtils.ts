@@ -51,6 +51,16 @@ export const paymentStatusOptions: FilterOption[] = [
   { value: "REFUNDED", label: "Refunded" },
 ];
 
+export const isShippingOrder = (
+  shippingStatus: string
+) => {
+  return [
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED",
+  ].includes(shippingStatus);
+};
+
 // Helper to convert string to proper type
 export const toOrderStatus = (value: string): OrderStatus | undefined => {
   if (!value) return undefined;

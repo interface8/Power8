@@ -1,95 +1,77 @@
 "use client";
-
 import { ChevronDown } from "lucide-react";
 
-interface Props {
+interface HeaderProfileProps {
   name?: string;
+  email?: string;
 }
 
-export function HeaderProfile({
-  name,
-}: Props) {
+export function HeaderProfile({ name, email }: HeaderProfileProps) {
   const initials =
     name
       ?.split(" ")
-      .map((word) => word[0])
+      .map((part) => part[0])
       .join("")
       .slice(0, 2)
       .toUpperCase() || "AD";
 
   return (
-    <button
-      className="
-        group flex items-center
-        gap-3 rounded-2xl
-        border border-transparent
-        bg-white px-2 py-1.5
-        transition-all duration-200
-        hover:border-gray-200
-        hover:bg-gray-50
-      "
-    >
-      {/* Avatar */}
-      <div
+    <div className="relative">
+      <button
         className="
-          relative flex
-          h-11 w-11 items-center
-          justify-center rounded-2xl
-          bg-linear-to-br
-          from-orange-500
-          to-orange-600
-          text-sm font-bold
-          text-white shadow-lg
-          shadow-orange-100
+          flex items-center gap-1 sm:gap-2 lg:gap-3
+          rounded-lg sm:rounded-xl
+          px-1.5 sm:px-2 lg:px-2.5 py-1 sm:py-1.5 lg:py-2
+          transition-all duration-200 bg-green-50
+          hover:bg-green-100
+          hover:shadow-sm
         "
       >
-        {initials}
-
-        <span
+        
+        <div
           className="
-            absolute bottom-0
-            right-0 h-3 w-3
-            rounded-full border-2
-            border-white bg-green-500
+            relative flex items-center justify-center
+            rounded-full
+            bg-green-950 ring-1 ring-green-500
+            font-semibold text-white
+            shadow-sm
+            w-6 h-6 sm:w-7 sm:h-7 lg:w-9 lg:h-9
+            text-xs sm:text-sm lg:text-base
           "
+        >
+          {initials}
+        </div>
+
+       
+        <div className="hidden sm:block text-left">
+          <p
+            className="
+              max-w-25 md:max-w-35 lg:max-w-40
+              truncate text-xs sm:text-sm lg:text-base
+              font-semibold text-gray-900
+            "
+          >
+            {name || "Administrator"}
+          </p>
+          <p
+            className="
+              hidden md:block
+              max-w30 lg:max-w-40
+              truncate text-[10px] sm:text-xs
+              text-gray-500
+            "
+          >
+            {email || "admin@power8.com"}
+          </p>
+        </div>
+
+
+        <ChevronDown
+          className="
+            hidden sm:block h-3 w-3 sm:h-4 sm:w-4
+            text-gray-500 transition-transform"
         />
-      </div>
-
-      {/* Info */}
-      <div
-        className="
-          hidden text-left
-          sm:block
-        "
-      >
-        <p
-          className="
-            max-w-32 truncate
-            text-sm font-semibold
-            text-gray-900
-          "
-        >
-          {name || "Administrator"}
-        </p>
-
-        <p
-          className="
-            text-xs text-gray-500
-          "
-        >
-          System Administrator
-        </p>
-      </div>
-
-      <ChevronDown
-        className="
-          hidden h-4 w-4
-          text-gray-400
-          transition-transform
-          group-hover:rotate-180
-          sm:block
-        "
-      />
-    </button>
+      </button>
+    </div>
   );
 }
