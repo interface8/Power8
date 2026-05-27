@@ -6,17 +6,13 @@ import { usePathname } from "next/navigation";
 
 // Helper to format order ID - extracts ORD-XXXX pattern or creates a readable ID
 const formatOrderId = (orderId: string) => {
-  // If it already has ORD- pattern, return as is
   if (orderId.includes("ORD-")) return orderId;
 
   // If it's a long database ID (like cmpfslb9u0002icynjwjol5ao)
   // Extract a readable format or use a generic pattern
   if (orderId.length > 10) {
-    // Try to find ORD in the string
     const ordMatch = orderId.match(/ORD[_-]?\d+/i);
     if (ordMatch) return ordMatch[0].toUpperCase();
-
-    // Otherwise create a short readable ID
     return `ORD-${orderId.slice(-3).toUpperCase()}`;
   }
 
@@ -35,7 +31,7 @@ export function HeaderBreadcrumb() {
 
   return (
     <div className="min-w-0">
-      {/* Admin Panel Label - Hidden on mobile */}
+      {/* Admin Panel Label */}
       <p className="hidden text-xs font-medium uppercase tracking-[0.2em] text-gray-400 sm:block">
         Admin Panel
       </p>
@@ -48,7 +44,7 @@ export function HeaderBreadcrumb() {
           </h1>
         ) : (
           <>
-            {/* Dashboard Link - Responsive text */}
+            {/* Dashboard Link  */}
             <Link
               href="/admin/dashboard"
               className="text-sm sm:text-base font-medium text-gray-500 transition-colors hover:text-orange-600"
@@ -56,17 +52,14 @@ export function HeaderBreadcrumb() {
               Dashboard
             </Link>
 
-            {/* Chevron - visible on all screens */}
             <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-gray-300" />
 
             {/* Orders Section */}
             {isOrders ? (
-              // Orders Page - Active state
               <span className="text-xs sm:text-base font-semibold text-gray-900">
                 Orders
               </span>
             ) : isOrderDetails ? (
-              // Order Details Page
               <>
                 {/* Orders Link */}
                 <Link
@@ -79,13 +72,12 @@ export function HeaderBreadcrumb() {
                 {/* Chevron */}
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-gray-300" />
 
-                {/* Order ID - Shows ORD_ID format on all screens */}
+                {/* Order ID */}
                 <span className="text-sm sm:text-base font-semibold text-gray-900">
                   {displayOrderId}
                 </span>
               </>
             ) : (
-              // Other segments (categories, products, etc.)
               segments.slice(1).map((segment, index, arr) => {
                 const href = "/" + segments.slice(0, index + 2).join("/");
                 const isLast = index === arr.length - 1;

@@ -57,10 +57,7 @@ export default function AdminHeader({ setOpen }: Props) {
 
           <HeaderRoleBadge role={user?.roles?.[0]} />
 
-          <HeaderProfile
-            name={user?.name}
-            email={user?.email}
-          />
+          <HeaderProfile name={user?.name} email={user?.email} />
         </div>
       </div>
     </header>

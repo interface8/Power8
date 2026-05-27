@@ -62,7 +62,7 @@ export default function AdminSidebar({ open, setOpen }: Props) {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Desktop: collapsed by default (w-20), expands on hover (w-64)
+  // Desktop-collapsed 
   const isExpanded = isHovered;
   const sidebarWidth = isExpanded ? "w-64" : "w-20";
 
@@ -124,7 +124,7 @@ export default function AdminSidebar({ open, setOpen }: Props) {
         <nav className="p-3 space-y-6 overflow-y-auto h-[calc(100vh-64px)]">
           {sections.map((section) => (
             <div key={section.title}>
-              {/* Section Title - Only show when expanded */}
+              {/* Section Title */}
               {isExpanded && (
                 <p className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-green-300 uppercase whitespace-nowrap">
                   {section.title}

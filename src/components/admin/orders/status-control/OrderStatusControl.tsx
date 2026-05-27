@@ -194,7 +194,7 @@ export function OrderStatusControl({
 
         {/* Timeline */}
         <div className="overflow-x-auto pt-2">
-          <div className="flex min-w-[600px] items-start">
+          <div className="flex min-w-150 items-start">
             {timelineSteps.map((step, idx) => {
               const stepIndex = timelineSteps.indexOf(step);
 
