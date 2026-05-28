@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminHeader from "@/components/admin/AdminHeader";
+import AdminSidebar from "@/components/admin/dashboard/AdminSidebar";
+import AdminHeader from "@/components/admin/dashboard/AdminHeader";
 
 export default function AdminLayout({
   children,
@@ -12,19 +12,19 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <AdminSidebar
-        open={sidebarOpen}
-        setOpen={setSidebarOpen}
-      />
+      <AdminSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col lg:ml-72">
+      {/* Main Content - Proper margin on desktop to prevent overlap */}
+      <div className="lg:ml-20 xl:ml-20 transition-all duration-300">
         <AdminHeader setOpen={setSidebarOpen} />
 
-        <main className="p-4 sm:p-6 lg:p-8">
-          {children}
+        {/* Main content */}
+        <main className="overflow-x-hidden">
+          <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+            <div className="w-full max-w-400 mx-auto">{children}</div>
+          </div>
         </main>
       </div>
     </div>
