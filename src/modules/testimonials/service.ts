@@ -10,6 +10,7 @@ export async function createTestimonial(data: {
   role?: string | null;
    rating?: number; 
    imageUrl?: string | null;
+   location?: string | null;
   userId: string;
 }) {
   return testimonialsRepository.createTestimonial(data);

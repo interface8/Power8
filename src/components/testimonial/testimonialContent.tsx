@@ -106,7 +106,7 @@ export default function TestimonialContent({
                 quote={testimonial.description}
                 name={testimonial.title}
                 role={testimonial.role || "Customer"}
-                location="Lagos, Nigeria"
+                location={testimonial.location || "Location not specified"}
                 system=""
                 savings=""
                 imageUrl={

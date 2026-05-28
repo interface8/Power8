@@ -14,8 +14,8 @@ model Company {
   contactNumber String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  blogs         Blog[]
   products      Product[]
+  blogs         Blog[]
 
   @@map("company")
 }
@@ -25,6 +25,7 @@ model ProductCategory {
   name        String
   description String?
   sort        Int
+  isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   products    Product[]
@@ -36,21 +37,21 @@ model Product {
   id            String          @id @default(cuid())
   name          String
   description   String?
+  categoryId    String
+  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  companyId     String
+  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   price         Decimal         @db.Decimal(10, 2)
+  warranty      Int
+  capacity      Int
   imageUrl      String?
   stockQuantity Int             @default(0)
   isActive      Boolean         @default(true)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  capacity      Int
-  categoryId    String
-  companyId     String
-  warranty      Int
-  bundleItems   BundleItem[]
   cartItems     CartItem[]
+  bundleItems   BundleItem[]
   orderItems    OrderItem[]
-  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
@@ -61,18 +62,18 @@ model Order {
   totalAmount      Decimal            @db.Decimal(10, 2)
   paymentType      PaymentType
   status           OrderStatus        @default(PENDING)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
   paymentStatus    OrderPaymentStatus @default(PENDING)
-  shippingProvider String?
   shippingStatus   ShippingStatus     @default(PENDING)
   trackingNumber   String?
-  adminAuditLogs   AdminAuditLog[]
-  credit           CreditAccount?
-  items            OrderItem[]
+  shippingProvider String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   user             User               @relation(fields: [userId], references: [id])
+  items            OrderItem[]
   payments         Payment[]
   solarSystems     SolarSystem[]
+  credit           CreditAccount?
+  adminAuditLogs   AdminAuditLog[]
 
   @@map("orders")
 }
@@ -86,22 +87,22 @@ model OrderItem {
   quantity   Int
   unitPrice  Decimal        @db.Decimal(10, 2)
   totalPrice Decimal        @db.Decimal(10, 2)
-  bundle     ProductBundle? @relation(fields: [bundleId], references: [id])
   order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product    Product?       @relation(fields: [productId], references: [id])
+  bundle     ProductBundle? @relation(fields: [bundleId], references: [id])
 
   @@map("order_items")
 }
 
 model CreditAccount {
-  id               String            @id @default(cuid())
-  orderId          String            @unique
-  totalAmount      Decimal           @db.Decimal(10, 2)
-  balanceRemaining Decimal           @db.Decimal(10, 2)
+  id               String       @id @default(cuid())
+  orderId          String       @unique
+  totalAmount      Decimal      @db.Decimal(10, 2)
+  balanceRemaining Decimal      @db.Decimal(10, 2)
   durationMonths   Int
-  status           CreditStatus      @default(ACTIVE)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  status           CreditStatus @default(ACTIVE)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
   order            Order             @relation(fields: [orderId], references: [id])
   schedules        PaymentSchedule[]
 
@@ -131,23 +132,23 @@ model Payment {
   paidAt    DateTime?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-  order     Order         @relation(fields: [orderId], references: [id])
   user      User          @relation(fields: [userId], references: [id])
+  order     Order         @relation(fields: [orderId], references: [id])
 
   @@map("payments")
 }
 
 model SolarSystem {
-  id        String             @id @default(cuid())
+  id        String       @id @default(cuid())
   userId    String
   orderId   String
   bundleId  String
-  status    SystemStatus       @default(ACTIVE)
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-  bundle    ProductBundle      @relation(fields: [bundleId], references: [id])
-  order     Order              @relation(fields: [orderId], references: [id])
-  user      User               @relation(fields: [userId], references: [id])
+  status    SystemStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  user      User          @relation(fields: [userId], references: [id])
+  order     Order         @relation(fields: [orderId], references: [id])
+  bundle    ProductBundle @relation(fields: [bundleId], references: [id])
   logs      SystemControlLog[]
   savings   UserSaving[]
 
@@ -158,8 +159,8 @@ model SystemControlLog {
   id        String        @id @default(cuid())
   systemId  String
   action    ControlAction
-  createdAt DateTime      @default(now())
   actorId   String?
+  createdAt DateTime      @default(now())
   system    SolarSystem   @relation(fields: [systemId], references: [id])
 
   @@map("system_control_logs")
@@ -172,8 +173,8 @@ model UserSaving {
   estimatedAnnualSavings Decimal?    @db.Decimal(10, 2)
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
-  system                 SolarSystem @relation(fields: [systemId], references: [id])
   user                   User        @relation(fields: [userId], references: [id])
+  system                 SolarSystem @relation(fields: [systemId], references: [id])
 
   @@map("user_savings")
 }
@@ -183,8 +184,8 @@ model Cart {
   userId    String     @unique
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  items     CartItem[]
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
 
   @@map("carts")
 }
@@ -233,22 +234,22 @@ model User {
   email             String             @unique
   password          String
   name              String
+  phone             String             @unique
   isActive          Boolean            @default(true)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
-  phone             String             @unique
-  blogs             Blog[]
   cart              Cart?
-  filesCreated      File[]             @relation("FilesCreated")
-  filesModified     File[]             @relation("FilesModified")
-  files             File[]             @relation("UserFiles")
+  roles             UserRole[]
+  testimonials      Testimonial[]
+  solarCalculations SolarCalculation[]
+  blogs             Blog[]
   orders            Order[]
   payments          Payment[]
-  solarCalculations SolarCalculation[]
   solarSystems      SolarSystem[]
-  testimonials      Testimonial[]
-  roles             UserRole[]
   savings           UserSaving[]
+  files             File[]             @relation("UserFiles")
+  filesCreated      File[]             @relation("FilesCreated")
+  filesModified     File[]             @relation("FilesModified")
 
   @@map("users")
 }
@@ -259,8 +260,8 @@ model Role {
   description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  permissions RolePermission[]
   users       UserRole[]
+  permissions RolePermission[]
 
   @@map("roles")
 }
@@ -281,8 +282,8 @@ model Permission {
 model UserRole {
   userId String
   roleId String
-  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@map("user_roles")
@@ -291,8 +292,8 @@ model UserRole {
 model RolePermission {
   roleId       String
   permissionId String
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
   @@map("role_permissions")
@@ -304,12 +305,12 @@ model Testimonial {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  userId      String
+  role        String?
+  status      String   @default("pending")
   rating      Int?
   imageUrl    String?
   location    String?
-  role        String?
-  status      String   @default("pending")
+  userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("testimonials")
@@ -373,9 +374,9 @@ model Blog {
   authorId    String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  author      User?         @relation(fields: [authorId], references: [id])
-  category    BlogCategory? @relation(fields: [categoryId], references: [id])
-  company     Company?      @relation(fields: [companyId], references: [id])
+  author      User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  category    BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  company     Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@map("blogs")
 }
@@ -393,21 +394,21 @@ model File {
   createdById  String
   updatedAt    DateTime @updatedAt
   modifiedById String?
+  user         User     @relation("UserFiles", fields: [userId], references: [id], onDelete: Cascade)
   createdBy    User     @relation("FilesCreated", fields: [createdById], references: [id])
   modifiedBy   User?    @relation("FilesModified", fields: [modifiedById], references: [id])
-  user         User     @relation("UserFiles", fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("files")
 }
 
 model AdminAuditLog {
-  id        String           @id @default(cuid())
+  id        String          @id @default(cuid())
   action    AdminAuditAction
   adminId   String
   orderId   String?
   metadata  Json?
-  createdAt DateTime         @default(now())
-  order     Order?           @relation(fields: [orderId], references: [id])
+  createdAt DateTime        @default(now())
+  order     Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@index([adminId])
@@ -485,449 +486,3 @@ enum ControlAction {
   LIMIT
   DISABLE
 }
-
-// ─── Models ──────────────────────────────────────────────
-
-model Company {
-  id            String    @id @default(cuid())
-  name          String
-  description   String?
-  address       String
-  contactNumber String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  products      Product[]
-  blogs         Blog[]
-
-  @@map("company")
-}
-
-model ProductCategory {
-  id          String    @id @default(cuid())
-  name        String
-  description String?
-  sort        Int
-  isActive Boolean @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  products    Product[]
-
-  @@map("product_category")
-}
-
-model Product {
-  id            String          @id @default(cuid())
-  name          String
-  description   String?
-  categoryId    String
-  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  companyId     String
-  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  price         Decimal         @db.Decimal(10, 2)
-  warranty      Int
-  capacity      Int
-  imageUrl      String?
-  stockQuantity Int             @default(0)
-  isActive      Boolean         @default(true)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  
-  cartItems     CartItem[]
-  bundleItems   BundleItem[]
-  orderItems    OrderItem[]
-
-  @@map("products")
-}
-
-model Order {
-  id            String      @id @default(cuid())
-  userId        String
-  totalAmount   Decimal     @db.Decimal(10, 2)
-  paymentType   PaymentType
-
-  status        OrderStatus @default(PENDING)
-
-  // NEW: admin-facing payment progress (kept in sync with payments/credit)
-  paymentStatus OrderPaymentStatus @default(PENDING)
-
-  // NEW: fulfillment/shipping tracking
-  shippingStatus   ShippingStatus @default(PENDING)
-  trackingNumber   String?
-  shippingProvider String?
-
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  user          User        @relation(fields: [userId], references: [id])
-  items         OrderItem[]
-  payments      Payment[]
-  solarSystems  SolarSystem[]
-  credit        CreditAccount?
-
-  // NEW: audit trail relation
-  adminAuditLogs AdminAuditLog[]
-
-  @@map("orders")
-}
-
-model OrderItem {
-  id         String    @id @default(cuid())
-  orderId    String
-  itemType   ItemType
-  productId  String?
-  bundleId   String?
-  quantity   Int
-  unitPrice  Decimal   @db.Decimal(10, 2)
-  totalPrice Decimal   @db.Decimal(10, 2)
-
-  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product    Product?       @relation(fields: [productId], references: [id])
-  bundle     ProductBundle? @relation(fields: [bundleId], references: [id])
-
-  @@map("order_items")
-}
-
-model CreditAccount {
-  id               String       @id @default(cuid())
-  orderId          String       @unique
-  totalAmount      Decimal      @db.Decimal(10, 2)
-  balanceRemaining Decimal      @db.Decimal(10, 2)
-  durationMonths   Int
-  status           CreditStatus @default(ACTIVE)
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
-
-  order            Order             @relation(fields: [orderId], references: [id])
-  schedules        PaymentSchedule[]
-
-  @@map("credit_accounts")
-}
-
-model PaymentSchedule {
-  id              String         @id @default(cuid())
-  creditAccountId String
-  dueDate         DateTime
-  amountDue       Decimal        @db.Decimal(10, 2)
-  status          ScheduleStatus @default(PENDING)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  creditAccount   CreditAccount @relation(fields: [creditAccountId], references: [id])
-
-  @@map("payment_schedules")
-}
-
-model Payment {
-  id        String        @id @default(cuid())
-  userId    String
-  orderId   String
-  amount    Decimal       @db.Decimal(10, 2)
-  status    PaymentStatus
-  reference String        @unique
-  paidAt    DateTime?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
-  user      User  @relation(fields: [userId], references: [id])
-  order     Order @relation(fields: [orderId], references: [id])
-
-  @@map("payments")
-}
-
-model SolarSystem {
-  id        String       @id @default(cuid())
-  userId    String
-  orderId   String
-  bundleId  String
-  status    SystemStatus @default(ACTIVE)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  user      User          @relation(fields: [userId], references: [id])
-  order     Order         @relation(fields: [orderId], references: [id])
-  bundle    ProductBundle @relation(fields: [bundleId], references: [id])
-  logs      SystemControlLog[]
-  savings   UserSaving[]
-
-
-  @@map("solar_systems")
-}
-
-model SystemControlLog {
-  id        String        @id @default(cuid())
-  systemId  String
-  action    ControlAction
-  actorId   String?
-  createdAt DateTime      @default(now())
-
-  system    SolarSystem @relation(fields: [systemId], references: [id])
-
-  @@map("system_control_logs")
-}
-
-
-model UserSaving {
-  id                     String      @id @default(cuid())
-  userId                 String
-  systemId               String
-  estimatedAnnualSavings Decimal?    @db.Decimal(10, 2)
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
-
-  user                   User        @relation(fields: [userId], references: [id])
-  system                 SolarSystem @relation(fields: [systemId], references: [id])
-
-  @@map("user_savings")
-}
-
-
-model Cart {
-  id        String     @id @default(cuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     CartItem[]
-
-  @@map("carts")
-}
-
-model CartItem {
-  id        String   @id @default(cuid())
-  cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([cartId, productId])
-  @@map("cart_items")
-}
-
-model ProductBundle {
-  id               String   @id @default(cuid())
-  name             String
-  totalPrice       Decimal  @db.Decimal(10, 2)
-  systemCapacityKw Decimal? @db.Decimal(10, 2)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  items            BundleItem[]
-  orderItems       OrderItem[]
-  solarSystems     SolarSystem[]
-
-
-  @@map("product_bundles")
-}
-
-model BundleItem {
-  id        String @id @default(cuid())
-  bundleId  String
-  productId String
-  quantity  Int
-
-  bundle    ProductBundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
-  product   Product       @relation(fields: [productId], references: [id])
-
-  @@map("bundle_items")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  phone     String   @unique
-  cart      Cart?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  roles             UserRole[]
-  testimonials      Testimonial[]
-  solarCalculations SolarCalculation[]
-  blogs             Blog[]
-  orders            Order[]
-  payments          Payment[]
-  solarSystems      SolarSystem[]
-  savings           UserSaving[]
-  files          File[]  @relation("UserFiles") 
-  filesCreated   File[]  @relation("FilesCreated")
-  filesModified  File[]  @relation("FilesModified")
-
-
-
-
-  @@map("users")
-}
-
-model Role {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       UserRole[]
-  permissions RolePermission[]
-
-  @@map("roles")
-}
-
-model Permission {
-  id          String   @id @default(cuid())
-  resource    String
-  action      String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  roles       RolePermission[]
-
-  @@unique([resource, action], name: "resource_action")
-  @@map("permissions")
-}
-
-model UserRole {
-  userId String
-  roleId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-
-  @@id([userId, roleId])
-  @@map("user_roles")
-}
-
-model RolePermission {
-  roleId       String
-  permissionId String
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@id([roleId, permissionId])
-  @@map("role_permissions")
-}
-
-model Testimonial {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  role        String?   
-  status      String   @default("pending")  
-  rating      Int?
-  imageUrl    String?
-  location    String?
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("testimonials")
-}
-
-model CarouselSlide {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  imageUrl    String
-  linkUrl     String?
-  sort        Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("carousel_slides")
-}
-
-model SolarCalculation {
-  id              String   @id @default(cuid())
-  userId          String?
-  user            User?    @relation(fields: [userId], references: [id])
-  appliances      Json
-  config          Json
-  results         Json
-  location        String?
-  totalDailyWh    Int
-  inverterSize    Int
-  solarPanelWatts Int
-  batteryAh       Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("solar_calculations")
-}
-
-// ─── Blog ──────────────────────────────────────────────
-
-model BlogCategory {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  sort        Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  blogs       Blog[]
-
-  @@map("blog_categories")
-}
-
-model Blog {
-  id          String        @id @default(cuid())
-  title       String
-  slug        String        @unique
-  excerpt     String?
-  content     String
-  imageUrl    String?
-  isPublished Boolean       @default(false)
-  publishedAt DateTime?
-  categoryId  String?
-  category    BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  companyId   String?
-  company     Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  authorId    String?
-  author      User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  @@map("blogs")
-}
-
-model File {
-  id           String   @id @default(cuid())
-  title        String
-  description  String?
-  type         String
-  size         Int
-  url          String
-  pathname     String
-
-  userId       String
-  user         User     @relation("UserFiles", fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt    DateTime @default(now())
-  createdById  String
-  createdBy    User     @relation("FilesCreated", fields: [createdById], references: [id])
-
-  updatedAt    DateTime @updatedAt
-  modifiedById String?
-  modifiedBy   User?    @relation("FilesModified", fields: [modifiedById], references: [id])
-
-  @@map("files")
-}
-
-model AdminAuditLog {
-  id        String          @id @default(cuid())
-  action    AdminAuditAction
-  adminId   String
-  orderId   String?
-  metadata  Json?
-  createdAt DateTime        @default(now())
-
-  order     Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
-
-  @@index([orderId])
-  @@index([adminId])
-  @@map("admin_audit_logs")
-}
-
