@@ -4,7 +4,8 @@ type RawProduct = {
   id: string;
   name: string;
   description: string | null;
-  imageUrl: string | null;
+  imageUrls: string[];
+  imageUrl?: string;
   price: number;
   stockQuantity: number;
   categoryId: string;
@@ -34,7 +35,8 @@ export const getProducts = async (): Promise<Product[]> => {
       id: item.id,
       name: item.name,
       description: item.description,
-      imageUrl: item.imageUrl,
+      imageUrl: item.imageUrls[0] ?? null,
+      imageUrls: item.imageUrls,
       price: item.price,
       stockQuantity: item.stockQuantity,
       categoryId: item.categoryId,
