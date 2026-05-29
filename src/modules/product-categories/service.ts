@@ -4,8 +4,8 @@ import type {
   UpdateProductCategoryInput,
 } from "./types";
 
-export async function listCategories() {
-  return categoryRepo.findCategories();
+export async function listCategories(activeOnly?: boolean) {
+  return categoryRepo.findCategories(activeOnly);
 }
 
 export async function getCategoryById(id: string) {

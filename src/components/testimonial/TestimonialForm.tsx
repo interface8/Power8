@@ -13,12 +13,14 @@ import {
   Star,
   Upload,
   X,
+  MapPin,
 } from "lucide-react";
 
 export default function TestimonialForm() {
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [role, setRole] = useState("");
+  const [location, setLocation] = useState("");
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -108,6 +110,7 @@ export default function TestimonialForm() {
     setTimeout(() => setIsAnimating(false), 300);
 
     setIsLoading(true);
+    console.log("Submitting location:", location);
 
     try {
       const response = await fetch("/api/testimonials", {
@@ -118,6 +121,7 @@ export default function TestimonialForm() {
         body: JSON.stringify({
           name: name,
           role: role,
+          location: location,
           rating: rating,
           message: message,
           imageUrl: imageUrl || null,
@@ -133,6 +137,7 @@ export default function TestimonialForm() {
       setIsSubmitted(true);
       setName("");
       setRole("");
+      setLocation("");
       setRating(0);
       setMessage("");
       setImageUrl("");
@@ -242,6 +247,23 @@ export default function TestimonialForm() {
                   onChange={(e) => setRole(e.target.value)}
                   className="w-full px-5 py-4 border rounded-lg focus:ring-orange-500 focus:border-orange-500 text-lg font-semibold placeholder:font-bold"
                   placeholder="e.g. Product Designer at ABC Ltd"
+                />
+              </div>
+            </div>
+
+            {/* Location Field */}
+            <div>
+              <label className="block text-lg font-bold text-gray-700 mb-2">
+                Location <span className="text-gray-400 text-sm font-normal">(Optional)</span>
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full pl-12 pr-5 py-4 border rounded-lg focus:ring-orange-500 focus:border-orange-500 text-lg font-semibold placeholder:font-bold"
+                  placeholder="e.g., Lagos, Nigeria / New York, USA / London, UK"
                 />
               </div>
             </div>

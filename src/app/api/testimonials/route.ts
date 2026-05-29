@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, role, rating, message, imageUrl } = body;
+    const { name, role, rating, message, location, imageUrl } = body;
 
     // Validation
     if (!name || name.trim().length < 2) {
@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       description: message,
       role: role || null,
       rating: rating,
+      location: location || null,
       imageUrl: imageUrl || null,  // ← ADD THIS
       userId: guard.id,
     });
