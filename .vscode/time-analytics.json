@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "project": {
+    "totalFocusTime": 8529958,
+    "totalActiveTime": 108758
+  },
+  "files": {
+    ".vscode/settings.json": {
+      "pending": 0,
+      "focus": 6421
+    },
+    "src/types/checkout.tsx": {
+      "pending": 1080,
+      "focus": 94518
+    },
+    "src/components/checkout/checkoutUtils.ts": {
+      "pending": 6890,
+      "focus": 158525
+    },
+    "src/components/checkout/CheckoutPage.tsx": {
+      "pending": 63173,
+      "focus": 620884
+    },
+    "src/components/checkout/shared/CheckoutCard.tsx": {
+      "pending": 1781,
+      "focus": 24693
+    },
+    "src/components/checkout/shared/SectionHeader.tsx": {
+      "pending": 4378,
+      "focus": 29580
+    },
+    "src/components/checkout/shared/CheckoutInput.tsx": {
+      "pending": 1582,
+      "focus": 33416
+    },
+    "src/components/checkout/shared/CheckoutModal.tsx": {
+      "pending": 3416,
+      "focus": 64800
+    },
+    "src/components/checkout/sections/PaymentMethodSection.tsx": {
+      "pending": 8359,
+      "focus": 186927
+    },
+    "src/components/checkout/sections/AddressSection.tsx": {
+      "pending": 9529,
+      "focus": 199539
+    },
+    "src/components/checkout/sections/CreditDetailsSection.tsx": {
+      "pending": 2684,
+      "focus": 125857
+    },
+    "src/components/checkout/sections/IdentityVerificationSection.tsx": {
+      "pending": 3111,
+      "focus": 47116
+    },
+    "src/components/checkout/sections/PaymentChannelSection.tsx": {
+      "pending": 1320,
+      "focus": 35401
+    },
+    "src/components/checkout/sections/OrderSummarySection.tsx": {
+      "pending": 1455,
+      "focus": 4458
+    }
+  }
+}
