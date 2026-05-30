@@ -10,6 +10,7 @@ export type Product = {
   warranty: number;
   capacity: number;
   imageUrl: string | null;
+  imageUrls: string[];
   stockQuantity: number;
   isActive: boolean;
   createdAt: string;

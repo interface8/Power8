@@ -6,12 +6,16 @@ export async function getAdminStats(
 ): Promise<AdminStatsDto> {
   const recentTake = 10;
 
+  const now = new Date();
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
   const [
     totalRegisteredUsers,
     activeCreditAccounts,
     overduePaymentSchedules,
     revenueAgg,
-
+    prevMonthRevenueAgg,
     totalOrders,
 
     inStock,
@@ -28,6 +32,17 @@ export async function getAdminStats(
 
     prisma.payment.aggregate({
       where: { status: "SUCCESS" },
+      _sum: { amount: true },
+    }),
+
+    prisma.payment.aggregate({
+      where: {
+        status: "SUCCESS",
+        paidAt: {
+          gte: prevMonthStart,
+          lte: prevMonthEnd,
+        },
+      },
       _sum: { amount: true },
     }),
 
@@ -60,12 +75,14 @@ export async function getAdminStats(
   ]);
 
   const totalRevenue = revenueAgg._sum.amount?.toNumber() ?? 0;
+  const previousMonthRevenue = prevMonthRevenueAgg._sum.amount?.toNumber() ?? 0;
 
   return {
     totalRegisteredUsers,
     activeCreditAccounts,
     overduePaymentSchedules,
     totalRevenue,
+    previousMonthRevenue,
 
     totalOrders,
 
@@ -77,6 +94,9 @@ export async function getAdminStats(
       customerEmail: o.user.email,
       totalAmount: o.totalAmount.toNumber(),
       paymentType: o.paymentType,
+      installationAddress: o.installationAddress,
+      city: o.city,
+      state: o.state,
       orderStatus: o.status,
       createdAt: o.createdAt,
       updatedAt: o.updatedAt,

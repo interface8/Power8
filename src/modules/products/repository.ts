@@ -20,12 +20,14 @@ function toProductDto(product: {
   price: { toNumber: () => number };
   warranty: number;
   capacity: number;
-  imageUrl: string | null;
+  imageUrls: string[] | null;
   stockQuantity: number;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): ProductDto {
+  const imageUrls = product.imageUrls ?? [];
+
   return {
     id: product.id,
     name: product.name,
@@ -37,7 +39,8 @@ function toProductDto(product: {
     price: product.price.toNumber(),
     warranty: product.warranty,
     capacity: product.capacity,
-    imageUrl: product.imageUrl,
+    imageUrl: imageUrls[0],
+    imageUrls,
     stockQuantity: product.stockQuantity,
     isActive: product.isActive,
     createdAt: product.createdAt,

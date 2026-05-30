@@ -79,6 +79,9 @@ export interface AdminOrderDetail {
   updatedAt: string;
   totalAmount: number;
   paymentType: PaymentType;
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
   shipping: {
@@ -102,6 +105,9 @@ export interface AdminOrder {
   customerEmail: string;
   totalAmount: number;
   paymentType: PaymentType;
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
   paymentStatus: PaymentStatus;
   orderStatus: OrderStatus;
   shippingStatus: ShippingStatus;
