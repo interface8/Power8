@@ -9,6 +9,7 @@ export const createProductSchema = z.object({
   warranty: z.number().int().min(0, "Warranty cannot be negative"),
   capacity: z.number().int().min(0, "Capacity cannot be negative"),
   imageUrl: z.string().url("Invalid image URL").optional(),
+  imageUrls: z.array(z.string().url("Invalid image URL")).max(4, "Up to 4 product images are allowed").optional(),
   stockQuantity: z.number().int().min(0, "Stock cannot be negative").optional(),
   isActive: z.boolean().optional().default(true),
 });

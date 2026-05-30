@@ -18,6 +18,9 @@ function toOrderDto(order: {
   totalAmount: { toNumber: () => number };
   paymentType: string;
   status: string;
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
   items: {
     id: string;
     itemType: string;
@@ -38,6 +41,9 @@ function toOrderDto(order: {
     totalAmount: order.totalAmount.toNumber(),
     paymentType: order.paymentType as OrderDto["paymentType"],
     status: order.status as OrderDto["status"],
+    installationAddress: order.installationAddress,
+    city: order.city,
+    state: order.state,
     items: order.items.map(
       (item): OrderItemDto => ({
         id: item.id,
@@ -125,6 +131,9 @@ export async function createOrder(userId: string, input: CreateOrderInput): Prom
       userId,
       totalAmount,
       paymentType: input.paymentType,
+      installationAddress: input.installationAddress,
+      city: input.city,
+      state: input.state,
       items: {
         create: itemsWithPrices,
       },

@@ -12,6 +12,7 @@ export interface ProductDto {
   warranty: number;
   capacity: number;
   imageUrl: string | null;
+  imageUrls: string[];
   stockQuantity: number;
   isActive: boolean;
   createdAt: Date;
@@ -27,6 +28,7 @@ export interface CreateProductInput {
   warranty: number;
   capacity: number;
   imageUrl?: string;
+  imageUrls?: string[];
   stockQuantity?: number;
   isActive?: boolean;
 }

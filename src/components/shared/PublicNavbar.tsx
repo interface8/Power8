@@ -46,15 +46,15 @@ export default function PublicNavbar() {
     router.push("/");
   };
 
-  const getLinkClassName = (
-    isActive: boolean,
-    isLoading: boolean,
-    baseClass: string,
-  ) => {
-    return `${baseClass} ${isActive ? "bg-green-200 text-black" : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-black border border-gray-200"} ${
-      isLoading ? "opacity-50 cursor-wait pointer-events-none" : ""
-    }`;
-  };
+  // const getLinkClassName = (
+  //   isActive: boolean,
+  //   isLoading: boolean,
+  //   baseClass: string,
+  // ) => {
+  //   return `${baseClass} ${isActive ? "bg-green-200 text-black" : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-black border border-gray-200"} ${
+  //     isLoading ? "opacity-50 cursor-wait pointer-events-none" : ""
+  //   }`;
+  // };
 
   const LoadingSpinner = () => (
     <Loader2 className="w-4 h-4 animate-spin text-orange-500" />

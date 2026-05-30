@@ -44,13 +44,13 @@ model Product {
   price         Decimal         @db.Decimal(10, 2)
   warranty      Int
   capacity      Int
-  imageUrl      String?
+  imageUrls     String[]
   stockQuantity Int             @default(0)
   isActive      Boolean         @default(true)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  cartItems     CartItem[]
   bundleItems   BundleItem[]
+  cartItems     CartItem[]
   orderItems    OrderItem[]
 
   @@map("products")
@@ -66,6 +66,9 @@ model Order {
   shippingStatus   ShippingStatus     @default(PENDING)
   trackingNumber   String?
   shippingProvider String?
+  installationAddress String?
+  city             String?
+  state            String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   user             User               @relation(fields: [userId], references: [id])
@@ -95,15 +98,15 @@ model OrderItem {
 }
 
 model CreditAccount {
-  id               String       @id @default(cuid())
-  orderId          String       @unique
-  totalAmount      Decimal      @db.Decimal(10, 2)
-  balanceRemaining Decimal      @db.Decimal(10, 2)
+  id               String          @id @default(cuid())
+  orderId          String          @unique
+  totalAmount      Decimal         @db.Decimal(10, 2)
+  balanceRemaining Decimal         @db.Decimal(10, 2)
   durationMonths   Int
-  status           CreditStatus @default(ACTIVE)
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
-  order            Order             @relation(fields: [orderId], references: [id])
+  status           CreditStatus    @default(ACTIVE)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  order            Order           @relation(fields: [orderId], references: [id])
   schedules        PaymentSchedule[]
 
   @@map("credit_accounts")
@@ -132,23 +135,23 @@ model Payment {
   paidAt    DateTime?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-  user      User          @relation(fields: [userId], references: [id])
   order     Order         @relation(fields: [orderId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
 
   @@map("payments")
 }
 
 model SolarSystem {
-  id        String       @id @default(cuid())
+  id        String           @id @default(cuid())
   userId    String
   orderId   String
   bundleId  String
-  status    SystemStatus @default(ACTIVE)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  user      User          @relation(fields: [userId], references: [id])
-  order     Order         @relation(fields: [orderId], references: [id])
-  bundle    ProductBundle @relation(fields: [bundleId], references: [id])
+  status    SystemStatus     @default(ACTIVE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  user      User             @relation(fields: [userId], references: [id])
+  order     Order            @relation(fields: [orderId], references: [id])
+  bundle    ProductBundle    @relation(fields: [bundleId], references: [id])
   logs      SystemControlLog[]
   savings   UserSaving[]
 
@@ -239,17 +242,17 @@ model User {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   cart              Cart?
-  roles             UserRole[]
-  testimonials      Testimonial[]
-  solarCalculations SolarCalculation[]
   blogs             Blog[]
-  orders            Order[]
-  payments          Payment[]
-  solarSystems      SolarSystem[]
-  savings           UserSaving[]
   files             File[]             @relation("UserFiles")
   filesCreated      File[]             @relation("FilesCreated")
   filesModified     File[]             @relation("FilesModified")
+  orders            Order[]
+  payments          Payment[]
+  roles             UserRole[]
+  savings           UserSaving[]
+  solarCalculations SolarCalculation[]
+  solarSystems      SolarSystem[]
+  testimonials      Testimonial[]
 
   @@map("users")
 }
@@ -260,8 +263,8 @@ model Role {
   description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  users       UserRole[]
   permissions RolePermission[]
+  users       UserRole[]
 
   @@map("roles")
 }
@@ -292,8 +295,8 @@ model UserRole {
 model RolePermission {
   roleId       String
   permissionId String
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
   @@map("role_permissions")
@@ -402,13 +405,13 @@ model File {
 }
 
 model AdminAuditLog {
-  id        String          @id @default(cuid())
+  id        String           @id @default(cuid())
   action    AdminAuditAction
   adminId   String
   orderId   String?
   metadata  Json?
-  createdAt DateTime        @default(now())
-  order     Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt DateTime         @default(now())
+  order     Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@index([adminId])

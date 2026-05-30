@@ -1,3 +1,5 @@
+import { OrderStatus, PaymentType } from "@prisma/client";
+
 export interface OrderItemDto {
   id: string;
   itemType: "PRODUCT" | "BUNDLE";
@@ -14,8 +16,11 @@ export interface OrderDto {
   id: string;
   userId: string;
   totalAmount: number;
-  paymentType: "FULL" | "CREDIT";
-  status: "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+  paymentType: PaymentType;
+  status: OrderStatus;
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
   items: OrderItemDto[];
   createdAt: Date;
   updatedAt: Date;
@@ -30,5 +35,8 @@ export interface CreateOrderItemInput {
 
 export interface CreateOrderInput {
   paymentType: "FULL" | "CREDIT";
+  installationAddress: string;
+  city: string;
+  state: string;
   items: CreateOrderItemInput[];
 }
