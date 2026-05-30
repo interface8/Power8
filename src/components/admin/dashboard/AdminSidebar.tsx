@@ -18,6 +18,7 @@ import {
   HomeIcon,
   ShieldCheck,
   KeyRound,
+  CreditCard,
 } from "lucide-react";
 
 const sections = [
@@ -33,6 +34,11 @@ const sections = [
       { name: "Blog", href: "/admin/blog", icon: BookOpen },
       { name: "Categories", href: "/admin/categories", icon: Layers3 },
       { name: "Carousel", href: "/admin/carousel", icon: Image },
+      {
+        name: "Credit Accounts",
+        href: "/admin/credit-accounts",
+        icon: CreditCard,
+      },
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
       {
@@ -62,7 +68,7 @@ export default function AdminSidebar({ open, setOpen }: Props) {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Desktop-collapsed 
+  // Desktop-collapsed
   const isExpanded = isHovered;
   const sidebarWidth = isExpanded ? "w-64" : "w-20";
 
