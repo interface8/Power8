@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { CreditAccountDetail } from "@/types/credit-account-detail";
 
-import CreditSummaryCards from "./CreditsummaryCards";
+import CreditSummaryCards from "./CreditSummaryCards";
 import CreditAccountInfo from "./CreditAccountInfo";
 import PaymentScheduleTable from "./PaymentScheduleTable";
 import RepaymentProgressCard from "./RepaymentProgressCard";

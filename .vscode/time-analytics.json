@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "project": {
-    "totalFocusTime": 68700631,
+    "totalFocusTime": 68722384,
     "totalActiveTime": 593790
   },
   "files": {
@@ -160,6 +160,10 @@
     "src/components/admin/credit-accounts/credit-id/RepaymentProgressCard.tsx": {
       "pending": 1026,
       "focus": 80537
+    },
+    "src/modules/admin-stats/repository.ts": {
+      "pending": 0,
+      "focus": 21753
     }
   },
   "deleted": {

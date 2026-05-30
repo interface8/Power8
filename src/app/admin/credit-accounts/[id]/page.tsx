@@ -10,12 +10,8 @@ interface PageProps {
   };
 }
 
-export default function Page({
-  params,
-}: PageProps) {
-  const account = creditAccountDetails.find(
-    (item) => item.id === params.id
-  );
+export default function Page({ params }: PageProps) {
+  const account = creditAccountDetails.find((item) => item.id === params.id);
 
   if (!account) {
     notFound();
@@ -23,9 +19,7 @@ export default function Page({
 
   return (
     <div className="w-full p-4 md:p-6">
-      <CreditAccountDetailPage
-        account={account}
-      />
+      <CreditAccountDetailPage account={account} />
     </div>
   );
 }
