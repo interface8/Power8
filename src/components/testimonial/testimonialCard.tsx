@@ -11,6 +11,7 @@ interface TestimonialCardProps {
   system: string;
   savings: string;
   imageUrl?: string;
+  
 }
 
 export default function TestimonialCard({
@@ -25,7 +26,7 @@ export default function TestimonialCard({
 }: TestimonialCardProps) {
   return (
     <Card className="w-full max-w-[420px] h-full hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden flex flex-col">
-      <CardContent className="pt-10 pb-6 px-7 flex-1">
+      <CardContent className="pt-10 pb-6 px-7 flex-1 flex flex-col">
         {/* Quote Icon + Stars */}
         <div className="flex mb-15">
           <Quote className="text-orange-200 w-9 h-9 shrink-0" />
@@ -48,8 +49,8 @@ export default function TestimonialCard({
           {quote}
         </p>
 
-        {/* Profile Section */}
-        <div className="flex items-center gap-4">
+        {/* Profile Section - stays at bottom */}
+        <div className="flex items-center gap-4 mt-auto">
           <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-orange-300">
             {imageUrl ? (
               <Image
@@ -69,7 +70,7 @@ export default function TestimonialCard({
           <div className="leading-tight">
             <h4 className="font-semibold text-xl text-gray-900">{name}</h4>
             <p className="text-gray-600 text-lg">{role}</p>
-            <p className="text-gray-500 text-sm">{location}</p>
+            <p className="text-gray-500 text-sm">{location || "Location not specified"}</p>
           </div>
         </div>
       </CardContent>

@@ -2,8 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Star, CheckCircle, XCircle } from "lucide-react";
+import { Star, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 interface Testimonial {
   id: string;
@@ -22,6 +33,8 @@ export default function AdminTestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"pending" | "approved" | "rejected">("pending");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [testimonialToDelete, setTestimonialToDelete] = useState<Testimonial | null>(null);
 
   const fetchTestimonials = async () => {
     setLoading(true);
@@ -54,6 +67,32 @@ export default function AdminTestimonialsPage() {
     }
   };
 
+  const deleteTestimonial = async () => {
+    if (!testimonialToDelete) return;
+
+    try {
+      const res = await fetch(`/api/admin/testimonials?id=${testimonialToDelete.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        toast.success("Testimonial deleted");
+        fetchTestimonials();
+      } else {
+        toast.error("Failed to delete");
+      }
+    } catch {
+      toast.error("Failed to delete");
+    } finally {
+      setDeleteDialogOpen(false);
+      setTestimonialToDelete(null);
+    }
+  };
+
+  const openDeleteDialog = (testimonial: Testimonial) => {
+    setTestimonialToDelete(testimonial);
+    setDeleteDialogOpen(true);
+  };
+
   useEffect(() => {
     fetchTestimonials();
   }, []);
@@ -74,7 +113,6 @@ export default function AdminTestimonialsPage() {
     });
   };
 
-  // Skeleton Loader Component
   const SkeletonCard = () => (
     <div className="bg-white rounded-xl border p-10 shadow-sm flex flex-col">
       <div className="flex gap-8">
@@ -106,6 +144,7 @@ export default function AdminTestimonialsPage() {
       </div>
       <div className="mt-6 pt-5 border-t border-gray-200">
         <div className="flex gap-4">
+          <div className="flex-1 h-9 bg-gray-200 rounded-lg animate-pulse" />
           <div className="flex-1 h-9 bg-gray-200 rounded-lg animate-pulse" />
           <div className="flex-1 h-9 bg-gray-200 rounded-lg animate-pulse" />
         </div>
@@ -224,7 +263,7 @@ export default function AdminTestimonialsPage() {
                       </span>
                     </div>
 
-                    {/* Message - Bolder and darker */}
+                    {/* Message */}
                     <p className="text-gray-600 mt-3 text-[12px] leading-relaxed font-normal">
                       {testimonial.description}
                     </p>
@@ -262,17 +301,35 @@ export default function AdminTestimonialsPage() {
                   )}
 
                   {activeTab === "approved" && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                      <CheckCircle className="w-3 h-3" />
-                      Approved
-                    </span>
+                    <div className="flex gap-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <CheckCircle className="w-3 h-3" />
+                        Approved
+                      </span>
+                      <button
+                        onClick={() => openDeleteDialog(testimonial)}
+                        className="flex-1 bg-transparent border border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-400 hover:text-red-600 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Delete
+                      </button>
+                    </div>
                   )}
 
                   {activeTab === "rejected" && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                      <XCircle className="w-3 h-3" />
-                      Rejected
-                    </span>
+                    <div className="flex gap-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                        <XCircle className="w-3 h-3" />
+                        Rejected
+                      </span>
+                      <button
+                        onClick={() => openDeleteDialog(testimonial)}
+                        className="flex-1 bg-transparent border border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-400 hover:text-red-600 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Delete
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -280,6 +337,31 @@ export default function AdminTestimonialsPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the testimonial from{" "}
+              <span className="font-semibold text-red-600">{testimonialToDelete?.title}</span>?
+              <br />
+              <br />
+              This action <span className="font-semibold">cannot be undone</span>. The testimonial will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={deleteTestimonial}
+              className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
