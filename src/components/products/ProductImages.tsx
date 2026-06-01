@@ -13,24 +13,24 @@ export default function ProductImages({ images }: ProductImagesProps) {
   return (
     <div className="flex flex-col gap-4 w-full">
       {/* Main Image - Full width on mobile, 90% on desktop */}
-      <div className="relative h-75 md:h-95 bg-gray-100 rounded-xl overflow-hidden w-full md:w-[90%] md:mx-auto mb-4">
+      <div className="relative h-75 md:h-125 bg-gray-100 rounded-xl overflow-hidden w-full md:w-[90%] md:mx-auto mb-4">
         <Image
           src={selectedImage}
           alt="Product image"
           fill
-          className="object-cover"
+          className="object-fit"
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
 
       {/* Thumbnails - Full width on mobile, 90% on desktop */}
       <div className="w-full md:w-[90%] md:mx-auto">
-        <div className="flex gap-2 md:gap-3 justify-between">
+        <div className="flex gap-2 md:gap-2 justify-start md:justify-start">
           {images.slice(0, 4).map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(image)}
-              className={`relative w-[22%] h-12 md:h-24 rounded-lg overflow-hidden transition-all duration-300 ${
+              className={`relative w-[25%] h-15 md:h-28 rounded-lg overflow-hidden transition-all duration-300 ${
                 selectedImage === image ? "opacity-100" : "opacity-40 hover:opacity-70"
               }`}
             >
@@ -38,7 +38,7 @@ export default function ProductImages({ images }: ProductImagesProps) {
                 src={image}
                 alt={`Thumbnail ${index + 1}`}
                 fill
-                className="object-cover"
+                className="object-fit"
               />
             </button>
           ))}

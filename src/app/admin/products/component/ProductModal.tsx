@@ -21,7 +21,7 @@ import {
 import { toast } from "sonner";
 import Image from "next/image";
 import type { Product, ProductCategory, Company } from "@/types/products";
-import { X } from "lucide-react";
+import { X, Upload, Loader2 } from "lucide-react";
 
 interface ProductModalProps {
   open: boolean;
@@ -30,6 +30,12 @@ interface ProductModalProps {
   onSuccess: () => void;
   categories: ProductCategory[];
   companies: Company[];
+}
+
+interface ImageItem {
+  url: string;
+  file?: File;
+  isUploading?: boolean;
 }
 
 export default function ProductModal({
@@ -41,6 +47,8 @@ export default function ProductModal({
   companies,
 }: ProductModalProps) {
   const [loading, setLoading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -51,9 +59,9 @@ export default function ProductModal({
     warranty: 0,
     capacity: "",
     isActive: true,
-    imageUrl: "",
   });
-  const [imagePreview, setImagePreview] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<ImageItem[]>([]);
 
   useEffect(() => {
     if (product) {
@@ -67,9 +75,12 @@ export default function ProductModal({
         warranty: product.warranty || 0,
         capacity: product.capacity?.toString() || "",
         isActive: product.isActive !== undefined ? product.isActive : true,
-        imageUrl: product.imageUrl || "",
       });
-      setImagePreview(product.imageUrl || "");
+      
+      // Handle existing images
+      const existingImages = product.imageUrls || (product.imageUrl ? [product.imageUrl] : []);
+      setImageUrls(existingImages);
+      setImagePreviews(existingImages.map(url => ({ url, isUploading: false })));
     } else {
       setFormData({
         name: "",
@@ -81,13 +92,13 @@ export default function ProductModal({
         warranty: 0,
         capacity: "",
         isActive: true,
-        imageUrl: "",
       });
-      setImagePreview("");
+      setImageUrls([]);
+      setImagePreviews([]);
     }
   }, [product]);
 
-  const handleImageUpload = async (file: File) => {
+  const uploadImage = async (file: File): Promise<string | null> => {
     const formDataObj = new FormData();
     formDataObj.append("file", file);
 
@@ -95,22 +106,80 @@ export default function ProductModal({
       const res = await fetch("/api/upload", { method: "POST", body: formDataObj });
       const data = await res.json();
       if (res.ok) {
-        setFormData((prev) => ({ ...prev, imageUrl: data.url }));
-        setImagePreview(data.url);
-        toast.success("Image uploaded");
-      } else {
-        toast.error("Failed to upload image");
+        return data.url;
       }
+      toast.error("Failed to upload image");
+      return null;
     } catch {
       toast.error("Failed to upload image");
+      return null;
     }
+  };
+
+  const handleImageUpload = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const remainingSlots = 4 - imagePreviews.length;
+    
+    if (remainingSlots <= 0) {
+      toast.error("Maximum 4 images allowed");
+      return;
+    }
+
+    const filesToUpload = fileArray.slice(0, remainingSlots);
+    
+    // Add loading placeholders
+    const newPreviews: ImageItem[] = filesToUpload.map(file => ({
+      url: URL.createObjectURL(file),
+      file,
+      isUploading: true,
+    }));
+    
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+    setUploadingImages(true);
+
+    // Upload each file
+    const uploadedUrls: string[] = [];
+    for (const item of newPreviews) {
+      const uploadedUrl = await uploadImage(item.file!);
+      if (uploadedUrl) {
+        uploadedUrls.push(uploadedUrl);
+        // Update the preview with the actual URL
+        setImagePreviews(prev =>
+          prev.map(p => 
+            p.file === item.file ? { ...p, url: uploadedUrl, isUploading: false } : p
+          )
+        );
+      } else {
+        // Remove failed upload
+        setImagePreviews(prev => prev.filter(p => p.file !== item.file));
+      }
+    }
+    
+    setImageUrls(prev => [...prev, ...uploadedUrls]);
+    setUploadingImages(false);
+  };
+
+  const removeImage = (index: number) => {
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
   };
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      await handleImageUpload(file);
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      await handleImageUpload(files);
     }
   };
 
@@ -134,16 +203,9 @@ export default function ProductModal({
       const method = product ? "PATCH" : "POST";
 
       const submitData = {
-        name: formData.name,
-        description: formData.description,
-        categoryId: formData.categoryId,
-        companyId: formData.companyId,
-        price: formData.price,
-        stockQuantity: formData.stockQuantity,
-        warranty: formData.warranty,
+        ...formData,
         capacity: parseInt(formData.capacity) || 0,
-        isActive: formData.isActive,
-        imageUrl: formData.imageUrl && formData.imageUrl.trim() !== "" ? formData.imageUrl : undefined,
+        imageUrls,
       };
 
       const res = await fetch(url, {
@@ -300,58 +362,87 @@ export default function ProductModal({
             </div>
           </div>
 
-          {/* Right Column - Image Upload */}
+          {/* Right Column - Multiple Image Upload */}
           <div className="w-full lg:w-96">
-            <Label className="text-sm font-semibold text-gray-700">Product Image</Label>
+            <Label className="text-sm font-semibold text-gray-700">Product Images (Max 4)</Label>
+            
+            {/* Drop Zone */}
             <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-              className="mt-2 rounded-xl p-4 md:p-8 text-center hover:border-orange-500 transition cursor-pointer bg-amber-50/50 border-2 border-dashed border-gray-300"
+              className={`mt-2 rounded-xl p-4 md:p-6 text-center transition-all duration-200 cursor-pointer border-2 border-dashed ${
+                isDragging 
+                  ? "border-orange-500 bg-orange-50 scale-[1.02]" 
+                  : "border-gray-300 bg-amber-50/50 hover:border-orange-500"
+              }`}
               onClick={() => document.getElementById("image-input")?.click()}
             >
-              {imagePreview ? (
-                <div className="relative inline-block">
-                  <Image
-                    src={imagePreview}
-                    alt="Preview"
-                    width={200}
-                    height={200}
-                    className="rounded-lg object-cover max-h-48 w-auto mx-auto"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setImagePreview("");
-                      setFormData({ ...formData, imageUrl: "" });
-                    }}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-6 h-6 text-xs"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
+              {uploadingImages ? (
+                <div className="py-8">
+                  <Loader2 className="w-10 h-10 mx-auto mb-3 animate-spin text-orange-500" />
+                  <p className="text-sm text-gray-600">Uploading images...</p>
                 </div>
               ) : (
                 <>
-                  <div className="text-4xl md:text-5xl mb-2 md:mb-3">📷</div>
-                  <p className="text-xs md:text-sm text-gray-600">Drag and drop image here or click to browse</p>
-                  <p className="text-xs text-gray-400 mt-2">PNG, JPG, WEBP up to 5MB</p>
-                  <p className="text-xs text-gray-400">Recommended: 800×800px, square format</p>
+                  <Upload className={`w-8 h-8 mx-auto mb-2 transition-colors ${isDragging ? "text-orange-500" : "text-gray-400"}`} />
+                  <p className="text-sm text-gray-600">Drag and drop images here or click to browse</p>
+                  <p className="text-xs text-gray-400 mt-2">PNG, JPG, WEBP up to 5MB each</p>
+                  <p className="text-xs text-orange-500 mt-1">Maximum 4 images</p>
                 </>
               )}
               <input
                 id="image-input"
                 type="file"
                 accept="image/*"
+                multiple
                 className="hidden"
                 onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    await handleImageUpload(file);
+                  const files = e.target.files;
+                  if (files && files.length > 0) {
+                    await handleImageUpload(files);
                   }
                 }}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-3 md:mt-4 text-center">
-              Tip: Use clear, well-lit product photos against a white background for the best customer experience.
+
+            {/* Image Gallery */}
+            {imagePreviews.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs text-gray-500 mb-2">
+                  {imagePreviews.length} of 4 images used
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {imagePreviews.map((item, index) => (
+                    <div key={index} className="relative group">
+                      <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white">
+                        {item.isUploading ? (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                            <Loader2 className="w-6 h-6 animate-spin text-orange-500" />
+                          </div>
+                        ) : (
+                          <Image
+                            src={item.url}
+                            alt={`Product image ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center shadow-md hover:bg-red-600 transition z-10"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p className="text-xs text-gray-500 mt-4 text-center">
+              Tip: Use clear, well-lit product photos against a white background. First image will be the main thumbnail.
             </p>
           </div>
         </div>

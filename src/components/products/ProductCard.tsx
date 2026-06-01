@@ -16,6 +16,9 @@ const ProductCard = ({ product }: Props) => {
   const { addToCart } = useCart();
   const [loading, setLoading] = useState(false);
 
+  // Use first image from imageUrls array, fallback to imageUrl, then default
+  const productImage = product.imageUrls?.[0] || product.imageUrl || "/images/product-1.jpg";
+
   const handleAddToCart = async () => {
     if (loading) return;
 
@@ -27,7 +30,7 @@ const ProductCard = ({ product }: Props) => {
           productId: product.id,
           productName: product.name,
           price: product.price,
-          productImage: product.imageUrl || "/images/product-1.jpg",
+          productImage: productImage,
         },
         1,
       );
@@ -40,10 +43,10 @@ const ProductCard = ({ product }: Props) => {
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden flex flex-col h-full">
       <div className="relative w-full aspect-4/3 sm:aspect-video">
         <Image
-          src={product.imageUrl || "/images/product-1.jpg"}
+          src={productImage}
           alt={product.name}
           fill
-          className="object-cover"
+          className="object-fit"
         />
       </div>
 
