@@ -314,7 +314,7 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Button
             onClick={() => {
               setEditingProduct(null);
@@ -432,7 +432,7 @@ export default function AdminProductsPage() {
                     className="w-12 h-12 rounded-md object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center shrink-0">
                     <span className="text-gray-400 text-xs">No img</span>
                   </div>
                 )}

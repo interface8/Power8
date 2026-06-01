@@ -16,5 +16,8 @@ const orderItemSchema = z.object({
 
 export const createOrderSchema = z.object({
   paymentType: z.enum(["FULL", "CREDIT"]),
+  installationAddress: z.string().min(5, "Address is too short"),
+  city: z.string().min(2, "City is required"),
+  state: z.string().min(2, "State is required"),
   items: z.array(orderItemSchema).min(1, "Order must have at least one item"),
 });

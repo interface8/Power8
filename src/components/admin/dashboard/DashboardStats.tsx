@@ -7,9 +7,7 @@ import {
   Boxes,
   CreditCard,
 } from "lucide-react";
-
 import { AdminStats } from "@/types/admin";
-
 import StatCard from "./StatCard";
 
 interface DashboardStatsProps {
@@ -30,6 +28,7 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: DollarSign,
       iconColor: "text-green-600",
       iconBg: "bg-green-100",
+      trend: "+12%",
     },
 
     {
@@ -38,6 +37,7 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: Users,
       iconColor: "text-purple-600",
       iconBg: "bg-purple-100",
+      trend: "+8%",
     },
 
     {
@@ -46,14 +46,16 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: ShoppingCart,
       iconColor: "text-orange-600",
       iconBg: "bg-orange-100",
+      trend: "+6%",
     },
 
     {
-      title: "Active Credit Accounts",
+      title: "Active Credits",
       value: stats.activeCreditAccounts,
       icon: CreditCard,
       iconColor: "text-blue-600",
       iconBg: "bg-blue-100",
+      trend: "+5%",
     },
 
     {
@@ -64,14 +66,16 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
         stats.overduePaymentSchedules > 0 ? "text-red-600" : "text-green-600",
       iconBg: stats.overduePaymentSchedules > 0 ? "bg-red-100" : "bg-green-100",
       warning: stats.overduePaymentSchedules > 0,
+      trend: "-3%",
     },
 
     {
-      title: "In Stock Products",
+      title: "In Stock",
       value: stats.products.inStock,
       icon: Boxes,
       iconColor: "text-emerald-600",
       iconBg: "bg-emerald-100",
+      trend: "+2%",
     },
 
     {
@@ -81,21 +85,23 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       iconColor: "text-red-600",
       iconBg: "bg-red-100",
       warning: stats.products.outOfStock > 0,
+      trend: "-1%",
     },
 
     {
-      title: "Low Stock Products",
+      title: "Low Stock",
       value: stats.products.lowStock,
       icon: Package,
       iconColor:
         stats.products.lowStock > 0 ? "text-yellow-600" : "text-green-600",
       iconBg: stats.products.lowStock > 0 ? "bg-yellow-100" : "bg-green-100",
       warning: stats.products.lowStock > 0,
+      trend: "+4%",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => (
         <StatCard
           key={card.title}
@@ -105,6 +111,7 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
           iconColor={card.iconColor}
           iconBg={card.iconBg}
           warning={card.warning}
+          trend={card.trend}
         />
       ))}
     </div>

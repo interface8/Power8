@@ -6,6 +6,9 @@ export interface RecentOrder {
   totalAmount: number;
 
   paymentType: string;
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
 
   orderStatus: string;
 
@@ -27,6 +30,8 @@ export interface AdminStats {
   overduePaymentSchedules: number;
 
   totalRevenue: number;
+
+  previousMonthRevenue: number;
 
   totalOrders: number;
 

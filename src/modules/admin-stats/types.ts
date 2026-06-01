@@ -5,6 +5,7 @@ export type AdminStatsDto = {
   activeCreditAccounts: number;
   overduePaymentSchedules: number;
   totalRevenue: number;
+  previousMonthRevenue: number;
 
   totalOrders: number;
 
@@ -20,6 +21,9 @@ export type AdminStatsDto = {
     customerEmail: string;
     totalAmount: number;
     paymentType: PaymentType
+    installationAddress: string | null;
+    city: string | null;
+    state: string | null;
     orderStatus: OrderStatus;
     createdAt: Date;
     updatedAt: Date;

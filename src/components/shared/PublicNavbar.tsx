@@ -12,6 +12,7 @@ import {
   Box,
   Menu,
   X,
+  Loader2,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -22,9 +23,8 @@ import { useCart } from "../providers/cart-providers";
 export default function PublicNavbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const { user, loading, setUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const { count } = useCart();
@@ -46,11 +46,29 @@ export default function PublicNavbar() {
     router.push("/");
   };
 
+  // const getLinkClassName = (
+  //   isActive: boolean,
+  //   isLoading: boolean,
+  //   baseClass: string,
+  // ) => {
+  //   return `${baseClass} ${isActive ? "bg-green-200 text-black" : "bg-green-50 hover:bg-green-200 hover:shadow-lg text-black border border-gray-200"} ${
+  //     isLoading ? "opacity-50 cursor-wait pointer-events-none" : ""
+  //   }`;
+  // };
+
+  const LoadingSpinner = () => (
+    <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
+  );
+
   return (
     <nav className="fixed top-0 left-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link
+          href="/"
+          className={`flex items-center gap-2 transition-opacity ${loading ? "opacity-70" : ""}`}
+          onClick={(e) => loading && e.preventDefault()}
+        >
           <div className="bg-orange-500 p-1.5 md:p-2 rounded-xl shadow">
             <Sun className="text-white w-5 h-5 md:w-7 md:h-7" />
           </div>
@@ -61,7 +79,44 @@ export default function PublicNavbar() {
 
         {/* DESKTOP */}
         <div className="hidden md:flex items-center gap-4">
-          {!user ? (
+          {loading ? (
+            <>
+              <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-green-50 text-black border border-gray-200 opacity-50 cursor-wait">
+                <Package size={16} className="text-blue-600" />
+                Products
+              </div>
+
+              <div className="relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-green-50 text-gray-800 opacity-50 cursor-wait">
+                <ShoppingCart size={16} className="text-green-600" />
+                Cart
+              </div>
+
+              <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-orange-400 text-orange-600 opacity-50 cursor-wait">
+                <Star size={14} />
+                Testimonials
+              </div>
+
+              <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-orange-400 text-orange-600 opacity-50 cursor-wait">
+                <BookOpen size={14} />
+                Blog
+              </div>
+
+              <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 bg-green-50 text-gray-800 rounded-lg opacity-50 cursor-wait">
+                <Calculator size={16} className="text-orange-600" />
+                Calculator
+              </div>
+
+              <div className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-green-950 opacity-50 cursor-wait">
+                <LogIn size={16} />
+                Login
+              </div>
+
+              {/* Loading indicator */}
+              <div className="ml-2">
+                <LoadingSpinner />
+              </div>
+            </>
+          ) : !user ? (
             <>
               <Link
                 href="/products"
@@ -172,7 +227,6 @@ export default function PublicNavbar() {
                 </span>
               </Link>
 
-              {/* User */}
               <UserDropdown
                 user={user}
                 open={open}
@@ -186,7 +240,26 @@ export default function PublicNavbar() {
 
         {/* MOBILE */}
         <div className="flex md:hidden items-center gap-2 relative">
-          {!user ? (
+          {loading ? (
+            <>
+              <div className="p-2 rounded-md border bg-green-50 opacity-50 cursor-wait">
+                <Box className="w-4 h-4 text-blue-600" />
+              </div>
+
+              <div className="bg-green-800 text-white p-2 rounded-md opacity-50 cursor-wait">
+                <LogIn className="w-4 h-4" />
+              </div>
+
+              <button
+                disabled
+                className="p-2 bg-orange-500 text-white rounded-md opacity-50 cursor-wait"
+              >
+                <Menu size={15} />
+              </button>
+
+              <LoadingSpinner />
+            </>
+          ) : !user ? (
             <>
               <Link
                 href="/products"
@@ -271,7 +344,7 @@ export default function PublicNavbar() {
             <>
               <Link
                 href="/products"
-                className={`p-2 rounded-md  hover:bg-green-100 hover:shadow-lg ${
+                className={`p-2 rounded-md hover:bg-green-100 hover:shadow-lg ${
                   pathname.startsWith("/products")
                     ? "bg-green-200"
                     : "bg-green-50"
@@ -282,7 +355,7 @@ export default function PublicNavbar() {
 
               <Link
                 href="/cart"
-                className={`relative p-2 rounded-md  hover:bg-green-100 hover:shadow-lg ${
+                className={`relative p-2 rounded-md hover:bg-green-100 hover:shadow-lg ${
                   pathname === "/cart" ? "bg-green-200" : "bg-green-50"
                 }`}
               >
