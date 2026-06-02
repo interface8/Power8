@@ -42,7 +42,7 @@ export default function SideDetails({
       </h1>
 
       {/* Rating Stars */}
-      <div className="flex items-center gap-2.5 mb-7">
+      <div className="flex items-center gap-2.5 mb-3">
         <div className="flex items-center gap-1">
           {[...Array(5)].map((_, index) => (
             <Star
@@ -72,7 +72,7 @@ export default function SideDetails({
       </p>
 
       {/* Features List - 2x2 Grid with individual cards */}
-      <div className="grid md:grid-cols-2 gap-4 mb-6 border-b border-gray-250 pb-8">
+      <div className="grid md:grid-cols-2 gap-4 mb-3 border-b border-gray-250 pb-8">
         {features.map((feature, index) => (
           <div key={index} className="flex items-center gap-3 p-6 rounded-lg bg-orange-50">
             {feature.text.includes("Warranty") ? (

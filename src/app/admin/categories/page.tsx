@@ -46,7 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, FolderTree, Calendar, Search, ChevronLeft, ChevronRight, Download, X, Copy, Check, Trash, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, FolderTree, Calendar, Search, ChevronLeft, ChevronRight, X, Copy, Check, Trash, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 interface CategoryFormData {
@@ -86,7 +86,6 @@ export default function CategoriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [showInactive, setShowInactive] = useState(false);
 
   const resetForm = () => {
     setFormData({ name: "", description: "", sort: 0, isActive: true });
@@ -312,12 +311,10 @@ export default function CategoriesPage() {
     }
   };
 
-  // Filter categories based on search term and active status
-  const filteredCategories = categories.filter((category) => {
-    const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = showInactive ? true : category.isActive;
-    return matchesSearch && matchesStatus;
-  });
+  // Filter categories based on search term only (show ALL active + inactive)
+  const filteredCategories = categories.filter((category) =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Pagination logic
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
@@ -339,30 +336,6 @@ export default function CategoriesPage() {
   const clearSearch = () => {
     setSearchTerm("");
     setCurrentPage(1);
-  };
-
-  const exportToCSV = () => {
-    const headers = ["Name", "Description", "Sort Order", "Status", "Date Created"];
-    const csvData = filteredCategories.map((category) => [
-      category.name,
-      category.description || "",
-      category.sort.toString(),
-      category.isActive ? "Active" : "Inactive",
-      new Date(category.createdAt).toLocaleDateString(),
-    ]);
-    
-    const csvContent = [headers, ...csvData].map(row => row.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `categories_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    toast.success(`Exported ${filteredCategories.length} categories to CSV`);
   };
 
   // Loading Skeleton for Desktop Table
@@ -483,23 +456,13 @@ export default function CategoriesPage() {
             Manage categories for your solar products
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={exportToCSV}
-            variant="outline"
-            className="border-orange-500 text-orange-600 hover:bg-orange-50"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
-          <Button
-            onClick={openAddModal}
-            className="bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Category
-          </Button>
-        </div>
+        <Button
+          onClick={openAddModal}
+          className="bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Category
+        </Button>
       </div>
 
       {/* Search and Items Per Page */}
@@ -523,36 +486,20 @@ export default function CategoriesPage() {
           )}
         </div>
         
-        <div className="flex items-center gap-4">
-          {/* Show Inactive Toggle */}
-          <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4 text-gray-400" />
-            <Switch
-              checked={showInactive}
-              onCheckedChange={setShowInactive}
-              id="show-inactive"
-            />
-            <EyeOff className="w-4 h-4 text-gray-400" />
-            <Label htmlFor="show-inactive" className="text-sm text-gray-600 cursor-pointer">
-              Show inactive
-            </Label>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Show:</span>
-            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span className="text-sm text-gray-500">per page</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Show:</span>
+          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+            </SelectContent>
+          </Select>
+          <span className="text-sm text-gray-500">per page</span>
         </div>
       </div>
       
@@ -740,7 +687,7 @@ export default function CategoriesPage() {
                         <Switch
                           checked={category.isActive}
                           onCheckedChange={() => toggleActiveStatus(category)}
-                          className="bg-gray-600 data-[state=checked]:bg-green-500"
+                          className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
                         />
                         <Button
                           variant="ghost"
@@ -832,11 +779,11 @@ export default function CategoriesPage() {
                       {new Date(category.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Switch
                       checked={category.isActive}
                       onCheckedChange={() => toggleActiveStatus(category)}
-                      className="data-[state=checked]:bg-green-500 scale-75"
+                      className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
                     />
                     <Button
                       variant="ghost"
