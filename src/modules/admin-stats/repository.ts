@@ -18,6 +18,14 @@ export async function getAdminStats(
     prevMonthRevenueAgg,
     totalOrders,
 
+    prevMonthUsers,
+    prevMonthOrders,
+    prevMonthActiveCredits,
+    prevMonthOverdue,
+    prevMonthInStock,
+    prevMonthOutOfStock,
+    prevMonthLowStock,
+
     inStock,
     outOfStock,
     lowStock,
@@ -48,6 +56,38 @@ export async function getAdminStats(
 
     prisma.order.count(),
 
+    prisma.user.count({ where: { createdAt: { gte: prevMonthStart, lte: prevMonthEnd } } }),
+    prisma.order.count({ where: { createdAt: { gte: prevMonthStart, lte: prevMonthEnd } } }),
+    prisma.creditAccount.count({
+      where: { status: "ACTIVE", createdAt: { gte: prevMonthStart, lte: prevMonthEnd } },
+    }),
+    prisma.paymentSchedule.count({
+      where: { status: "OVERDUE", createdAt: { gte: prevMonthStart, lte: prevMonthEnd } },
+    }),
+
+    // Previous Month Products snapshots (based on creation date)
+    prisma.product.count({
+      where: {
+        isActive: true,
+        stockQuantity: { gt: lowStockThreshold },
+        createdAt: { gte: prevMonthStart, lte: prevMonthEnd },
+      },
+    }),
+    prisma.product.count({
+      where: {
+        isActive: true,
+        stockQuantity: { lte: 0 },
+        createdAt: { gte: prevMonthStart, lte: prevMonthEnd },
+      },
+    }),
+    prisma.product.count({
+      where: {
+        isActive: true,
+        stockQuantity: { gt: 0, lte: lowStockThreshold },
+        createdAt: { gte: prevMonthStart, lte: prevMonthEnd },
+      },
+    }),
+
     // Products buckets:
     // - outOfStock: <= 0
     // - lowStock: 1..threshold
@@ -68,9 +108,18 @@ export async function getAdminStats(
     prisma.order.findMany({
       orderBy: { createdAt: "desc" },
       take: recentTake,
-      include: {
+      select: {
+        id: true,
+        totalAmount: true,
+        paymentType: true,
+        status: true,
+        installationAddress: true,
+        city: true,
+        state: true,
+        createdAt: true,
+        updatedAt: true,
         user: { select: { name: true, email: true } },
-      },
+      }
     }),
   ]);
 
@@ -83,6 +132,13 @@ export async function getAdminStats(
     overduePaymentSchedules,
     totalRevenue,
     previousMonthRevenue,
+    previousMonthUsers: prevMonthUsers,
+    previousMonthTotalOrder: prevMonthOrders,
+    previousMonthActiveCredits: prevMonthActiveCredits,
+    previousMonthOverduePayment: prevMonthOverdue,
+    previousMonthInStock: prevMonthInStock,
+    previousMonthOutOfStock: prevMonthOutOfStock,
+    previousMonthLowStock: prevMonthLowStock,
 
     totalOrders,
 

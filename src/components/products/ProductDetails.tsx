@@ -23,13 +23,10 @@ export default function ProductDetails({
   
   const [quantity, setQuantity] = useState(1);
 
-  // Prepare images array (using placeholders for now)
-  const productImages = [
-    product.imageUrl || "/images/solar.jpg",
-    "/images/power-1.jpg",
-    "/images/power-2.jpg",
-    "/images/power-7.jpg",
-  ];
+  // Use actual product images from imageUrls array, fallback to imageUrl, then placeholder
+  const productImages = product.imageUrls && product.imageUrls.length > 0 
+    ? product.imageUrls 
+    : [product.imageUrl || "/images/solar.jpg"];
 
   // Prepare features list
   const features = [
