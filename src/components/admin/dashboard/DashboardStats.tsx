@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { AdminStats } from "@/types/admin";
 import StatCard from "./StatCard";
+import { calculateTrend } from "@/utils/calculateTrend";
 
 interface DashboardStatsProps {
   stats: AdminStats;
@@ -21,6 +22,46 @@ const currencyFormatter = new Intl.NumberFormat("en-NG", {
 });
 
 export default function DashboardStats({ stats }: DashboardStatsProps) {
+  const revenueTrend = calculateTrend(
+    stats.totalRevenue,
+    stats.previousMonthRevenue,
+  );
+
+  const usersTrend = calculateTrend(
+    stats.totalRegisteredUsers,
+    stats.previousMonthUsers,
+  );
+
+  const ordersTrend = calculateTrend(
+    stats.totalOrders,
+    stats.previousMonthTotalOrder,
+  );
+
+  const creditsTrend = calculateTrend(
+    stats.activeCreditAccounts,
+    stats.previousMonthActiveCredits,
+  );
+
+  const overdueTrend = calculateTrend(
+    stats.overduePaymentSchedules,
+    stats.previousMonthOverduePayment,
+  );
+
+  const inStockTrend = calculateTrend(
+    stats.products.inStock,
+    stats.previousMonthInStock,
+  );
+
+  const outOfStockTrend = calculateTrend(
+    stats.products.outOfStock,
+    stats.previousMonthOutOfStock,
+  );
+
+  const lowStockTrend = calculateTrend(
+    stats.products.lowStock,
+    stats.previousMonthLowStock,
+  );
+
   const cards = [
     {
       title: "Total Revenue",
@@ -28,7 +69,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: DollarSign,
       iconColor: "text-green-600",
       iconBg: "bg-green-100",
-      trend: "+12%",
+      trend: revenueTrend.percentage,
+      trendPositive: revenueTrend.positive,
     },
 
     {
@@ -37,7 +79,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: Users,
       iconColor: "text-purple-600",
       iconBg: "bg-purple-100",
-      trend: "+8%",
+      trend: usersTrend.percentage,
+      trendPositive: usersTrend.positive,
     },
 
     {
@@ -46,7 +89,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: ShoppingCart,
       iconColor: "text-orange-600",
       iconBg: "bg-orange-100",
-      trend: "+6%",
+      trend: ordersTrend.percentage,
+      trendPositive: ordersTrend.positive,
     },
 
     {
@@ -55,7 +99,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: CreditCard,
       iconColor: "text-blue-600",
       iconBg: "bg-blue-100",
-      trend: "+5%",
+      trend: creditsTrend.percentage,
+      trendPositive: creditsTrend.positive,
     },
 
     {
@@ -66,7 +111,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
         stats.overduePaymentSchedules > 0 ? "text-red-600" : "text-green-600",
       iconBg: stats.overduePaymentSchedules > 0 ? "bg-red-100" : "bg-green-100",
       warning: stats.overduePaymentSchedules > 0,
-      trend: "-3%",
+      trend: overdueTrend.percentage,
+      trendPositive: overdueTrend.positive,
     },
 
     {
@@ -75,7 +121,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       icon: Boxes,
       iconColor: "text-emerald-600",
       iconBg: "bg-emerald-100",
-      trend: "+2%",
+      trend: inStockTrend.percentage,
+      trendPositive: inStockTrend.positive,
     },
 
     {
@@ -85,7 +132,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       iconColor: "text-red-600",
       iconBg: "bg-red-100",
       warning: stats.products.outOfStock > 0,
-      trend: "-1%",
+      trend: outOfStockTrend.percentage,
+      trendPositive: outOfStockTrend.positive,
     },
 
     {
@@ -96,7 +144,8 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
         stats.products.lowStock > 0 ? "text-yellow-600" : "text-green-600",
       iconBg: stats.products.lowStock > 0 ? "bg-yellow-100" : "bg-green-100",
       warning: stats.products.lowStock > 0,
-      trend: "+4%",
+      trend: lowStockTrend.percentage,
+      trendPositive: lowStockTrend.positive,
     },
   ];
 
@@ -112,6 +161,7 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
           iconBg={card.iconBg}
           warning={card.warning}
           trend={card.trend}
+          trendPositive={card.trendPositive}
         />
       ))}
     </div>
