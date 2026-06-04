@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 interface UseApiOptions {
   onSuccess?: () => void;
@@ -65,6 +65,11 @@ export function useQuery<T = unknown>(url: string, options?: UseApiOptions) {
     return result;
   }, [fetchData, url]);
 
+  // ✅ Auto fetch when component mounts or url changes
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   return {
     data,
     loading,
@@ -106,8 +111,3 @@ export function useMutation<TData = unknown, TVariables = unknown>(
     clearError,
   };
 }
-
-
-
-
-
