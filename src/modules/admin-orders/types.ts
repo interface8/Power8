@@ -16,6 +16,9 @@ export type AdminOrderListRowDto = {
   paymentType: PaymentType;
   paymentStatus: OrderPaymentStatus;
   orderStatus: OrderStatus;
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
   shippingStatus: ShippingStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -92,6 +95,10 @@ export type AdminOrderDetailsDto = {
 
   totalAmount: number;
   paymentType: PaymentType;
+
+  installationAddress: string | null;
+  city: string | null;
+  state: string | null;
 
   orderStatus: OrderStatus;
   paymentStatus: OrderPaymentStatus;

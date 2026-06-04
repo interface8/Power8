@@ -32,6 +32,13 @@ export interface AdminStats {
   totalRevenue: number;
 
   previousMonthRevenue: number;
+  previousMonthUsers: number;
+  previousMonthTotalOrder: number;
+  previousMonthActiveCredits: number;
+  previousMonthOverduePayment: number;
+  previousMonthInStock: number;
+  previousMonthOutOfStock: number;
+  previousMonthLowStock: number;
 
   totalOrders: number;
 
