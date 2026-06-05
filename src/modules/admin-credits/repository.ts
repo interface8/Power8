@@ -3,6 +3,7 @@ import type { Prisma } from "@prisma/client";
 import type {
   AdminCreditAccountFilters,
   AdminCreditAccountsListDto,
+  AdminCreditAccountDetailsDto
 } from "./types";
 
 function getNextDueDate(
@@ -116,5 +117,92 @@ export async function findCreditAccounts(
       total,
       totalPages: Math.ceil(total / limit),
     },
+  };
+}
+
+export async function findCreditAccountDetailsById(
+  id: string,
+): Promise<AdminCreditAccountDetailsDto | null> {
+  const credit = await prisma.creditAccount.findUnique({
+    where: { id },
+    include: {
+      order: {
+        select: {
+          id: true,
+          createdAt: true,
+          installationAddress: true,
+          city: true,
+          state: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
+      schedules: {
+        orderBy: { dueDate: "asc" },
+        select: {
+          id: true,
+          dueDate: true,
+          amountDue: true,
+          status: true,
+        },
+      },
+    },
+  });
+
+  if (!credit) return null;
+
+  const paidInstallments = credit.schedules.filter(
+    (schedule) => schedule.status === "PAID",
+  ).length;
+
+  const overdueInstallments = credit.schedules.filter(
+    (schedule) => schedule.status === "OVERDUE",
+  ).length;
+
+  const totalInstallments = credit.schedules.length;
+  const remainingInstallments = totalInstallments - paidInstallments;
+
+  return {
+    id: credit.id,
+    customer: {
+      id: credit.order.user.id,
+      name: credit.order.user.name,
+      email: credit.order.user.email,
+      phone: credit.order.user.phone,
+    },
+    order: {
+      id: credit.order.id,
+      createdAt: credit.order.createdAt,
+    },
+    installation: {
+      address: credit.order.installationAddress ?? null,
+      city: credit.order.city ?? null,
+      state: credit.order.state ?? null,
+    },
+    totalAmount: credit.totalAmount.toNumber(),
+    balanceRemaining: credit.balanceRemaining.toNumber(),
+    durationMonths: credit.durationMonths,
+    status: credit.status,
+    repayment: {
+      paidInstallments,
+      remainingInstallments,
+      overdueInstallments,
+      totalInstallments,
+      nextDueDate: getNextDueDate(credit.schedules),
+    },
+    schedules: credit.schedules.map((schedule, index) => ({
+      id: schedule.id,
+      installmentNumber: index + 1,
+      dueDate: schedule.dueDate,
+      amountDue: schedule.amountDue.toNumber(),
+      status: schedule.status,
+    })),
+    createdAt: credit.createdAt,
   };
 }
