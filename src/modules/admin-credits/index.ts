@@ -1,8 +1,10 @@
 export type {
+  AdminCreditAccountDetailsDto,
   AdminCreditAccountFilters,
   AdminCreditAccountRowDto,
   AdminCreditAccountsListDto,
   AdminCreditRepaymentDto,
+  AdminCreditScheduleDto,
 } from "./types";
 
 export { adminCreditAccountFiltersSchema } from "./validation";

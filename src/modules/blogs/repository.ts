@@ -1,15 +1,16 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import type {
-  BlogDto,
-  CreateBlogInput,
-  UpdateBlogInput,
-  BlogFilters,
+  AdminBlogFilters,
+  AdminBlogsListDto,
   BlogCategoryDto,
+  BlogDto,
+  BlogFilters,
   CreateBlogCategoryInput,
+  CreateBlogInput,
   UpdateBlogCategoryInput,
+  UpdateBlogInput,
 } from "./types";
-
-// ─── Blog ──────────────────────────────────────────────
 
 const blogWithRelations = {
   include: {
@@ -69,6 +70,7 @@ export async function findBlogs(filters: BlogFilters = {}): Promise<BlogDto[]> {
         ? {
             OR: [
               { title: { contains: search, mode: "insensitive" as const } },
+              { slug: { contains: search, mode: "insensitive" as const } },
               { excerpt: { contains: search, mode: "insensitive" as const } },
               { content: { contains: search, mode: "insensitive" as const } },
             ],
@@ -80,6 +82,52 @@ export async function findBlogs(filters: BlogFilters = {}): Promise<BlogDto[]> {
   });
 
   return blogs.map(toBlogDto);
+}
+
+export async function findAdminBlogs(
+  filters: AdminBlogFilters,
+): Promise<AdminBlogsListDto> {
+  const { search, categoryId, authorId, published, page, limit } = filters;
+  const skip = (page - 1) * limit;
+
+  const where: Prisma.BlogWhereInput = {
+    ...(categoryId ? { categoryId } : {}),
+    ...(authorId ? { authorId } : {}),
+    ...(published != null ? { isPublished: published } : {}),
+    ...(search
+      ? {
+          OR: [
+            { title: { contains: search, mode: "insensitive" } },
+            { slug: { contains: search, mode: "insensitive" } },
+            { excerpt: { contains: search, mode: "insensitive" } },
+            { content: { contains: search, mode: "insensitive" } },
+            { author: { name: { contains: search, mode: "insensitive" } } },
+            { category: { name: { contains: search, mode: "insensitive" } } },
+          ],
+        }
+      : {}),
+  };
+
+  const [total, rows] = await Promise.all([
+    prisma.blog.count({ where }),
+    prisma.blog.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      ...blogWithRelations,
+    }),
+  ]);
+
+  return {
+    data: rows.map(toBlogDto),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function findBlogById(id: string): Promise<BlogDto | null> {
@@ -98,36 +146,6 @@ export async function findBlogBySlug(slug: string): Promise<BlogDto | null> {
   return blog ? toBlogDto(blog) : null;
 }
 
-export async function createBlog(input: CreateBlogInput): Promise<BlogDto> {
-  const blog = await prisma.blog.create({
-    data: {
-      ...input,
-      publishedAt: input.isPublished ? new Date() : undefined,
-    },
-    ...blogWithRelations,
-  });
-  return toBlogDto(blog);
-}
-
-export async function updateBlog(id: string, input: UpdateBlogInput): Promise<BlogDto> {
-  const existing = await prisma.blog.findUnique({ where: { id } });
-
-  const blog = await prisma.blog.update({
-    where: { id },
-    data: {
-      ...input,
-      // Set publishedAt when first published
-      ...(input.isPublished && !existing?.publishedAt ? { publishedAt: new Date() } : {}),
-    },
-    ...blogWithRelations,
-  });
-  return toBlogDto(blog);
-}
-
-export async function deleteBlog(id: string): Promise<void> {
-  await prisma.blog.delete({ where: { id } });
-}
-
 export async function blogExists(id: string): Promise<boolean> {
   const count = await prisma.blog.count({ where: { id } });
   return count > 0;
@@ -138,29 +156,134 @@ export async function blogSlugExists(slug: string): Promise<boolean> {
   return count > 0;
 }
 
-// ─── Blog Categories ───────────────────────────────────
+export async function createBlog(input: CreateBlogInput): Promise<BlogDto> {
+  const blog = await prisma.blog.create({
+    data: {
+      ...input,
+      publishedAt: input.isPublished ? new Date() : undefined,
+    },
+    ...blogWithRelations,
+  });
 
-export async function findBlogCategories(): Promise<BlogCategoryDto[]> {
-  return prisma.blogCategory.findMany({ orderBy: { sort: "asc" } });
+  return toBlogDto(blog);
 }
 
-export async function findBlogCategoryById(id: string): Promise<BlogCategoryDto | null> {
+export async function updateBlog(
+  id: string,
+  input: UpdateBlogInput,
+): Promise<BlogDto> {
+  const existing = await prisma.blog.findUnique({
+    where: { id },
+    select: {
+      publishedAt: true,
+    },
+  });
+
+  const data: Prisma.BlogUpdateInput = {
+    ...input,
+  };
+
+  if (Object.prototype.hasOwnProperty.call(input, "isPublished")) {
+    if (input.isPublished) {
+      data.publishedAt = existing?.publishedAt ?? new Date();
+    } else {
+      data.publishedAt = null;
+    }
+  }
+
+  const blog = await prisma.blog.update({
+    where: { id },
+    data,
+    ...blogWithRelations,
+  });
+
+  return toBlogDto(blog);
+}
+
+export async function publishBlog(id: string): Promise<BlogDto> {
+  const blog = await prisma.blog.update({
+    where: { id },
+    data: {
+      isPublished: true,
+      publishedAt: new Date(),
+    },
+    ...blogWithRelations,
+  });
+
+  return toBlogDto(blog);
+}
+
+export async function unpublishBlog(id: string): Promise<BlogDto> {
+  const blog = await prisma.blog.update({
+    where: { id },
+    data: {
+      isPublished: false,
+      publishedAt: null,
+    },
+    ...blogWithRelations,
+  });
+
+  return toBlogDto(blog);
+}
+
+export async function deleteBlog(id: string): Promise<void> {
+  await prisma.blog.delete({ where: { id } });
+}
+
+export async function findBlogCategories(): Promise<BlogCategoryDto[]> {
+  return prisma.blogCategory.findMany({
+    orderBy: [{ sort: "asc" }, { name: "asc" }],
+  });
+}
+
+export async function findBlogCategoryById(
+  id: string,
+): Promise<BlogCategoryDto | null> {
   return prisma.blogCategory.findUnique({ where: { id } });
 }
 
-export async function createBlogCategory(input: CreateBlogCategoryInput): Promise<BlogCategoryDto> {
-  return prisma.blogCategory.create({ data: input });
-}
+export async function findBlogCategoryByName(
+  name: string,
+): Promise<BlogCategoryDto | null> {
+  const category = await prisma.blogCategory.findFirst({
+    where: {
+      name: {
+        equals: name,
+        mode: "insensitive",
+      },
+    },
+  });
 
-export async function updateBlogCategory(id: string, input: UpdateBlogCategoryInput): Promise<BlogCategoryDto> {
-  return prisma.blogCategory.update({ where: { id }, data: input });
-}
-
-export async function deleteBlogCategory(id: string): Promise<void> {
-  await prisma.blogCategory.delete({ where: { id } });
+  return category;
 }
 
 export async function blogCategoryExists(id: string): Promise<boolean> {
   const count = await prisma.blogCategory.count({ where: { id } });
   return count > 0;
+}
+
+export async function createBlogCategory(
+  input: CreateBlogCategoryInput,
+): Promise<BlogCategoryDto> {
+  return prisma.blogCategory.create({ data: input });
+}
+
+export async function updateBlogCategory(
+  id: string,
+  input: UpdateBlogCategoryInput,
+): Promise<BlogCategoryDto> {
+  return prisma.blogCategory.update({
+    where: { id },
+    data: input,
+  });
+}
+
+export async function deleteBlogCategory(id: string): Promise<void> {
+  await prisma.$transaction([
+    prisma.blog.updateMany({
+      where: { categoryId: id },
+      data: { categoryId: null },
+    }),
+    prisma.blogCategory.delete({ where: { id } }),
+  ]);
 }
