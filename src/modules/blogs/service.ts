@@ -1,10 +1,19 @@
 import * as blogRepo from "./repository";
-import type { CreateBlogInput, UpdateBlogInput, BlogFilters, CreateBlogCategoryInput, UpdateBlogCategoryInput } from "./types";
-
-// ─── Blog ──────────────────────────────────────────────
+import type {
+  AdminBlogFilters,
+  BlogFilters,
+  CreateBlogCategoryInput,
+  CreateBlogInput,
+  UpdateBlogCategoryInput,
+  UpdateBlogInput,
+} from "./types";
 
 export async function listBlogs(filters: BlogFilters) {
   return blogRepo.findBlogs(filters);
+}
+
+export async function listAdminBlogs(filters: AdminBlogFilters) {
+  return blogRepo.findAdminBlogs(filters);
 }
 
 export async function getBlogById(id: string) {
@@ -27,16 +36,31 @@ export async function createBlog(input: CreateBlogInput) {
 }
 
 export async function updateBlog(id: string, input: UpdateBlogInput) {
-  if (!(await blogRepo.blogExists(id))) {
-    throw new Error("Blog not found");
-  }
-  if (input.slug) {
-    const existing = await blogRepo.findBlogBySlug(input.slug);
-    if (existing && existing.id !== id) {
+  const existing = await blogRepo.findBlogById(id);
+  if (!existing) throw new Error("Blog not found");
+
+  if (input.slug && input.slug !== existing.slug) {
+    const duplicate = await blogRepo.findBlogBySlug(input.slug);
+    if (duplicate && duplicate.id !== id) {
       throw new Error("A blog with this slug already exists");
     }
   }
+
   return blogRepo.updateBlog(id, input);
+}
+
+export async function publishBlog(id: string) {
+  if (!(await blogRepo.blogExists(id))) {
+    throw new Error("Blog not found");
+  }
+  return blogRepo.publishBlog(id);
+}
+
+export async function unpublishBlog(id: string) {
+  if (!(await blogRepo.blogExists(id))) {
+    throw new Error("Blog not found");
+  }
+  return blogRepo.unpublishBlog(id);
 }
 
 export async function deleteBlog(id: string) {
@@ -45,8 +69,6 @@ export async function deleteBlog(id: string) {
   }
   return blogRepo.deleteBlog(id);
 }
-
-// ─── Blog Categories ───────────────────────────────────
 
 export async function listBlogCategories() {
   return blogRepo.findBlogCategories();
@@ -59,13 +81,28 @@ export async function getBlogCategoryById(id: string) {
 }
 
 export async function createBlogCategory(input: CreateBlogCategoryInput) {
+  const existing = await blogRepo.findBlogCategoryByName(input.name);
+  if (existing) {
+    throw new Error("A blog category with this name already exists");
+  }
+
   return blogRepo.createBlogCategory(input);
 }
 
-export async function updateBlogCategory(id: string, input: UpdateBlogCategoryInput) {
-  if (!(await blogRepo.blogCategoryExists(id))) {
-    throw new Error("Blog category not found");
+export async function updateBlogCategory(
+  id: string,
+  input: UpdateBlogCategoryInput,
+) {
+  const current = await blogRepo.findBlogCategoryById(id);
+  if (!current) throw new Error("Blog category not found");
+
+  if (input.name) {
+    const duplicate = await blogRepo.findBlogCategoryByName(input.name);
+    if (duplicate && duplicate.id !== id) {
+      throw new Error("A blog category with this name already exists");
+    }
   }
+
   return blogRepo.updateBlogCategory(id, input);
 }
 
