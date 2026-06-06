@@ -15,7 +15,7 @@ export interface CreateCarouselSlideInput {
   description?: string;
   imageUrl: string;
   linkUrl?: string;
-  sort?: number;
+  sort: number;
   isActive?: boolean;
 }
 

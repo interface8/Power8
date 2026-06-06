@@ -2,6 +2,8 @@ export type {
   AdminBlogFilters,
   AdminBlogsListDto,
   BlogDto,
+  BlogSlugAvailabilityDto,
+  BlogStatsDto,
   CreateBlogInput,
   UpdateBlogInput,
   BlogFilters,

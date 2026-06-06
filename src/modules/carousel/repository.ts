@@ -18,6 +18,11 @@ export async function getSlideById(id: string) {
   return prisma.carouselSlide.findUnique({ where: { id } });
 }
 
+export async function slideExists(id: string) {
+  const count = await prisma.carouselSlide.count({ where: { id } });
+  return count > 0;
+}
+
 export async function createSlide(data: CreateCarouselSlideInput) {
   return prisma.carouselSlide.create({ data });
 }
@@ -28,4 +33,18 @@ export async function updateSlide(id: string, data: UpdateCarouselSlideInput) {
 
 export async function deleteSlide(id: string) {
   return prisma.carouselSlide.delete({ where: { id } });
+}
+
+export async function approveSlide(id: string) {
+  return prisma.carouselSlide.update({
+    where: { id },
+    data: { isActive: true },
+  });
+}
+
+export async function rejectSlide(id: string) {
+  return prisma.carouselSlide.update({
+    where: { id },
+    data: { isActive: false },
+  });
 }
