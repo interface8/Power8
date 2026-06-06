@@ -67,7 +67,7 @@ interface DeletedCategory {
 }
 
 export default function CategoriesPage() {
-  const { categories, loading, error, fetchCategories } = useProductCategories();
+  const { categories, loading, error, fetchCategories, updateCategoryLocally } = useProductCategories();
   
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
@@ -158,27 +158,36 @@ export default function CategoriesPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
-  const toggleActiveStatus = async (category: ProductCategory) => {
-    try {
-      const res = await fetch(`/api/product-categories/${category.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !category.isActive }),
-      });
+const toggleActiveStatus = async (category: ProductCategory) => {
+  const newStatus = !category.isActive;
+  
+  // THIS USES updateCategoryLocally - instant UI update
+  updateCategoryLocally(category.id, { isActive: newStatus });
+  
+  const toastId = toast.loading("Updating status...");
+  
+  try {
+    const res = await fetch(`/api/product-categories/${category.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: newStatus }),
+    });
 
-      if (!res.ok) {
-        throw new Error("Failed to update status");
-      }
-
-      toast.success(category.isActive ? "Category deactivated" : "Category activated");
-      await fetchCategories();
-    } catch {
-      toast.error("Failed to update status");
+    if (!res.ok) {
+      // Revert on error
+      updateCategoryLocally(category.id, { isActive: category.isActive });
+      throw new Error("Failed to update status");
     }
-  };
 
+    toast.success(newStatus ? "Category activated" : "Category deactivated", { id: toastId });
+    
+  } catch {
+    toast.error("Failed to update status", { id: toastId });
+    updateCategoryLocally(category.id, { isActive: category.isActive });
+  }
+};
   const undoDelete = async (deletedCategory: DeletedCategory, toastId: string | number) => {
     try {
       const res = await fetch("/api/product-categories", {
@@ -920,9 +929,19 @@ export default function CategoriesPage() {
               </Label>
               <Input
                 id="sort"
-                type="number"
-                value={formData.sort}
-                onChange={(e) => setFormData({ ...formData, sort: parseInt(e.target.value) || 0 })}
+                type="text"
+                value={formData.sort === 0 ? "" : formData.sort}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setFormData({ ...formData, sort: 0 });
+                  } else {
+                    const num = parseInt(value, 10);
+                    if (!isNaN(num)) {
+                      setFormData({ ...formData, sort: num });
+                    }
+                  }
+                }}
                 placeholder="1, 2, 3..."
                 className="focus:ring-orange-500 focus:border-orange-500"
               />
