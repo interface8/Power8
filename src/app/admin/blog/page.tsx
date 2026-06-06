@@ -1,7 +1,5 @@
-import React from "react";
+import BlogPage from "@/components/admin/blog/BlogPage";
 
-const page = () => {
-  return <div></div>;
-};
-
-export default page;
+export default function Page() {
+  return <BlogPage />;
+}

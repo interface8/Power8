@@ -1,12 +1,14 @@
-import { CreditAccount } from "@/types/credit-account";
+import { AdminCreditAccount } from "@/types/admin-credit";
 
 import CreditAccountRow from "./CreditAccountRow";
 
 interface Props {
-  accounts: CreditAccount[];
+  accounts: AdminCreditAccount[];
 }
 
-export default function CreditAccountsTable({ accounts }: Props) {
+export default function CreditAccountsTable({
+  accounts,
+}: Props) {
   return (
     <div className="overflow-x-auto">
       <div className="min-w-237.5">
@@ -21,7 +23,10 @@ export default function CreditAccountsTable({ accounts }: Props) {
 
         <div>
           {accounts.map((account) => (
-            <CreditAccountRow key={account.id} account={account} />
+            <CreditAccountRow
+              key={account.id}
+              account={account}
+            />
           ))}
         </div>
       </div>

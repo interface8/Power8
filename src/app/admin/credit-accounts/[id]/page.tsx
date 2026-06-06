@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 
 import CreditAccountDetailPage from "@/components/admin/credit-accounts/credit-id/CreditAccountDetailPage";
 
-import { creditAccountDetails } from "@/data/creditAccountDetail";
 
 interface PageProps {
   params: {
