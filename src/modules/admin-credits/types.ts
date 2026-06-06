@@ -1,4 +1,4 @@
-import type { CreditStatus } from "@prisma/client";
+import type { CreditStatus, ScheduleStatus } from "@prisma/client";
 
 export type AdminCreditRepaymentDto = {
   paidInstallments: number;
@@ -46,4 +46,38 @@ export type AdminCreditAccountFilters = {
   search?: string;
   page: number;
   limit: number;
+};
+
+export type AdminCreditScheduleDto = {
+  id: string;
+  installmentNumber: number;
+  dueDate: Date;
+  amountDue: number;
+  status: ScheduleStatus;
+};
+
+export type AdminCreditAccountDetailsDto = {
+  id: string;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
+  order: {
+    id: string;
+    createdAt: Date;
+  };
+  installation: {
+    address: string | null;
+    city: string | null;
+    state: string | null;
+  };
+  totalAmount: number;
+  balanceRemaining: number;
+  durationMonths: number;
+  status: CreditStatus;
+  repayment: AdminCreditRepaymentDto;
+  schedules: AdminCreditScheduleDto[];
+  createdAt: Date;
 };

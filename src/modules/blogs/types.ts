@@ -29,13 +29,42 @@ export interface CreateBlogInput {
   authorId?: string;
 }
 
-export type UpdateBlogInput = Partial<CreateBlogInput>;
+export type UpdateBlogInput = {
+  title?: string;
+  slug?: string;
+  excerpt?: string | null;
+  content?: string;
+  imageUrl?: string | null;
+  isPublished?: boolean;
+  categoryId?: string | null;
+  companyId?: string | null;
+  authorId?: string | null;
+};
 
 export interface BlogFilters {
   search?: string;
   categoryId?: string;
   companyId?: string;
   published?: boolean;
+}
+
+export interface AdminBlogFilters {
+  search?: string;
+  categoryId?: string;
+  authorId?: string;
+  published?: boolean;
+  page: number;
+  limit: number;
+}
+
+export interface AdminBlogsListDto {
+  data: BlogDto[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface BlogCategoryDto {
@@ -53,4 +82,19 @@ export interface CreateBlogCategoryInput {
   sort?: number;
 }
 
-export type UpdateBlogCategoryInput = Partial<CreateBlogCategoryInput>;
+export type UpdateBlogCategoryInput = {
+  name?: string;
+  description?: string | null;
+  sort?: number;
+};
+
+export interface BlogStatsDto {
+  totalBlogs: number;
+  publishedBlogs: number;
+  draftBlogs: number;
+  categories: number;
+}
+
+export interface BlogSlugAvailabilityDto {
+  available: boolean;
+}

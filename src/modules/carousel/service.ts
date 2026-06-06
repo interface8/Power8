@@ -10,7 +10,9 @@ export async function listAllSlides() {
 }
 
 export async function getSlide(id: string) {
-  return carouselRepository.getSlideById(id);
+  const slide = await carouselRepository.getSlideById(id);
+  if (!slide) throw new Error("Carousel slide not found");
+  return slide;
 }
 
 export async function createSlide(data: CreateCarouselSlideInput) {
@@ -18,9 +20,25 @@ export async function createSlide(data: CreateCarouselSlideInput) {
 }
 
 export async function updateSlide(id: string, data: UpdateCarouselSlideInput) {
+  const exists = await carouselRepository.slideExists(id);
+  if (!exists) throw new Error("Carousel slide not found");
   return carouselRepository.updateSlide(id, data);
 }
 
 export async function deleteSlide(id: string) {
+  const exists = await carouselRepository.slideExists(id);
+  if (!exists) throw new Error("Carousel slide not found");
   return carouselRepository.deleteSlide(id);
+}
+
+export async function approveSlide(id: string) {
+  const exists = await carouselRepository.slideExists(id);
+  if (!exists) throw new Error("Carousel slide not found");
+  return carouselRepository.approveSlide(id);
+}
+
+export async function rejectSlide(id: string) {
+  const exists = await carouselRepository.slideExists(id);
+  if (!exists) throw new Error("Carousel slide not found");
+  return carouselRepository.rejectSlide(id);
 }
