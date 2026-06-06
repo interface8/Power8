@@ -70,7 +70,7 @@ export default function BlogFilters({
           value={category}
           onValueChange={onCategoryChange}
         >
-          <SelectTrigger className="h-12 w-full xl:w-[220px]">
+          <SelectTrigger className="h-12 w-full xl:w-55">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
 
@@ -98,7 +98,7 @@ export default function BlogFilters({
           value={status}
           onValueChange={onStatusChange}
         >
-          <SelectTrigger className="h-12 w-full xl:w-[220px]">
+          <SelectTrigger className="h-12 w-full xl:w-55">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
 

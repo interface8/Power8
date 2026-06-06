@@ -1,7 +1,6 @@
 import { AdminCreditAccount } from "@/types/admin-credit";
-
 import CreditAccountRow from "./CreditAccountRow";
-
+import { formatCreditId } from "@/utils/formatId";
 interface Props {
   accounts: AdminCreditAccount[];
 }
@@ -24,7 +23,7 @@ export default function CreditAccountsTable({
         <div>
           {accounts.map((account) => (
             <CreditAccountRow
-              key={account.id}
+              key={formatCreditId(account.id)}
               account={account}
             />
           ))}

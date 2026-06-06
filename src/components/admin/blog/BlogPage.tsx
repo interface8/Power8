@@ -80,7 +80,7 @@ export default function BlogPage() {
         <div
           className="
             flex
-            min-h-[300px]
+            min-h-75
             flex-col
             items-center
             justify-center

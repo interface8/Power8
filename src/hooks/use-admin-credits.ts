@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { AdminCreditsResponse } from "@/types/admin-credit";
+import { AdminCreditDetailResponse } from "@/types/admin-credit-detail";
 
 interface UseAdminCreditsParams {
   status?: string;
@@ -43,5 +44,37 @@ export function useAdminCredits(params: UseAdminCreditsParams) {
   return useQuery({
     queryKey: ["admin-credits", params],
     queryFn: () => fetchCredits(params),
+  });
+}
+
+
+// Credit Account Details Hook
+async function fetchCreditDetails(
+  id: string
+): Promise<AdminCreditDetailResponse> {
+  const response = await fetch(
+    `/api/admin/credit-accounts/${id}`
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch credit details"
+    );
+  }
+
+  return response.json();
+}
+
+export function useAdminCreditDetails(
+  id: string
+) {
+  return useQuery({
+    queryKey: [
+      "admin-credit-detail",
+      id,
+    ],
+    queryFn: () =>
+      fetchCreditDetails(id),
+    enabled: Boolean(id),
   });
 }
