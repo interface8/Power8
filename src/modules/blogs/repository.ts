@@ -10,6 +10,8 @@ import type {
   CreateBlogInput,
   UpdateBlogCategoryInput,
   UpdateBlogInput,
+  BlogSlugAvailabilityDto,
+  BlogStatsDto
 } from "./types";
 
 const blogWithRelations = {
@@ -286,4 +288,35 @@ export async function deleteBlogCategory(id: string): Promise<void> {
     }),
     prisma.blogCategory.delete({ where: { id } }),
   ]);
+}
+
+export async function getBlogStats(): Promise<BlogStatsDto> {
+  const [totalBlogs, publishedBlogs, categories] = await Promise.all([
+    prisma.blog.count(),
+    prisma.blog.count({ where: { isPublished: true } }),
+    prisma.blogCategory.count(),
+  ]);
+
+  return {
+    totalBlogs,
+    publishedBlogs,
+    draftBlogs: totalBlogs - publishedBlogs,
+    categories,
+  };
+}
+
+export async function isBlogSlugAvailable(
+  slug: string,
+  excludeId?: string,
+): Promise<BlogSlugAvailabilityDto> {
+  const count = await prisma.blog.count({
+    where: {
+      slug,
+      ...(excludeId ? { id: { not: excludeId } } : {}),
+    },
+  });
+
+  return {
+    available: count === 0,
+  };
 }

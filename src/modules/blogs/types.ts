@@ -87,3 +87,14 @@ export type UpdateBlogCategoryInput = {
   description?: string | null;
   sort?: number;
 };
+
+export interface BlogStatsDto {
+  totalBlogs: number;
+  publishedBlogs: number;
+  draftBlogs: number;
+  categories: number;
+}
+
+export interface BlogSlugAvailabilityDto {
+  available: boolean;
+}
