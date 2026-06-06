@@ -6,6 +6,8 @@ import type {
   CreateBlogInput,
   UpdateBlogCategoryInput,
   UpdateBlogInput,
+  BlogSlugAvailabilityDto,
+  BlogStatsDto
 } from "./types";
 
 export async function listBlogs(filters: BlogFilters) {
@@ -111,4 +113,15 @@ export async function deleteBlogCategory(id: string) {
     throw new Error("Blog category not found");
   }
   return blogRepo.deleteBlogCategory(id);
+}
+
+export async function getBlogStats(): Promise<BlogStatsDto> {
+  return blogRepo.getBlogStats();
+}
+
+export async function checkBlogSlugAvailability(
+  slug: string,
+  excludeId?: string,
+): Promise<BlogSlugAvailabilityDto> {
+  return blogRepo.isBlogSlugAvailable(slug, excludeId);
 }
