@@ -2,7 +2,7 @@
 
 import { ReceiptText } from "lucide-react";
 import { StatusBadge } from "../../orders-id/StatusBadge";
-import { formatDate, truncateOrderId } from "./headerUtils";
+import { formatDate, } from "./headerUtils";
 import { formatOrderId } from "@/utils/formatId";
 
 interface HeaderInfoProps {

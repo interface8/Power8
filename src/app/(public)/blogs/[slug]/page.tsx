@@ -1,13 +1,26 @@
+
 "use client";
 
-import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Tag, BookOpen, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  Tag,
+  BookOpen,
+  Loader2,
+} from "lucide-react";
 import { useBlog } from "@/hooks/use-blogs";
 
-export default function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+interface BlogDetailPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+export default function BlogDetailPage({ params }: BlogDetailPageProps) {
+  const { slug } = params; // ✅ Remove use() hook, access directly
   const { blog, loading, error } = useBlog(slug, true);
 
   if (loading) {
@@ -22,8 +35,13 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <BookOpen className="mx-auto text-gray-300 mb-4" size={48} />
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Blog post not found</h1>
-        <p className="text-gray-500 mb-6">The article you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          Blog post not found
+        </h1>
+        <p className="text-gray-500 mb-6">
+          The article you&apos;re looking for doesn&apos;t exist or has been
+          removed.
+        </p>
         <Link
           href="/blogs"
           className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition"
@@ -55,7 +73,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ slug: str
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
         </div>
       )}
 

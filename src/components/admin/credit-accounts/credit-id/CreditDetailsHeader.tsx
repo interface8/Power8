@@ -4,7 +4,6 @@ import {
   CalendarDays,
   CreditCard,
   User,
-  MoreVertical,
   Copy,
   Check,
 } from "lucide-react";
