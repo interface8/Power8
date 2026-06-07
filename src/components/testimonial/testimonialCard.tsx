@@ -20,8 +20,6 @@ export default function TestimonialCard({
   name,
   role,
   location,
-  system,
-  savings,
   imageUrl,
 }: TestimonialCardProps) {
   return (
