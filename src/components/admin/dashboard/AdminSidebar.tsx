@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -15,10 +15,10 @@ import {
   Settings,
   X,
   Sun,
-  HomeIcon,
   ShieldCheck,
   KeyRound,
   CreditCard,
+  ChevronLeft,
 } from "lucide-react";
 
 const sections = [
@@ -66,11 +66,34 @@ interface Props {
 
 export default function AdminSidebar({ open, setOpen }: Props) {
   const pathname = usePathname();
-  const [isHovered, setIsHovered] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [currentYear] = useState(new Date().getFullYear());
 
-  // Desktop-collapsed
-  const isExpanded = isHovered;
+  // Check screen size on mount and resize
+  useEffect(() => {
+    const checkScreen = () => {
+      const isMobile = window.innerWidth < 1024;
+      if (isMobile) {
+        setIsExpanded(false);
+      } else {
+        setIsExpanded(true);
+      }
+    };
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  // Update body attribute for layout spacing
+  useEffect(() => {
+    document.body.setAttribute("data-sidebar-expanded", String(isExpanded));
+  }, [isExpanded]);
+
   const sidebarWidth = isExpanded ? "w-64" : "w-20";
+
+  const toggleSidebar = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <>
@@ -92,14 +115,11 @@ export default function AdminSidebar({ open, setOpen }: Props) {
           ${sidebarWidth}
           ${open ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
+          flex flex-col
         `}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Header */}
-        <div
-          className={`h-16 border-b border-white/10 flex items-center justify-between px-4 transition-all duration-300 ${!isExpanded ? "justify-center" : ""}`}
-        >
+        <div className="relative h-16 border-b border-white/10 flex items-center justify-between px-4">
           <Link
             href="/admin/dashboard"
             className={`flex items-center gap-2 transition-all duration-300 ${!isExpanded ? "justify-center w-full" : ""}`}
@@ -114,11 +134,16 @@ export default function AdminSidebar({ open, setOpen }: Props) {
             )}
           </Link>
 
-          {isExpanded && (
-            <Link href="/" className="shrink-0">
-              <HomeIcon className="w-5 h-5 text-white/70 hover:text-white transition-colors" />
-            </Link>
-          )}
+          {/* Chevron Toggle Button */}
+          <button
+            onClick={toggleSidebar}
+            className={`absolute -right-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white shadow-md hover:bg-orange-600 transition-all duration-200 z-50 ${
+              isExpanded ? "rotate-0" : "rotate-180"
+            }`}
+            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
 
           {/* Mobile close button */}
           <button onClick={() => setOpen(false)} className="lg:hidden">
@@ -127,58 +152,80 @@ export default function AdminSidebar({ open, setOpen }: Props) {
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 space-y-6 overflow-y-auto h-[calc(100vh-64px)]">
-          {sections.map((section) => (
-            <div key={section.title}>
-              {/* Section Title */}
-              {isExpanded && (
-                <p className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-green-300 uppercase whitespace-nowrap">
-                  {section.title}
-                </p>
-              )}
-              {!isExpanded && <div className="h-5" />}
+        <nav className="flex-1 overflow-y-auto py-4">
+          <div className="px-3 space-y-6">
+            {sections.map((section) => (
+              <div key={section.title}>
+                {/* Section Title */}
+                {isExpanded && (
+                  <p className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-green-300 uppercase whitespace-nowrap">
+                    {section.title}
+                  </p>
+                )}
+                {!isExpanded && <div className="h-5" />}
 
-              {/* Section Links */}
-              <div className="space-y-1">
-                {section.links.map((link) => {
-                  const active =
-                    pathname === link.href ||
-                    pathname.startsWith(`${link.href}/`);
-                  const Icon = link.icon;
+                {/* Section Links */}
+                <div className="space-y-1">
+                  {section.links.map((link) => {
+                    const active =
+                      pathname === link.href ||
+                      pathname.startsWith(`${link.href}/`);
+                    const Icon = link.icon;
 
-                  return (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-xl
-                        transition-all duration-200 group
-                        ${
-                          active
-                            ? "bg-orange-500 text-white shadow-md"
-                            : "text-white/80 hover:bg-white/10 hover:text-white"
-                        }
-                        ${!isExpanded ? "justify-center" : ""}
-                      `}
-                      title={!isExpanded ? link.name : undefined}
-                    >
-                      <Icon
-                        className={`w-5 h-5 shrink-0 transition-all duration-200 ${active ? "scale-110" : "group-hover:scale-110"}`}
-                      />
+                    return (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        className={`
+                          flex items-center gap-3 px-3 py-2.5 rounded-xl
+                          transition-all duration-200 group
+                          ${
+                            active
+                              ? "bg-orange-500 text-white shadow-md"
+                              : "text-white/80 hover:bg-white/10 hover:text-white"
+                          }
+                          ${!isExpanded ? "justify-center" : ""}
+                        `}
+                        title={!isExpanded ? link.name : undefined}
+                      >
+                        <Icon
+                          className={`w-5 h-5 shrink-0 transition-all duration-200 ${active ? "scale-110" : "group-hover:scale-110"}`}
+                        />
 
-                      {isExpanded && (
-                        <span className="text-sm font-medium whitespace-nowrap">
-                          {link.name}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
+                        {isExpanded && (
+                          <span className="text-sm font-medium whitespace-nowrap">
+                            {link.name}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </nav>
+
+        {/* Footer with Year */}
+        <div
+          className={`border-t border-white/10 py-3 ${isExpanded ? "px-4" : "px-2"}`}
+        >
+          <div className="text-center">
+            {isExpanded ? (
+              <>
+                <p className="text-[10px] text-white/40">
+                  © {currentYear} Power-8
+                </p>
+                <p className="text-[9px] text-white/30 mt-0.5">
+                  Admin Dashboard
+                </p>
+              </>
+            ) : (
+              <p className="text-[9px] text-white/40">© {currentYear}</p>
+            )}
+          </div>
+        </div>
       </aside>
     </>
   );
