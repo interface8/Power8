@@ -36,16 +36,29 @@ export function BlogForm({ blog, categories, onSubmit, isSubmitting, isModal = f
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <TitleField value={formData.title} onChange={setters.setTitle} autoFocus={!isModal} />
-      <SlugField value={formData.slug} onChange={setters.setSlug} onEdit={() => setters.setSlugEdited(true)} />
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TitleField value={formData.title} onChange={setters.setTitle} autoFocus={!isModal} />
+        <SlugField value={formData.slug} onChange={setters.setSlug} onEdit={() => setters.setSlugEdited(true)} />
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <CategoryField categories={categories} value={formData.categoryId} onChange={setters.setCategoryId} />
         <StatusToggle value={formData.isPublished} onChange={setters.setIsPublished} />
       </div>
+
       <ExcerptField value={formData.excerpt} onChange={setters.setExcerpt} />
+      
       <ImageUploadField value={formData.imageUrl} onChange={setters.setImageUrl} />
-      <BlogEditor content={formData.content} onChange={setters.setContent} />
+      
+      {/* Compact Editor */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Content <span className="text-red-500">*</span>
+        </label>
+        <BlogEditor content={formData.content} onChange={setters.setContent} />
+      </div>
+
       <FormActions isSubmitting={isSubmitting} isEdit={!!blog} onCancel={handleCancel} />
     </form>
   );

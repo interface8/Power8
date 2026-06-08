@@ -18,12 +18,20 @@ export function BlogEditor({ content, onChange }: BlogEditorProps) {
     extensions: [
       StarterKit,
       Image.configure({ inline: true, allowBase64: false }),
-      Link.configure({ openOnClick: false, HTMLAttributes: { target: "_blank" } }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: { target: "_blank" },
+      }),
       Placeholder.configure({ placeholder: "Write your blog content here..." }),
     ],
     content,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
-    editorProps: { attributes: { class: "prose prose-sm sm:prose lg:prose-lg focus:outline-none min-h-[300px] max-w-none p-4" } },
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm max-w-none focus:outline-none min-h-[200px] max-h-[300px] overflow-y-auto p-3",
+      },
+    },
   });
 
   const handleImageUpload = () => {
@@ -47,7 +55,11 @@ export function BlogEditor({ content, onChange }: BlogEditorProps) {
       try {
         const formData = new FormData();
         formData.append("file", file);
-        const response = await fetch("/api/admin/blogs/upload-image", { method: "POST", credentials: "include", body: formData });
+        const response = await fetch("/api/admin/blogs/upload-image", {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
         if (!response.ok) throw new Error("Upload failed");
         const result = await response.json();
         editor?.chain().focus().setImage({ src: result.url }).run();

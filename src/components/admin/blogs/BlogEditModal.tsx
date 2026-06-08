@@ -80,7 +80,7 @@ export function BlogEditModal({
         }`}
       >
         <div
-          className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
+          className="relative w-full max-w-5xl max-h-[85vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -99,7 +99,7 @@ export function BlogEditModal({
           </div>
 
           {/* Content */}
-          <div className="overflow-y-auto p-6 max-h-[calc(90vh-80px)]">
+          <div className="overflow-y-auto p-5 max-h-[calc(85vh-70px)]">
             <BlogForm
               blog={blog}
               categories={categories}
