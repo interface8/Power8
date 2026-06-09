@@ -6,6 +6,7 @@ import DashboardStatsSkeleton from "@/components/admin/dashboard/DashboardStatsS
 import { useAdminStats } from "@/hooks/use-admin-stats";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ArrowUpRight } from "lucide-react";
+import { StateHandler } from "@/components/ui/StateHandler";
 
 export default function DashboardPage() {
   const { data, loading, error, refetch } = useAdminStats();
@@ -15,22 +16,16 @@ export default function DashboardPage() {
     return <DashboardStatsSkeleton />;
   }
 
+  // Error handler using StateHandler
   if (error || !data) {
     return (
-      <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
-        <h2 className="text-lg font-semibold text-red-700">
-          Failed to load dashboard
-        </h2>
-
-        <p className="mt-2 text-sm text-red-500">{error}</p>
-
-        <button
-          onClick={refetch}
-          className="mt-5 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700"
-        >
-          Retry
-        </button>
-      </div>
+      <StateHandler
+        isError={true}
+        error={error|| "Failed to load dashboard data"}
+        onRetry={refetch}
+        title="Dashboard Error"
+        message="Unable to load dashboard data. Please check your connection and try again."
+      />
     );
   }
 

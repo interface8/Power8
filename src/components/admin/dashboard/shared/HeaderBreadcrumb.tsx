@@ -4,19 +4,42 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-// Helper to format order ID - extracts ORD-XXXX pattern or creates a readable ID
+// Helper to format order ID - shows last 3 characters
 const formatOrderId = (orderId: string) => {
+  if (!orderId) return "";
+  
+  // If it already has ORD- pattern, return as is
   if (orderId.includes("ORD-")) return orderId;
-
-  // If it's a long database ID (like cmpfslb9u0002icynjwjol5ao)
-  // Extract a readable format or use a generic pattern
-  if (orderId.length > 10) {
-    const ordMatch = orderId.match(/ORD[_-]?\d+/i);
-    if (ordMatch) return ordMatch[0].toUpperCase();
-    return `ORD-${orderId.slice(-3).toUpperCase()}`;
+  
+  // If it's a long database ID, take last 3 characters
+  if (orderId.length > 5) {
+    const suffix = orderId.slice(-3).toUpperCase();
+    return `ORD-${suffix}`;
   }
-
+  
   return orderId;
+};
+
+// Helper to format credit account ID - shows last 3 characters
+const formatCreditId = (creditId: string) => {
+  if (!creditId) return "";
+  
+  // If it already has CRD- pattern, return as is
+  if (creditId.includes("CRD-")) return creditId;
+  
+  // If it's a long database ID, take last 3 characters
+  if (creditId.length > 5) {
+    const suffix = creditId.slice(-3).toUpperCase();
+    return `CRD-${suffix}`;
+  }
+  
+  return creditId;
+};
+
+// Generic formatter for any ID type
+const formatId = (id: string, type: "order" | "credit"): string => {
+  if (type === "order") return formatOrderId(id);
+  return formatCreditId(id);
 };
 
 export function HeaderBreadcrumb() {
@@ -24,10 +47,14 @@ export function HeaderBreadcrumb() {
   const segments = pathname.split("/").filter(Boolean);
   const isDashboard = pathname === "/admin/dashboard";
   const isOrders = pathname === "/admin/orders";
-  const isOrderDetails =
-    pathname.startsWith("/admin/orders/") && pathname !== "/admin/orders";
-  const rawOrderId = isOrderDetails ? segments[2] : null;
-  const displayOrderId = rawOrderId ? formatOrderId(rawOrderId) : null;
+  const isOrderDetails = pathname.startsWith("/admin/orders/") && pathname !== "/admin/orders";
+  const isCreditAccounts = pathname === "/admin/credit-accounts";
+  const isCreditDetails = pathname.startsWith("/admin/credit-accounts/") && pathname !== "/admin/credit-accounts";
+  
+  // Get the ID from the path
+  const rawId = isOrderDetails ? segments[2] : isCreditDetails ? segments[2] : null;
+  const idType = isOrderDetails ? "order" : isCreditDetails ? "credit" : null;
+  const displayId = rawId && idType ? formatId(rawId, idType) : null;
 
   return (
     <div className="min-w-0">
@@ -44,7 +71,7 @@ export function HeaderBreadcrumb() {
           </h1>
         ) : (
           <>
-            {/* Dashboard Link  */}
+            {/* Dashboard Link */}
             <Link
               href="/admin/dashboard"
               className="text-sm sm:text-base font-medium text-gray-500 transition-colors hover:text-orange-600"
@@ -55,29 +82,53 @@ export function HeaderBreadcrumb() {
             <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-gray-300" />
 
             {/* Orders Section */}
-            {isOrders ? (
-              <span className="text-xs sm:text-base font-semibold text-gray-900">
+            {isOrders && (
+              <span className="text-sm sm:text-base font-semibold text-gray-900">
                 Orders
               </span>
-            ) : isOrderDetails ? (
+            )}
+
+            {/* Credit Accounts Section */}
+            {isCreditAccounts && (
+              <span className="text-sm sm:text-base font-semibold text-gray-900">
+                Credit Accounts
+              </span>
+            )}
+
+            {/* Order Details Section */}
+            {isOrderDetails && (
               <>
-                {/* Orders Link */}
                 <Link
                   href="/admin/orders"
                   className="text-sm sm:text-base font-medium text-gray-500 transition-colors hover:text-orange-600"
                 >
                   Orders
                 </Link>
-
-                {/* Chevron */}
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-gray-300" />
-
-                {/* Order ID */}
                 <span className="text-sm sm:text-base font-semibold text-gray-900">
-                  {displayOrderId}
+                  {displayId}
                 </span>
               </>
-            ) : (
+            )}
+
+            {/* Credit Details Section */}
+            {isCreditDetails && (
+              <>
+                <Link
+                  href="/admin/credit-accounts"
+                  className="text-sm sm:text-base font-medium text-gray-500 transition-colors hover:text-orange-600"
+                >
+                  Credit Accounts
+                </Link>
+                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-gray-300" />
+                <span className="text-sm sm:text-base font-semibold text-gray-900">
+                  {displayId}
+                </span>
+              </>
+            )}
+
+            {/* Other segments (categories, products, etc.) */}
+            {!isOrders && !isCreditAccounts && !isOrderDetails && !isCreditDetails && (
               segments.slice(1).map((segment, index, arr) => {
                 const href = "/" + segments.slice(0, index + 2).join("/");
                 const isLast = index === arr.length - 1;

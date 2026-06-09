@@ -2,7 +2,8 @@
 
 import { ReceiptText } from "lucide-react";
 import { StatusBadge } from "../../orders-id/StatusBadge";
-import { formatDate, truncateOrderId } from "./headerUtils";
+import { formatDate, } from "./headerUtils";
+import { formatOrderId } from "@/utils/formatId";
 
 interface HeaderInfoProps {
   orderId: string;
@@ -10,11 +11,9 @@ interface HeaderInfoProps {
   createdAt: string;
 }
 
-export function HeaderInfo({
-  orderId,
-  orderStatus,
-  createdAt,
-}: HeaderInfoProps) {
+export function HeaderInfo({ orderId, orderStatus, createdAt }: HeaderInfoProps) {
+  const displayOrderId = formatOrderId(orderId);
+
   return (
     <div className="flex items-start gap-3 sm:gap-4">
       {/* Icon */}
@@ -26,7 +25,7 @@ export function HeaderInfo({
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <h1 className="break-all text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
-            {truncateOrderId(orderId)}
+            {displayOrderId}
           </h1>
           <StatusBadge status={orderStatus} />
         </div>
