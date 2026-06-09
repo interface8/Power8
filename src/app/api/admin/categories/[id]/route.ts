@@ -63,7 +63,10 @@ export async function DELETE(
     return jsonResponse({ message: "Category deleted successfully" });
   } catch (e: unknown) {
     if (e instanceof Error && e.message === "Category not found") {
-      return errorResponse("Category not found", 404);
+       return errorResponse(
+    "Cannot delete category because it has products assigned. Move or delete those products first.",
+    400,
+  );
     }
     if (e instanceof Error && e.message === "Category has products") {
       return errorResponse("Category has products", 409);

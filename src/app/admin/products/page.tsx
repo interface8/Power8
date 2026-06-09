@@ -40,6 +40,11 @@ export default function AdminProductsPage() {
   const { companies } = useCompanies();
 
   const [products, setProducts] = useState<Product[]>([]);
+  const updateProductLocally = (id: string, updates: Partial<Product>) => {
+  setProducts(prev => prev.map(product => 
+    product.id === id ? { ...product, ...updates } : product
+  ));
+};
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -109,26 +114,54 @@ export default function AdminProductsPage() {
     currentPage * itemsPerPage,
   );
 
-  const toggleProductStatus = async (product: Product) => {
-    try {
-      const res = await fetch(`/api/products/${product.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !product.isActive }),
-      });
-      if (res.ok) {
-        toast.success(
-          product.isActive ? "Product deactivated" : "Product activated",
-        );
-        fetchProducts();
-      } else {
-        toast.error("Failed to update status");
-      }
-    } catch {
-      toast.error("Failed to update status");
-    }
-  };
+  // const toggleProductStatus = async (product: Product) => {
+  //   try {
+  //     const res = await fetch(`/api/products/${product.id}`, {
+  //       method: "PATCH",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ isActive: !product.isActive }),
+  //     });
+  //     if (res.ok) {
+  //       toast.success(
+  //         product.isActive ? "Product deactivated" : "Product activated",
+  //       );
+  //       fetchProducts();
+  //     } else {
+  //       toast.error("Failed to update status");
+  //     }
+  //   } catch {
+  //     toast.error("Failed to update status");
+  //   }
+  // };
 
+
+  const toggleProductStatus = async (product: Product) => {
+  const newStatus = !product.isActive;
+  
+  // Update UI instantly
+  updateProductLocally(product.id, { isActive: newStatus });
+  
+  const toastId = toast.loading("Updating status...");
+  
+  try {
+    const res = await fetch(`/api/products/${product.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: newStatus }),
+    });
+    
+    if (!res.ok) {
+      updateProductLocally(product.id, { isActive: product.isActive });
+      throw new Error("Failed to update status");
+    }
+    
+    toast.success(newStatus ? "Product activated" : "Product deactivated", { id: toastId });
+    
+  } catch {
+    toast.error("Failed to update status", { id: toastId });
+    updateProductLocally(product.id, { isActive: product.isActive });
+  }
+};
   const handleDeleteConfirm = async () => {
     if (!productToDelete) return;
 

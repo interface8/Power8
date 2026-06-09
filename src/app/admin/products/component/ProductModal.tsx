@@ -229,14 +229,27 @@ export default function ProductModal({
     }
   };
 
+  // Format number for display - shows empty string when value is 0
   const formatNumber = (value: number) => {
+    if (value === 0) return "";
     return value.toLocaleString();
   };
 
+  // Handle number field changes - allows empty fields
   const handleNumberChange = (field: 'price' | 'stockQuantity' | 'warranty', value: string) => {
+    // If the field is empty, set value to 0 but show empty in input
+    if (value === "") {
+      setFormData({ ...formData, [field]: 0 });
+      return;
+    }
+    
     const rawValue = value.replace(/,/g, '');
-    const num = field === 'price' ? parseFloat(rawValue) : parseInt(rawValue);
-    setFormData({ ...formData, [field]: isNaN(num) ? 0 : num });
+    const num = field === 'price' ? parseFloat(rawValue) : parseInt(rawValue, 10);
+    
+    // Only update if it's a valid number
+    if (!isNaN(num)) {
+      setFormData({ ...formData, [field]: num });
+    }
   };
 
   return (
@@ -307,6 +320,7 @@ export default function ProductModal({
                   type="text"
                   value={formatNumber(formData.price)}
                   onChange={(e) => handleNumberChange('price', e.target.value)}
+                  placeholder="0"
                   className="mt-1.5 bg-white/80"
                 />
               </div>
@@ -316,6 +330,7 @@ export default function ProductModal({
                   type="text"
                   value={formatNumber(formData.stockQuantity)}
                   onChange={(e) => handleNumberChange('stockQuantity', e.target.value)}
+                  placeholder="0"
                   className="mt-1.5 bg-white/80"
                 />
               </div>
@@ -366,12 +381,47 @@ export default function ProductModal({
           <div className="w-full lg:w-96">
             <Label className="text-sm font-semibold text-gray-700">Product Images (Max 4)</Label>
             
+            {/* Image URL Input */}
+            <div className="mt-2">
+              <div className="flex gap-2">
+                <Input
+                  id="image-url-input"
+                  placeholder="https://example.com/image.jpg"
+                  className="flex-1 bg-white/80"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const urlInput = document.getElementById("image-url-input") as HTMLInputElement;
+                    const url = urlInput?.value.trim();
+                    if (url && /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)$/i.test(url)) {
+                      if (imagePreviews.length >= 4) {
+                        toast.error("Maximum 4 images allowed");
+                        return;
+                      }
+                      setImagePreviews(prev => [...prev, { url, isUploading: false }]);
+                      setImageUrls(prev => [...prev, url]);
+                      urlInput.value = "";
+                      toast.success("Image added from URL");
+                    } else if (url) {
+                      toast.error("Please enter a valid image URL (jpg, png, webp, gif)");
+                    }
+                  }}
+                  className="border-gray-300 hover:bg-orange-50 hover:text-orange-600"
+                >
+                  Add URL
+                </Button>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Paste a direct image URL (JPG, PNG, WEBP, GIF)</p>
+            </div>
+            
             {/* Drop Zone */}
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`mt-2 rounded-xl p-4 md:p-6 text-center transition-all duration-200 cursor-pointer border-2 border-dashed ${
+              className={`mt-3 rounded-xl p-4 md:p-6 text-center transition-all duration-200 cursor-pointer border-2 border-dashed ${
                 isDragging 
                   ? "border-orange-500 bg-orange-50 scale-[1.02]" 
                   : "border-gray-300 bg-amber-50/50 hover:border-orange-500"

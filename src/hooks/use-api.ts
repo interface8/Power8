@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 interface UseApiOptions {
   onSuccess?: () => void;
@@ -21,16 +21,17 @@ export function useApi<T = unknown>() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        const errorMessage = data.message ?? "Request failed";
+        let errorMessage = "Request failed";
+        if (data && typeof data === 'object') {
+          errorMessage = data.message ?? data.error ?? errorMessage;
+        }
         setError(errorMessage);
         return { data: null, error: errorMessage };
       }
 
       return { data, error: null };
     } catch (err) {
-      const errorMessage =
-        "Something went wrong" +
-        (err instanceof Error ? `: ${err.message}` : "");
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong";
       setError(errorMessage);
       return { data: null, error: errorMessage };
     } finally {
@@ -64,6 +65,10 @@ export function useQuery<T = unknown>(url: string, options?: UseApiOptions) {
     }
     return result;
   }, [fetchData, url]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return {
     data,
@@ -106,8 +111,3 @@ export function useMutation<TData = unknown, TVariables = unknown>(
     clearError,
   };
 }
-
-
-
-
-

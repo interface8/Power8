@@ -71,10 +71,15 @@ export default function TestimonialContent({
 
       {/* Loading State */}
       {loading && (
-        <div className="flex justify-center items-center py-24">
-          <p className="text-sm text-gray-600">Loading...</p>
-        </div>
-      )}
+  <div className="flex justify-center items-center py-24">
+    <div className="flex flex-col items-center gap-3">
+      {/* Spinner */}
+      <div className="w-10 h-10 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
+      {/* Pulsing text */}
+      <p className="text-sm text-gray-500 animate-pulse">Loading testimonials...</p>
+    </div>
+  </div>
+)}
 
       {/* Error State */}
       {error && (

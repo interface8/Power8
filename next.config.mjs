@@ -19,14 +19,19 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'images.rawpixel.com',  // ← ADD THIS
+        hostname: 'images.rawpixel.com',
         pathname: '/**',
       },
       {
-  protocol: 'https',
-  hostname: '**.public.blob.vercel-storage.com',
-  pathname: '/**',
-}
+        protocol: 'https',
+        hostname: 'png.pngtree.com',  // ← ADD THIS LINE
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.public.blob.vercel-storage.com',
+        pathname: '/**',
+      },
     ],
   },
 };

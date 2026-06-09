@@ -1,4 +1,4 @@
-import { Card, CardContent, CardFooter } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 import { Quote, Star } from "lucide-react";
 
@@ -20,8 +20,6 @@ export default function TestimonialCard({
   name,
   role,
   location,
-  system,
-  savings,
   imageUrl,
 }: TestimonialCardProps) {
   return (
@@ -50,7 +48,7 @@ export default function TestimonialCard({
         </p>
 
         {/* Profile Section - stays at bottom */}
-        <div className="flex items-center gap-4 mt-auto">
+        <div className="flex items-center gap-4 mt-auto pb-7">
           <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-orange-300">
             {imageUrl ? (
               <Image
@@ -75,21 +73,7 @@ export default function TestimonialCard({
         </div>
       </CardContent>
 
-      {/* Footer - System & Savings */}
-      <CardFooter className="border-t border-orange-200 bg-white px-7 py-5 flex flex-col gap-3 text-sm pb-17 pt-2">
-        <div className="flex justify-between w-full">
-          <span className="text-gray-500 font-medium text-lg">System:</span>
-          <span className="font-medium text-gray-800 text-lg">
-            {system || "10kW Premium System"}
-          </span>
-        </div>
-        <div className="flex justify-between w-full">
-          <span className="text-gray-500 font-medium text-lg">Annual Savings:</span>
-          <span className="font-semibold text-green-600 text-lg">
-            {savings || "₦850,000/year"}
-          </span>
-        </div>
-      </CardFooter>
+     
     </Card>
   );
 }
