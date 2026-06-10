@@ -123,13 +123,7 @@ export default function TestimonialContent({
          </div>
       )}
 
-      {/* Empty State */}
-      {!loading && !error && testimonials.length === 0 && (
-        <div className="flex justify-center items-center py-24">
-          <p className="text-xl text-gray-600">No testimonials yet.</p>
-        </div>
-      )}
-
+    
       <div className="px-4 sm:px-6 lg:px-8">
         <TestimonialForm />
       </div>

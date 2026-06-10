@@ -164,20 +164,59 @@ export default function TestimonialForm() {
     );
   }
 
-  if (isSubmitted) {
-    return (
-      <div className="mt-12">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
-          <h3 className="text-2xl font-bold text-green-800 mb-3">Thank You!</h3>
-          <p className="text-green-700 text-lg font-medium">
-            Thank you for sharing your feedback! Your testimonial has been
-            received and will appear on the page once reviewed and approved by
-            our team.
+  // if (isSubmitted) {
+  //   return (
+  //     <div className="mt-12">
+  //       <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+  //         <h3 className="text-2xl font-bold text-green-800 mb-3">Thank You!</h3>
+  //         <p className="text-green-700 text-lg font-medium">
+  //           Thank you for sharing your feedback! Your testimonial has been
+  //           received and will appear on the page once reviewed and approved by
+  //           our team.
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+if (isSubmitted) {
+  return (
+    <div className="mt-12 animate-fade-in">
+      <div className="bg-white border border-green-200 rounded-2xl p-8 md:p-12 text-center shadow-lg">
+        {/* Animated checkmark circle */}
+        <div className="mb-6">
+          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
+            <CheckCircle className="w-12 h-12 text-white" />
+          </div>
+        </div>
+        
+        {/* Main message */}
+        <h3 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">
+          Thank You
+        </h3>
+        
+        <p className="text-gray-700 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+          Your testimonial has been successfully submitted and will appear on the page once reviewed and approved by our team.
+        </p>
+        
+        {/* Decorative divider with icon */}
+        <div className="flex items-center justify-center gap-3 mt-8">
+          <div className="h-px w-12 bg-gray-200"></div>
+          <CheckCircle className="w-4 h-4 text-green-500" />
+          <div className="h-px w-12 bg-gray-200"></div>
+        </div>
+        
+        {/* Secondary message with icon */}
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <MessageCircle className="w-5 h-5 text-gray-400" />
+          <p className="text-gray-500 text-base">
+            We appreciate you taking the time to share your experience.
           </p>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   const getCharWarning = () => {
     if (message.length >= 480 && message.length < 500) {
