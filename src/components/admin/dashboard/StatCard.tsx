@@ -7,6 +7,7 @@ interface StatCardProps {
   iconColor: string;
   iconBg: string;
   trend?: string;
+  trendPositive?: boolean;
   warning?: boolean;
 }
 
@@ -17,6 +18,7 @@ export default function StatCard({
   iconColor,
   iconBg,
   trend,
+  trendPositive = true,
   warning,
 }: StatCardProps) {
   return (
@@ -50,8 +52,15 @@ export default function StatCard({
           </h3>
 
           {trend && (
-            <div className="mt-4 inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
-              <ArrowUpRight className="h-3.5 w-3.5" />
+            <div
+              className={`
+    mt-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold
+    ${trendPositive ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}
+  `}
+            >
+              <ArrowUpRight
+                className={`h-3.5 w-3.5 ${!trendPositive ? "rotate-180" : ""}`}
+              />
               {trend} vs last month
             </div>
           )}
