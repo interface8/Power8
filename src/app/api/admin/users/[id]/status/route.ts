@@ -1,15 +1,15 @@
 import { NextRequest } from "next/server";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { adminUsersService, adminUpdateUserStatusSchema } from "@/modules/admin-users";
+
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("users", "update_status");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   const { id } = await params;
 

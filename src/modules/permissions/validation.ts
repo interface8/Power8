@@ -11,3 +11,5 @@ export const updatePermissionSchema = z.object({
   action: z.string().min(2).optional(),
   description: z.string().optional(),
 });
+
+export const replaceRolePermissionsSchema = z.array(z.string().min(1));

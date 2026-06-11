@@ -1,12 +1,11 @@
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { adminUpdateOrderStatusSchema } from "@/modules/admin-orders";
 import { adminOrdersService } from "@/modules/admin-orders";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("orders", "update_status");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   const body = await request.json();
   const parsed = adminUpdateOrderStatusSchema.safeParse(body);

@@ -4,12 +4,12 @@ import {
   createUserSchema,
   userFiltersSchema,
 } from "@/modules/users";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/users — List users (permission: users.read)
 export async function GET(request: NextRequest) {
-  const guard = await requireApiPermission("users.read");
+  const guard = await requireApiPermissionFor("users", "read");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/users — Create user (permission: users.create)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("users.create");
+  const guard = await requireApiPermissionFor("users", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

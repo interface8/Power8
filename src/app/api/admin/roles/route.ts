@@ -1,23 +1,25 @@
 import { NextRequest } from "next/server";
-import { roleService, createRoleSchema } from "@/modules/roles";
 import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
+import { roleService, createRoleSchema } from "@/modules/roles";
 
-// GET /api/roles — List all roles (permission: roles.read)
+// GET /api/admin/roles
+// GET /api/admin/roles
 export async function GET() {
-  const guard = await requireApiPermissionFor("roles", "read");
+  const guard = await requireApiPermissionFor("roles", "view");
   if (isErrorResponse(guard)) return guard;
 
   try {
-    const roles = await roleService.listRoles();
-    return jsonResponse(roles);
+    const data = await roleService.listRolesAdmin();
+    return jsonResponse({ data });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to fetch roles";
     return errorResponse(message, 500);
   }
 }
 
-// POST /api/roles — Create role (permission: roles.create)
+// POST /api/admin/roles
+// POST /api/admin/roles
 export async function POST(request: NextRequest) {
   const guard = await requireApiPermissionFor("roles", "create");
   if (isErrorResponse(guard)) return guard;
@@ -27,16 +29,17 @@ export async function POST(request: NextRequest) {
     const parsed = createRoleSchema.safeParse(body);
 
     if (!parsed.success) {
-      return Response.json(
-        { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
-        { status: 400 },
-      );
+      const firstError =
+        Object.values(parsed.error.flatten().fieldErrors).flat()[0] ??
+        "Validation failed";
+      return errorResponse(firstError, 400);
     }
 
-    const role = await roleService.createRole(parsed.data);
-    return jsonResponse(role, 201);
+    const data = await roleService.createRoleAdmin(parsed.data);
+    return jsonResponse({ data }, 201);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to create role";
+    if (message.includes("already exists")) return errorResponse(message, 409);
     return errorResponse(message, 500);
   }
 }
