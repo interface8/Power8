@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { roleService, updateRoleSchema } from "@/modules/roles";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 interface RouteParams {
@@ -9,11 +9,11 @@ interface RouteParams {
 
 // GET /api/roles/[id]
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiPermission("roles.read");
+  const guard = await requireApiPermissionFor("roles", "read");
   if (isErrorResponse(guard)) return guard;
 
   try {
-    const role = await roleService.getRoleById(params.id);
+    const role = await roleService.getRoleDetailsByIdAdmin(params.id);
     return jsonResponse(role);
   } catch (error: unknown) {
     if (error instanceof Error && error.message === "Role not found") {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 // PATCH /api/roles/[id]
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiPermission("roles.update");
+  const guard = await requireApiPermissionFor("roles", "update");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const role = await roleService.updateRole(params.id, parsed.data);
+    const role = await roleService.updateRoleAdmin(params.id, parsed.data);
     return jsonResponse(role);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to update role";
@@ -48,19 +48,35 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// DELETE /api/roles/[id]
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiPermission("roles.delete");
+  const guard = await requireApiPermissionFor("roles", "delete");
   if (isErrorResponse(guard)) return guard;
 
   try {
-    await roleService.deleteRole(params.id);
+    const { searchParams } = new URL(request.url);
+    const force = searchParams.get("force") === "true";
+
+    const result = await roleService.deleteRoleAdmin(params.id, force);
+
+    if (!result.deleted) {
+      return jsonResponse(
+        {
+          message:
+            "Cannot delete role because it has users assigned. Use force=true to delete anyway.",
+          affectedUsers: result.affectedUsers,
+          warning: result.warning,
+        },
+        409,
+      );
+    }
+
     return new Response(null, { status: 204 });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === "Role not found") {
       return errorResponse("Role not found", 404);
     }
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     return errorResponse(message, 500);
   }
 }

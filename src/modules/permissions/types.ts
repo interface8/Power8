@@ -18,3 +18,12 @@ export interface UpdatePermissionInput {
   action?: string;
   description?: string;
 }
+
+export interface PermissionGroupDto {
+  resource: string;
+  permissions: PermissionDto[];
+}
+
+export interface ReplaceRolePermissionsInput {
+  permissionIds: string[];
+}

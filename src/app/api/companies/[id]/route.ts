@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { companyService, updateCompanySchema } from "@/modules/companies";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/companies/:id
@@ -25,7 +25,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiPermission("companies.update");
+  const guard = await requireApiPermissionFor("companies", "update");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -54,7 +54,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiPermission("companies.delete");
+  const guard = await requireApiPermissionFor("companies", "delete");
   if (isErrorResponse(guard)) return guard;
 
   try {

@@ -56,6 +56,20 @@ export type AdminUserSavingDto = {
   createdAt: Date;
 };
 
+export type AdminRolePermissionDto = {
+  id: string;
+  resource: string;
+  action: string;
+  description: string | null;
+};
+
+export type AdminUserRoleDto = {
+  id: string;
+  name: string;
+  description: string | null;
+  permissions: AdminRolePermissionDto[];
+};
+
 export type AdminUserDetailsDto = {
   user: {
     id: string;
@@ -66,6 +80,7 @@ export type AdminUserDetailsDto = {
     createdAt: Date;
     updatedAt: Date;
   };
+  roles: AdminUserRoleDto[];
   orders: AdminUserOrderDto[];
   solarSystems: AdminUserSolarSystemDto[];
   creditAccounts: AdminUserCreditAccountDto[];

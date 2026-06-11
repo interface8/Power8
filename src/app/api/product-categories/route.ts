@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { categoryService, createProductCategorySchema } from "@/modules/product-categories";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/product-categories - list all (sorted by sort field)
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/product-categories — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("product-categories.create");
+  const guard = await requireApiPermissionFor("product-categories", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

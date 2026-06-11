@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { userService, updateUserSchema } from "@/modules/users";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 interface RouteParams {
@@ -9,7 +9,7 @@ interface RouteParams {
 
 // GET /api/users/[id] — Get single user (permission: users.read)
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiPermission("users.read");
+  const guard = await requireApiPermissionFor("users", "read");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 // PATCH /api/users/[id] — Update user (permission: users.update)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiPermission("users.update");
+  const guard = await requireApiPermissionFor("users", "update");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 // DELETE /api/users/[id] — Delete user (permission: users.delete)
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const guard = await requireApiPermission("users.delete");
+  const guard = await requireApiPermissionFor("users", "delete");
   if (isErrorResponse(guard)) return guard;
 
   try {
