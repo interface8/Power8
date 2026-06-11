@@ -1,12 +1,11 @@
 import { NextRequest } from "next/server";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { productService, adminProductFiltersSchema, createProductSchema } from "@/modules/products";
 
 export async function GET(request: NextRequest) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("products", "view");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   const { searchParams } = new URL(request.url);
   const parsed = adminProductFiltersSchema.safeParse(Object.fromEntries(searchParams));
@@ -26,9 +25,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("products", "create");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const body = await request.json();
