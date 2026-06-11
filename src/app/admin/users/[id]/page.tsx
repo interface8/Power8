@@ -1,5 +1,8 @@
 "use client";
 
+import { UserRolesSection } from "@/components/admin/roles/user-role-assign/UserRolesSection";
+import { dummyRoles } from "@/data/roles-data";
+import { Role } from "@/types/admin-role";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAdminUser, useUpdateUserStatus } from "@/hooks/use-admin-users";
@@ -138,6 +141,8 @@ const placeholderSavings: SavingType[] = [
   },
 ];
 
+
+
 // Shows gray placeholder boxes while the real data is loading
 function DetailPageSkeleton() {
   return (
@@ -212,6 +217,11 @@ export default function AdminUserDetailPage({
   // Stores the user's active status locally so we can update the UI instantly without waiting for the server
   const [localIsActive, setLocalIsActive] = useState<boolean>(true);
   
+    // State for roles
+  const [userRoles, setUserRoles] = useState<Role[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+  const [isRoleActionLoading, setIsRoleActionLoading] = useState(false);
+
   // Fetches all user data (profile, orders, solar systems, credit accounts, savings) from the API
   const { 
     data: userData, 
@@ -235,6 +245,26 @@ export default function AdminUserDetailPage({
     }
   }, [user]);
   
+  // Load user roles from the user data
+useEffect(() => {
+  if (user) {
+    // ✅ Use dummy roles for now since API doesn't have roles yet
+    // You can replace this with actual API call when ready
+    const existingRoles = dummyRoles.filter(role => 
+      // For demo purposes, assign different roles based on user ID
+      (user.id === "1" && role.id === "1") || // John Mensah gets Admin role
+      (user.id === "2" && (role.id === "4" || role.id === "5")) || // Jane gets Ops Mgr + Finance
+      (user.id === "3" && role.id === "6") // Mike gets Support Staff
+    );
+    setUserRoles(existingRoles);
+    
+    // Filter available roles (exclude roles the user already has)
+    const allRoles = dummyRoles;
+    const available = allRoles.filter(role => !existingRoles.some((ur: Role) => ur.id === role.id));
+    setAvailableRoles(available);
+  }
+}, [user]); 
+
   // If real data exists from the API, use it. Otherwise show the mock preview data.
   const orders: OrderType[] = userData?.orders?.length ? userData.orders : placeholderOrders;
   const solarSystems: SolarSystemType[] = userData?.solarSystems?.length ? userData.solarSystems : placeholderSolarSystems;
@@ -265,6 +295,32 @@ export default function AdminUserDetailPage({
       setLocalIsActive(!newStatus);
     }
   }
+
+    // Handle removing a role from the user
+  const handleRemoveRole = async (roleId: string) => {
+    setIsRoleActionLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const roleToRemove = userRoles.find(r => r.id === roleId);
+    const updatedRoles = userRoles.filter(r => r.id !== roleId);
+    setUserRoles(updatedRoles);
+    if (roleToRemove) {
+      setAvailableRoles(prev => [...prev, roleToRemove]);
+    }
+    setIsRoleActionLoading(false);
+  };
+  
+  // Handle assigning a role to the user
+  const handleAssignRole = async (roleId: string) => {
+    setIsRoleActionLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const newRole = dummyRoles.find(r => r.id === roleId);
+    if (newRole) {
+      setUserRoles(prev => [...prev, newRole]);
+      setAvailableRoles(prev => prev.filter(r => r.id !== roleId));
+    }
+    setIsRoleActionLoading(false);
+  };
+
   
   // While data is loading, show the skeleton placeholders
   if (isLoading) {
@@ -437,6 +493,16 @@ export default function AdminUserDetailPage({
             </button>
           </div>
         </div>
+
+          
+      {/* User Roles Section - Added here */}
+      <UserRolesSection 
+        userRoles={userRoles}
+        availableRoles={availableRoles}
+        onRemoveRole={handleRemoveRole}
+        onAssignRole={handleAssignRole}
+        isLoading={isRoleActionLoading}
+      />
         
         {/* Content area - tables can scroll horizontally on mobile */}
         <div className="mt-6 overflow-x-auto overflow-y-hidden">
