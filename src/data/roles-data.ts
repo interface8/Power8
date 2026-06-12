@@ -8,7 +8,6 @@ export const dummyRoles: Role[] = [
     permissionsCount: 67,
     usersCount: 2,
     createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "2",
@@ -17,7 +16,7 @@ export const dummyRoles: Role[] = [
     permissionsCount: 15,
     usersCount: 9,
     createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-01T00:00:00.000Z",
+   
   },
   {
     id: "3",
@@ -26,7 +25,7 @@ export const dummyRoles: Role[] = [
     permissionsCount: 26,
     usersCount: 5,
     createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-01T00:00:00.000Z",
+   
   },
   {
     id: "4",
@@ -35,7 +34,6 @@ export const dummyRoles: Role[] = [
     permissionsCount: 41,
     usersCount: 3,
     createdAt: "2024-02-05T00:00:00.000Z",
-    updatedAt: "2024-02-05T00:00:00.000Z",
   },
   {
     id: "5",
@@ -44,7 +42,6 @@ export const dummyRoles: Role[] = [
     permissionsCount: 16,
     usersCount: 2,
     createdAt: "2024-02-20T00:00:00.000Z",
-    updatedAt: "2024-02-20T00:00:00.000Z",
   },
   {
     id: "6",
@@ -53,7 +50,6 @@ export const dummyRoles: Role[] = [
     permissionsCount: 13,
     usersCount: 8,
     createdAt: "2024-03-01T00:00:00.000Z",
-    updatedAt: "2024-03-01T00:00:00.000Z",
   },
 ];
 

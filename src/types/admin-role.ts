@@ -2,27 +2,51 @@ export interface Role {
   id: string;
   name: string;
   description: string | null;
+  createdAt: string;
   permissionsCount: number;
   usersCount: number;
+}
+
+export interface RoleListItem {
+  id: string;
+  name: string;
+  description: string | null;
   createdAt: string;
-  updatedAt: string;
+  permissionsCount: number;
+  usersCount: number;
+}
+
+export interface RoleDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+  permissions: RolePermissionDetail[];
+}
+
+export interface RolePermissionDetail {
+  id: string;
+  resource: string;
+  action: string;
+  description: string | null;
 }
 
 export interface CreateRoleData {
   name: string;
   description?: string;
+  permissionIds?: string[];
 }
 
-export type UpdateRoleData = Partial<CreateRoleData>;
+export interface UpdateRoleData {
+  name?: string;
+  description?: string | null;
+  permissionIds?: string[];
+}
 
-export interface RolesResponse {
-  data: Role[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+export interface RoleDeleteResult {
+  deleted: boolean;
+  affectedUsers: number;
+  warning?: string;
 }
 
 export interface RoleStats {
@@ -32,49 +56,35 @@ export interface RoleStats {
   totalRolesWithUsers: number;
 }
 
+// API Response Wrapper
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+//Permission Types
 export interface Permission {
   id: string;
-  name: string;
   resource: string;
   action: string;
-  description: string;
-}
-
-export interface PermissionGroup {
-  resource: string;
-  label: string;
-  icon: React.ElementType;
-  permissions: Permission[];
-}
-
-export interface RolePermissions {
-  roleId: string;
-  roleName: string;
-  roleDescription: string | null;
-  permissionIds: string[];
-}
-
-export interface UpdateRolePermissionsData {
-  roleId: string;
-  permissionIds: string[];
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  roles: Role[];
+  description: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface AssignRoleData {
-  userId: string;
-  roleId: string;
+export interface PermissionGroup {
+  resource: string;
+  permissions: Permission[];
 }
 
-export interface RemoveRoleData {
-  userId: string;
+export interface RolePermissionsResponse {
   roleId: string;
+  roleName: string;
+  permissions: Permission[];
 }

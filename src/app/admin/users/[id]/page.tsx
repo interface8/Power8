@@ -1,11 +1,11 @@
 "use client";
 
 import { UserRolesSection } from "@/components/admin/roles/user-role-assign/UserRolesSection";
-import { dummyRoles } from "@/data/roles-data";
 import { Role } from "@/types/admin-role";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAdminUser, useUpdateUserStatus } from "@/hooks/use-admin-users";
+import { dummyRoles } from "@/data/roles-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
