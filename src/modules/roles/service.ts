@@ -5,10 +5,28 @@ import type {
   RoleDeleteResult,
   RoleDetailDto,
   RoleListItemDto,
+  RoleStatsDto,
 } from "./types";
 
 export async function listRolesAdmin(): Promise<RoleListItemDto[]> {
   return roleRepo.findAllRolesAdmin();
+}
+
+export async function getRoleStatsAdmin(): Promise<RoleStatsDto> {
+  const roles = await roleRepo.findAllRolesAdmin();
+  const totalRoles = roles.length;
+  const totalPermissions = roles.reduce((sum, role) => sum + role.permissionsCount, 0);
+  const totalUserAssignments = roles.reduce((sum, role) => sum + role.usersCount, 0);
+  const rolesWithUsers = roles.filter((role) => role.usersCount > 0).length;
+
+  return {
+    totalRoles,
+    totalPermissions,
+    totalUserAssignments,
+    rolesWithUsers,
+    rolesWithoutUsers: totalRoles - rolesWithUsers,
+    roles,
+  };
 }
 
 export async function getRoleDetailsByIdAdmin(
