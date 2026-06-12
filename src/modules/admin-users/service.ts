@@ -27,6 +27,13 @@ export async function getUserRolesById(userId: string) {
   return repo.findUserRolesByUserId(userId);
 }
 
+export async function getAvailableRolesForUser(userId: string) {
+  const user = await repo.findUserById(userId);
+  if (!user) throw new Error("User not found");
+
+  return repo.findRolesNotAssignedToUser(userId);
+}
+
 export async function assignRoleToUser(userId: string, roleId: string) {
   const user = await repo.findUserById(userId);
   if (!user) throw new Error("User not found");
