@@ -288,6 +288,29 @@ export async function findUserRolesByUserId(
   return user.roles.map((ur) => mapRole(ur.role));
 }
 
+export async function findRolesNotAssignedToUser(
+  userId: string,
+): Promise<AdminUserRoleDto[]> {
+  const roles = await prisma.role.findMany({
+    where: {
+      users: {
+        none: {
+          userId,
+        },
+      },
+    },
+    include: {
+      permissions: {
+        include: {
+          permission: true,
+        },
+      },
+    },
+  });
+
+  return roles.map((role) => mapRole(role));
+}
+
 export async function assignRoleToUser(userId: string, roleId: string) {
   await prisma.userRole.create({
     data: {

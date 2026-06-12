@@ -37,6 +37,15 @@ export interface RoleDeleteResult {
   warning?: string;
 }
 
+export interface RoleStatsDto {
+  totalRoles: number;
+  totalPermissions: number;
+  totalUserAssignments: number;
+  rolesWithUsers: number;
+  rolesWithoutUsers: number;
+  roles: RoleListItemDto[];
+}
+
 export interface CreateRoleInput {
   name: string;
   description?: string;
