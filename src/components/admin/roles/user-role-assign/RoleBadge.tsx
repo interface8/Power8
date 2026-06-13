@@ -5,7 +5,7 @@ import { Role } from "@/types/admin-role";
 
 interface RoleBadgeProps {
   role: Role;
-  onRemove?: (roleId: string) => void;
+  onRemove?: () => void;
   canRemove?: boolean;
 }
 
@@ -15,7 +15,11 @@ export function RoleBadge({ role, onRemove, canRemove = true }: RoleBadgeProps) 
       <Shield className="h-3.5 w-3.5" />
       <span>{role.name}</span>
       {canRemove && onRemove && (
-        <button onClick={() => onRemove(role.id)} className="ml-1 rounded-full p-0.5 hover:bg-orange-200 transition-colors" aria-label={`Remove ${role.name} role`}>
+        <button
+          onClick={onRemove}
+          className="ml-1 rounded-full p-0.5 hover:bg-orange-200 transition-colors"
+          aria-label={`Remove ${role.name} role`}
+        >
           <X className="h-3 w-3" />
         </button>
       )}
