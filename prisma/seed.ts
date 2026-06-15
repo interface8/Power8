@@ -134,12 +134,13 @@ const customerRole = await prisma.role.upsert({
 console.log("  ✅ Customer role created");
 
   // ─── 4. Create Admin User ───────────────────────────
-  const hashedPassword = await hash("admin123", 12);
+  const hashedPassword = await hash("Admin.123", 12);
 
   const adminUser = await prisma.user.upsert({
   where: { email: "admin@power8.dev" },
   update: {
     phone: "+10000000001",
+    password: hashedPassword,
   },
   create: {
     email: "admin@power8.dev",
