@@ -40,7 +40,7 @@ export async function initiatePayment(
   const reference = `PAY-${randomUUID()}`;
 
   // Create a pending-style payment record (status FAILED until webhook confirms)
-  const payment = await paymentRepo.createPayment({
+  await paymentRepo.createPayment({
     userId,
     orderId: input.orderId,
     amount,
@@ -48,13 +48,26 @@ export async function initiatePayment(
     status: "FAILED",
   });
 
+  // ─── TEMP: payment-gateway bypass (testing only) ───────────────────────────
+  // No gateway provider wired up yet, so no webhook will ever fire. Auto-confirm
+  // the payment immediately by running the same logic the real webhook would,
+  // which advances the order (and credit schedules) just like a real payment.
+  // DELETE this block and uncomment the return below once a provider is added.
+  const confirmed = await handleWebhook(reference);
+  return {
+    payment: confirmed,
+    reference,
+  };
+  // ───────────────────────────────────────────────────────────────────────────
+
   // In a real app, you'd call Paystack/Flutterwave here to initialize
   // and return their checkout URL. For now, return the reference.
-  return {
-    payment,
-    reference,
-    // checkoutUrl: "https://paystack.com/pay/..." ← would come from provider
-  };
+  // (When restoring, capture the record above: `const payment = await paymentRepo.createPayment(...)`)
+  // return {
+  //   payment,
+  //   reference,
+  //   // checkoutUrl: "https://paystack.com/pay/..." ← would come from provider
+  // };
 }
 
 export async function handleWebhook(reference: string) {
