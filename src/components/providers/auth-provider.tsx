@@ -8,6 +8,7 @@ type User = {
   name: string;
   email: string;
   permissions: string[];
+  roles: string[];
 };
 
 type RegisterInput = {
@@ -21,9 +22,8 @@ type AuthContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   hasPermission: (permission: string) => boolean;
-
   register: (data: RegisterInput) => Promise<void>;
-  loading: boolean;
+  loading: boolean; // Now this will be true during initial auth check
   error: string | null;
 };
 
@@ -35,7 +35,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   /* ===== PERMISSION CHECK ===== */
@@ -48,12 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        setLoading(true);
         const res = await fetch("/api/auth/me");
         const data = await res.json();
 
         setUser(res.ok ? data.user : null);
       } catch {
         setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
 

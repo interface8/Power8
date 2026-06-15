@@ -3,12 +3,15 @@ import { useEffect } from "react";
 
 export interface Testimonial {
   id: string;
+   title: string;
   rating: number;
   description: string;
   createdAt: string;
   updatedAt: string;
   userId: string;
+  location?: string;
   imageUrl?: string;
+  role?: string;
   user: {
     id: string;
     name: string;

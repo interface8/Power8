@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sun, User, Mail, Phone, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Sun, User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/components/providers/auth-provider";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const { register, loading, error } = useAuth();
 
   const [name, setName] = useState("");
@@ -18,12 +20,15 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
+  
+  // Password visibility states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateName = (name: string) => {
     if (!name) return "Full name is required";
@@ -59,6 +64,9 @@ export default function RegisterPage() {
     }
 
     await register({ name, email, phone, password });
+    
+    // Redirect to login page after successful registration
+    router.push("/login");
   }
 
   const isFormValid =
@@ -168,31 +176,45 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {/* Password with eye icon */}
           <div>
             <Label>Password</Label>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setPasswordError(validatePassword(e.target.value));
                 }}
-                className="pl-10 h-11 bg-gray-50"
+                className="pl-10 pr-10 h-11 bg-gray-50"
+                placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <Eye className="w-4 h-4 text-gray-400" />
+                )}
+              </button>
             </div>
             {passwordError && (
               <p className="text-xs text-red-500 mt-1">{passwordError}</p>
             )}
           </div>
 
+          {/* Confirm Password with eye icon */}
           <div>
             <Label>Confirm Password</Label>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
@@ -200,8 +222,20 @@ export default function RegisterPage() {
                     e.target.value !== password ? "Passwords do not match" : "",
                   );
                 }}
-                className="pl-10 h-11 bg-gray-50"
+                className="pl-10 pr-10 h-11 bg-gray-50"
+                placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <Eye className="w-4 h-4 text-gray-400" />
+                )}
+              </button>
             </div>
             {confirmError && (
               <p className="text-xs text-red-500 mt-1">{confirmError}</p>

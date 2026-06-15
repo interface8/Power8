@@ -10,6 +10,7 @@ export type Product = {
   warranty: number;
   capacity: number;
   imageUrl: string | null;
+  imageUrls: string[];
   stockQuantity: number;
   isActive: boolean;
   createdAt: string;
@@ -21,6 +22,8 @@ export interface ProductFilters {
   categoryId?: string;
   companyId?: string;
   minCapacity?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface ProductCategory {
@@ -28,6 +31,7 @@ export interface ProductCategory {
   name: string;
   description: string | null;
   sort: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }

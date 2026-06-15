@@ -10,6 +10,7 @@ function toCategoryDto(category: {
   name: string;
   description: string | null;
   sort: number;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): ProductCategoryDto {
@@ -18,13 +19,15 @@ function toCategoryDto(category: {
     name: category.name,
     description: category.description,
     sort: category.sort,
+    isActive: category.isActive,
     createdAt: category.createdAt,
     updatedAt: category.updatedAt,
   };
 }
 
-export async function findCategories(): Promise<ProductCategoryDto[]> {
+export async function findCategories(activeOnly?: boolean): Promise<ProductCategoryDto[]> {
   const categories = await prisma.productCategory.findMany({
+    where: activeOnly ? { isActive: true } : {},
     orderBy: { sort: "asc" },
   });
   return categories.map(toCategoryDto);
@@ -64,3 +67,7 @@ export async function findCategoryByName(name: string): Promise<ProductCategoryD
   return category ? toCategoryDto(category) : null;
 }
 
+export async function categoryHasProducts(categoryId: string): Promise<boolean> {
+  const count = await prisma.product.count({ where: { categoryId } });
+  return count > 0;
+}

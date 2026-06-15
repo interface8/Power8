@@ -8,9 +8,10 @@ import { useProductCategories } from "@/hooks/use-product-categories";
 import { useCart } from "@/hooks/use-cart";
 
 export default function ProductsPage() {
-  const { products, loading, fetchProducts } = useProducts();
+  const { products, loading, fetchProducts, pagination } = useProducts();
   const { companies } = useCompanies();
   const { categories } = useProductCategories();
+  const activeCategories = categories.filter(cat => cat.isActive === true);
   const { addToCart } = useCart();
 
   return (
@@ -19,24 +20,28 @@ export default function ProductsPage() {
       <ProductsContent
         products={products}
         loading={loading}
-        categories={categories}
+        categories={activeCategories}
         companies={companies}
         onAddToCart={(productId, quantity = 1) => {
           const product = products.find((p) => p.id === productId);
 
           if (!product) return Promise.resolve(false);
 
+          // Use first image from imageUrls array, fallback to imageUrl
+          const productImage = product.imageUrls?.[0] || product.imageUrl || "";
+
           return addToCart(
             {
               productId: product.id,
               productName: product.name,
               price: product.price,
-              productImage: product.imageUrl ?? "",
+              productImage: productImage,
             },
             quantity
           );
         }}
         fetchProducts={fetchProducts}
+        pagination={pagination}
       />
     </div>
   );

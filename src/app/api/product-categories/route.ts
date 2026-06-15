@@ -1,12 +1,16 @@
 import { NextRequest } from "next/server";
 import { categoryService, createProductCategorySchema } from "@/modules/product-categories";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
-// GET /api/product-categories — list all (sorted by sort field)
-export async function GET() {
+// GET /api/product-categories - list all (sorted by sort field)
+// Use ?activeOnly=true to get only active categories
+export async function GET(request: NextRequest) {
   try {
-    const categories = await categoryService.listCategories();
+    const { searchParams } = new URL(request.url);
+    const activeOnly = searchParams.get("activeOnly") === "true";
+
+    const categories = await categoryService.listCategories(activeOnly);
     return jsonResponse({ data: categories });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to fetch categories";
@@ -16,7 +20,7 @@ export async function GET() {
 
 // POST /api/product-categories — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("product-categories.create");
+  const guard = await requireApiPermissionFor("product-categories", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

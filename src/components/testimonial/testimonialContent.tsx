@@ -5,6 +5,7 @@ import StatsSummary from "./StatsSummary";
 import TestimonialCard from "./testimonialCard";
 import CTASection from "./CTASection";
 import type { Testimonial } from "@/hooks/use-testimonials";
+import TestimonialForm from "./TestimonialForm";
 
 interface TestimonialContentProps {
   testimonials: Testimonial[];
@@ -70,10 +71,15 @@ export default function TestimonialContent({
 
       {/* Loading State */}
       {loading && (
-        <div className="flex justify-center items-center py-24">
-          <p className="text-sm text-gray-600">Loading...</p>
-        </div>
-      )}
+  <div className="flex justify-center items-center py-24">
+    <div className="flex flex-col items-center gap-3">
+      {/* Spinner */}
+      <div className="w-10 h-10 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
+      {/* Pulsing text */}
+      <p className="text-sm text-gray-500 animate-pulse">Loading testimonials...</p>
+    </div>
+  </div>
+)}
 
       {/* Error State */}
       {error && (
@@ -103,9 +109,9 @@ export default function TestimonialContent({
                 key={testimonial.id}
                 rating={String(testimonial.rating)}
                 quote={testimonial.description}
-                name={testimonial.user.name}
-                role="Small Business Owner"
-                location="Lagos, Nigeria"
+                name={testimonial.title}
+                role={testimonial.role || "Customer"}
+                location={testimonial.location || "Location not specified"}
                 system=""
                 savings=""
                 imageUrl={
@@ -123,6 +129,10 @@ export default function TestimonialContent({
           <p className="text-xl text-gray-600">No testimonials yet.</p>
         </div>
       )}
+
+      <div className="px-4 sm:px-6 lg:px-8">
+        <TestimonialForm />
+      </div>
 
       <div className="flex justify-center items-center pb-24 mt-16">
         <CTASection />

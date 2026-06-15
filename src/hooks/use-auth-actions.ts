@@ -33,7 +33,7 @@ export function useAuthActions() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // 🔥 important for cookie/session auth
+        credentials: "include", 
         body: JSON.stringify(credentials),
       });
 
@@ -45,7 +45,7 @@ export function useAuthActions() {
         return { success: false };
       }
 
-      // 🔥 CRITICAL: update global auth state immediately
+      //  CRITICAL: update global auth state immediately
       setUser(data.user);
 
       toast.success(data.message ?? "Login successful");
@@ -53,7 +53,7 @@ export function useAuthActions() {
       // small delay ensures state propagates before navigation
       setTimeout(() => {
         router.push("/");
-        router.refresh(); // 🔥 forces navbar re-render sync
+        router.refresh(); //  forces navbar re-render sync
       }, 50);
 
       return { success: true };
@@ -87,7 +87,7 @@ export function useAuthActions() {
         return { success: false };
       }
 
-      // 🔥 set auth immediately after register
+      //  set auth immediately after register
       setUser(data.user);
 
       toast.success(data.message ?? "Registration successful");
@@ -112,19 +112,19 @@ export function useAuthActions() {
   setLoading(true);
 
   try {
-    // ✅ 1. Immediately update UI
+    // Immediately update UI
     setUser(null);
 
-    // ✅ 2. Call backend to clear session
+    // Call backend to clear session
     await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
 
-    // ✅ 3. Navigate AFTER state change
+    
     router.replace("/");
 
-    // ✅ 4. Force React + Next to re-render everything
+
     router.refresh();
 
     toast.success("Logged out");

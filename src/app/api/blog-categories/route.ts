@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { blogService, createBlogCategorySchema } from "@/modules/blogs";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/blog-categories — list all
@@ -16,7 +16,7 @@ export async function GET() {
 
 // POST /api/blog-categories — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("blog-categories.create");
+  const guard = await requireApiPermissionFor("blog-categories", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

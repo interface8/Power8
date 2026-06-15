@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { bundleService, createBundleSchema } from "@/modules/bundles";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/bundles — public
@@ -17,7 +17,7 @@ export async function GET() {
 
 // POST /api/bundles — admin
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("bundles.create");
+  const guard = await requireApiPermissionFor("bundles", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

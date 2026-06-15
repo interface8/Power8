@@ -1,15 +1,16 @@
 import { NextRequest } from "next/server";
-import { permissionService, createPermissionSchema } from "@/modules/permissions";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import * as permissionsModule from "@/modules/permissions";
+import { createPermissionSchema } from "@/modules/permissions";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/permissions
 export async function GET() {
-  const guard = await requireApiPermission("permissions.read");
+  const guard = await requireApiPermissionFor("permissions", "read");
   if (isErrorResponse(guard)) return guard;
 
   try {
-    const permissions = await permissionService.listPermissions();
+    const permissions = await permissionsModule.permissionService.listPermissions();
     return jsonResponse(permissions);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to fetch permissions";
@@ -19,7 +20,7 @@ export async function GET() {
 
 // POST /api/permissions
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("permissions.create");
+  const guard = await requireApiPermissionFor("permissions", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const permission = await permissionService.createPermission(parsed.data);
+    const permission = await permissionsModule.permissionService.createPermission(parsed.data);
     return jsonResponse(permission, 201);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to create permission";

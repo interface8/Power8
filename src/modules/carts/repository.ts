@@ -18,7 +18,7 @@ function toCartDto(cart: {
     quantity: number;
     product: {
       name: string;
-      imageUrl: string | null;
+      imageUrls: string[];
       price: { toNumber: () => number };
     };
   }>;
@@ -27,7 +27,7 @@ function toCartDto(cart: {
     id: item.id,
     productId: item.productId,
     productName: item.product.name,
-    productImage: item.product.imageUrl,
+    productImage: item.product.imageUrls[0] || null,
     price: item.product.price.toNumber(),
     quantity: item.quantity,
     subtotal: item.product.price.toNumber() * item.quantity,
@@ -114,4 +114,3 @@ export async function deleteCartItem(
 
   return cart ? toCartDto(cart) : null;
 }
-

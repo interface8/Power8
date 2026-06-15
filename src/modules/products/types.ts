@@ -1,3 +1,5 @@
+export type ProductStockStatus = "IN_STOCK" | "OUT_OF_STOCK" | "LOW_STOCK";
+
 export interface ProductDto {
   id: string;
   name: string;
@@ -10,6 +12,7 @@ export interface ProductDto {
   warranty: number;
   capacity: number;
   imageUrl: string | null;
+  imageUrls: string[];
   stockQuantity: number;
   isActive: boolean;
   createdAt: Date;
@@ -25,6 +28,7 @@ export interface CreateProductInput {
   warranty: number;
   capacity: number;
   imageUrl?: string;
+  imageUrls?: string[];
   stockQuantity?: number;
   isActive?: boolean;
 }
@@ -36,4 +40,19 @@ export interface ProductFilters {
   categoryId?: string;
   companyId?: string;
   minCapacity?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedProducts {
+  products: ProductDto[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export interface AdminProductFilters extends ProductFilters {
+  isActive?: boolean;
+  stockStatus?: ProductStockStatus;
+  lowStockThreshold?: number;
 }

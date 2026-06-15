@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { roleService, createRoleSchema } from "@/modules/roles";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/roles — List all roles (permission: roles.read)
 export async function GET() {
-  const guard = await requireApiPermission("roles.read");
+  const guard = await requireApiPermissionFor("roles", "read");
   if (isErrorResponse(guard)) return guard;
 
   try {
@@ -19,7 +19,7 @@ export async function GET() {
 
 // POST /api/roles — Create role (permission: roles.create)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("roles.create");
+  const guard = await requireApiPermissionFor("roles", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

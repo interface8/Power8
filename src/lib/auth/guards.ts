@@ -61,6 +61,33 @@ export async function requireApiPermission(
 }
 
 /**
+ * API route guard that checks a specific resource.action permission.
+ * Returns the `SessionUser` when allowed, or a `Response` (401/403) when not.
+ */
+export async function requireApiPermissionFor(
+  resource: string,
+  action: string,
+): Promise<SessionUser | Response> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return errorResponse("Unauthorized", 401);
+  }
+
+  // Use the DB-backed check for authoritative permission resolution
+  const allowed = await hasPermission(user.id, resource, action);
+
+  if (!allowed) {
+    return errorResponse(
+      `Forbidden: missing permission ${resource}.${action}`,
+      403,
+    );
+  }
+
+  return user;
+}
+
+/**
  * API route guard that only checks authentication.
  */
 export async function requireApiAuth(): Promise<SessionUser | Response> {

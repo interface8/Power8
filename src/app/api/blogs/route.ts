@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { blogService, blogFiltersSchema, createBlogSchema } from "@/modules/blogs";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/blogs — list with filters (public: only published; admin: all)
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/blogs — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("blogs.create");
+  const guard = await requireApiPermissionFor("blogs", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

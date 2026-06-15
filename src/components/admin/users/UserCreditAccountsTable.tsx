@@ -1,0 +1,44 @@
+import { CreditAccountType, formatCurrency } from "./utils";
+
+interface UserCreditAccountsTableProps {
+  creditAccounts: CreditAccountType[];
+}
+
+export function UserCreditAccountsTable({ creditAccounts }: UserCreditAccountsTableProps) {
+  if (creditAccounts.length === 0) {
+    return (
+      <div className="text-center py-12 text-gray-400 text-sm">
+        No credit accounts found
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full min-w-125">
+      <table className="w-full table-fixed">
+        <thead>
+          <tr className="border-b border-gray-200">
+            <th className="text-left pb-3 text-xs sm:text-sm font-medium text-gray-500">ACCOUNT ID</th>
+            <th className="text-left pb-3 text-xs sm:text-sm font-medium text-gray-500">TOTAL</th>
+            <th className="text-left pb-3 text-xs sm:text-sm font-medium text-gray-500">BALANCE</th>
+            <th className="text-left pb-3 text-xs sm:text-sm font-medium text-gray-500">STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {creditAccounts.map((account) => (
+            <tr key={account.id} className="border-b border-gray-50">
+              <td className="py-3 text-xs sm:text-sm text-gray-600 truncate">{account.id}</td>
+              <td className="py-3 text-xs sm:text-sm text-gray-600">{formatCurrency(account.totalAmount)}</td>
+              <td className="py-3 text-xs sm:text-sm text-gray-600">{formatCurrency(account.balanceRemaining)}</td>
+              <td className="py-3">
+                <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs sm:text-sm">
+                  {account.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

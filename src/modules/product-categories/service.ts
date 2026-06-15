@@ -4,8 +4,8 @@ import type {
   UpdateProductCategoryInput,
 } from "./types";
 
-export async function listCategories() {
-  return categoryRepo.findCategories();
+export async function listCategories(activeOnly?: boolean) {
+  return categoryRepo.findCategories(activeOnly);
 }
 
 export async function getCategoryById(id: string) {
@@ -35,5 +35,17 @@ export async function deleteCategory(id: string) {
   if (!(await categoryRepo.categoryExists(id))) {
     throw new Error("Category not found");
   }
+  return categoryRepo.deleteCategory(id);
+}
+
+export async function deleteCategoryAdmin(id: string) {
+  if (!(await categoryRepo.categoryExists(id))) {
+    throw new Error("Category not found");
+  }
+
+  if (await categoryRepo.categoryHasProducts(id)) {
+    throw new Error("Category has products");
+  }
+
   return categoryRepo.deleteCategory(id);
 }

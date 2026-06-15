@@ -5,6 +5,9 @@ export async function getTestimonials(): Promise<
   Array<Testimonial & { user: Pick<User, "id" | "name"> }>
 > {
   return prisma.testimonial.findMany({
+    where: {
+  status: "approved"
+},
     include: {
       user: {
         select: {
@@ -12,6 +15,28 @@ export async function getTestimonials(): Promise<
           name: true,
         },
       },
+    },
+  });
+}
+export async function createTestimonial(data: {
+  title: string;
+  description: string;
+  role?: string | null;
+  rating?: number;
+   location?: string | null; 
+  imageUrl?: string | null;
+  userId: string;
+}) {
+  return prisma.testimonial.create({
+    data: {
+      title: data.title,
+      description: data.description,
+      role: data.role || null,
+      rating: data.rating || null,
+      imageUrl: data.imageUrl || null, 
+      location: data.location || null,
+      status: "pending",
+      userId: data.userId,
     },
   });
 }

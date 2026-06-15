@@ -12,6 +12,7 @@ import {
   Sun,
   ArrowLeft,
   Package,
+  LayoutDashboard,
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "../providers/cart-providers";
@@ -25,7 +26,7 @@ function getInitials(name?: string) {
 
 export function DashboardNavbar() {
   const { user, setUser } = useAuth();
-  const { count } = useCart(); 
+  const { count } = useCart();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -75,7 +76,7 @@ export function DashboardNavbar() {
 
       {/* Right side */}
       <div className="flex items-center">
-       <Link
+        <Link
           href="/products"
           className="relative flex items-center px-2 py-1 rounded-lg hover:bg-green-100 hover:shadow-lg transition"
         >
@@ -151,8 +152,24 @@ export function DashboardNavbar() {
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <ArrowLeft className="w-4 h-4 text-gray-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-800">Home</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    Home
+                  </span>
                 </button>
+
+                {user?.roles?.includes("admin") && (
+                  <button
+                    onClick={() => handleNavigate("/admin/dashboard")}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 rounded-lg"
+                  >
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <LayoutDashboard className="w-4 h-4 text-purple-600 " />
+                    </div>
+                    <span className="text-sm font-medium text-gray-800">
+                      Admin Dashboard
+                    </span>
+                  </button>
+                )}
 
                 <button
                   onClick={() => handleNavigate("/calculator")}
@@ -161,7 +178,9 @@ export function DashboardNavbar() {
                   <div className="p-2 bg-orange-100 rounded-lg">
                     <Calculator className="w-4 h-4 text-orange-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-800">Calculator</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    Calculator
+                  </span>
                 </button>
 
                 <button
@@ -171,7 +190,9 @@ export function DashboardNavbar() {
                   <div className="p-2 bg-blue-100 rounded-lg">
                     <Package className="w-4 h-4 text-blue-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-800">Browse Products</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    Browse Products
+                  </span>
                 </button>
               </div>
 
@@ -186,7 +207,9 @@ export function DashboardNavbar() {
                   <div className="p-2 bg-red-50 rounded-lg">
                     <LogOut className="w-4 h-4 text-red-600" />
                   </div>
-                  <span className="text-sm font-medium text-red-600">Log out</span>
+                  <span className="text-sm font-medium text-red-600">
+                    Log out
+                  </span>
                 </button>
               </div>
             </div>

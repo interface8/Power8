@@ -1,4 +1,4 @@
-import { Card, CardContent, CardFooter } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 import { Quote, Star } from "lucide-react";
 
@@ -11,6 +11,7 @@ interface TestimonialCardProps {
   system: string;
   savings: string;
   imageUrl?: string;
+  
 }
 
 export default function TestimonialCard({
@@ -19,13 +20,11 @@ export default function TestimonialCard({
   name,
   role,
   location,
-  system,
-  savings,
   imageUrl,
 }: TestimonialCardProps) {
   return (
     <Card className="w-full max-w-[420px] h-full hover:shadow-xl transition-all duration-300 border border-[#F05700]/20 bg-white rounded-3xl overflow-hidden flex flex-col">
-      <CardContent className="pt-10 pb-6 px-7 flex-1">
+      <CardContent className="pt-10 pb-6 px-7 flex-1 flex flex-col">
         {/* Quote Icon + Stars */}
         <div className="flex mb-15">
           <Quote className="text-orange-200 w-9 h-9 shrink-0" />
@@ -48,8 +47,8 @@ export default function TestimonialCard({
           {quote}
         </p>
 
-        {/* Profile Section */}
-        <div className="flex items-center gap-4">
+        {/* Profile Section - stays at bottom */}
+        <div className="flex items-center gap-4 mt-auto pb-7">
           <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-orange-300">
             {imageUrl ? (
               <Image
@@ -69,26 +68,12 @@ export default function TestimonialCard({
           <div className="leading-tight">
             <h4 className="font-semibold text-xl text-gray-900">{name}</h4>
             <p className="text-gray-600 text-lg">{role}</p>
-            <p className="text-gray-500 text-sm">{location}</p>
+            <p className="text-gray-500 text-sm">{location || "Location not specified"}</p>
           </div>
         </div>
       </CardContent>
 
-      {/* Footer - System & Savings */}
-      <CardFooter className="border-t border-orange-200 bg-white px-7 py-5 flex flex-col gap-3 text-sm pb-17 pt-2">
-        <div className="flex justify-between w-full">
-          <span className="text-gray-500 font-medium text-lg">System:</span>
-          <span className="font-medium text-gray-800 text-lg">
-            {system || "10kW Premium System"}
-          </span>
-        </div>
-        <div className="flex justify-between w-full">
-          <span className="text-gray-500 font-medium text-lg">Annual Savings:</span>
-          <span className="font-semibold text-green-600 text-lg">
-            {savings || "₦850,000/year"}
-          </span>
-        </div>
-      </CardFooter>
+     
     </Card>
   );
 }

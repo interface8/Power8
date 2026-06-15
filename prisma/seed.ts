@@ -9,53 +9,136 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // ─── 1. Create Permissions ───────────────────────────
-  const permissionDefs = [
+ // ─── 1. Create Permissions ────────────────────────────────────────────────
+  const legacyPermissionDefs = [
     // Users
     { resource: "users", action: "create", description: "Create users" },
     { resource: "users", action: "read", description: "View users" },
     { resource: "users", action: "update", description: "Update users" },
     { resource: "users", action: "delete", description: "Delete users" },
+
     // Roles
     { resource: "roles", action: "create", description: "Create roles" },
     { resource: "roles", action: "read", description: "View roles" },
     { resource: "roles", action: "update", description: "Update roles" },
     { resource: "roles", action: "delete", description: "Delete roles" },
+
     // Permissions
     { resource: "permissions", action: "create", description: "Create permissions" },
     { resource: "permissions", action: "read", description: "View permissions" },
     { resource: "permissions", action: "update", description: "Update permissions" },
     { resource: "permissions", action: "delete", description: "Delete permissions" },
+
     // Bundles
     { resource: "bundles", action: "create", description: "Create bundles" },
     { resource: "bundles", action: "update", description: "Update bundles" },
+
     // Companies
     { resource: "companies", action: "create", description: "Create companies" },
     { resource: "companies", action: "update", description: "Update companies" },
     { resource: "companies", action: "delete", description: "Delete companies" },
+
     // Products
     { resource: "products", action: "create", description: "Create products" },
     { resource: "products", action: "update", description: "Update products" },
     { resource: "products", action: "delete", description: "Delete products" },
+
     // Blogs
     { resource: "blogs", action: "create", description: "Create blogs" },
     { resource: "blogs", action: "update", description: "Update blogs" },
     { resource: "blogs", action: "delete", description: "Delete blogs" },
+
     // Blog Categories
     { resource: "blog-categories", action: "create", description: "Create blog categories" },
+
     // Product Categories
     { resource: "product-categories", action: "create", description: "Create product categories" },
     { resource: "product-categories", action: "update", description: "Update product categories" },
     { resource: "product-categories", action: "delete", description: "Delete product categories" },
+
     // Systems
     { resource: "systems", action: "control", description: "Control solar systems" },
   ];
 
+  const newPermissionDefs = [
+    { resource: "dashboard", action: "view_stats", description: "View dashboard stats" },
+
+    { resource: "orders", action: "view_list", description: "View order list" },
+    { resource: "orders", action: "view_detail", description: "View order details" },
+    { resource: "orders", action: "update_status", description: "Update order status" },
+
+    { resource: "credit_accounts", action: "view_list", description: "View credit account list" },
+    { resource: "credit_accounts", action: "view_detail", description: "View credit account details" },
+    { resource: "credit_accounts", action: "update_status", description: "Update credit account status" },
+
+    { resource: "products", action: "view", description: "View products" },
+    { resource: "products", action: "create", description: "Create products" },
+    { resource: "products", action: "edit", description: "Edit products" },
+    { resource: "products", action: "delete", description: "Delete products" },
+    { resource: "products", action: "update_stock", description: "Update product stock" },
+
+    { resource: "categories", action: "view", description: "View categories" },
+    { resource: "categories", action: "create", description: "Create categories" },
+    { resource: "categories", action: "edit", description: "Edit categories" },
+    { resource: "categories", action: "delete", description: "Delete categories" },
+
+    { resource: "bundles", action: "view", description: "View bundles" },
+    { resource: "bundles", action: "create", description: "Create bundles" },
+    { resource: "bundles", action: "edit", description: "Edit bundles" },
+    { resource: "bundles", action: "delete", description: "Delete bundles" },
+
+    { resource: "users", action: "view_list", description: "View users list" },
+    { resource: "users", action: "view_detail", description: "View user details" },
+    { resource: "users", action: "update_status", description: "Update user status" },
+
+    { resource: "solar_systems", action: "view_list", description: "View solar systems list" },
+    { resource: "solar_systems", action: "enable", description: "Enable solar system" },
+    { resource: "solar_systems", action: "limit", description: "Limit solar system" },
+    { resource: "solar_systems", action: "disable", description: "Disable solar system" },
+    { resource: "solar_systems", action: "view_logs", description: "View solar system logs" },
+
+    { resource: "carousel", action: "view", description: "View carousel slides" },
+    { resource: "carousel", action: "create", description: "Create carousel slides" },
+    { resource: "carousel", action: "edit", description: "Edit carousel slides" },
+    { resource: "carousel", action: "delete", description: "Delete carousel slides" },
+
+    { resource: "testimonials", action: "view", description: "View testimonials" },
+    { resource: "testimonials", action: "approve", description: "Approve testimonials" },
+    { resource: "testimonials", action: "reject", description: "Reject testimonials" },
+
+    { resource: "blogs", action: "view", description: "View blogs" },
+    { resource: "blogs", action: "create", description: "Create blogs" },
+    { resource: "blogs", action: "edit", description: "Edit blogs" },
+    { resource: "blogs", action: "delete", description: "Delete blogs" },
+    { resource: "blogs", action: "publish", description: "Publish blogs" },
+
+    { resource: "blog_categories", action: "view", description: "View blog categories" },
+    { resource: "blog_categories", action: "create", description: "Create blog categories" },
+    { resource: "blog_categories", action: "edit", description: "Edit blog categories" },
+    { resource: "blog_categories", action: "delete", description: "Delete blog categories" },
+
+    { resource: "roles", action: "view", description: "View roles" },
+    { resource: "roles", action: "create", description: "Create roles" },
+    { resource: "roles", action: "edit", description: "Edit roles" },
+    { resource: "roles", action: "delete", description: "Delete roles" },
+
+    { resource: "permissions", action: "assign", description: "Assign permissions" },
+  ];
+
+    const permissionDefs = Array.from(
+    new Map(
+      [...legacyPermissionDefs, ...newPermissionDefs].map((def) => [
+        `${def.resource}.${def.action}`,
+        def,
+      ]),
+    ).values(),
+  );
+  
   const permissions = [];
   for (const def of permissionDefs) {
     const permission = await prisma.permission.upsert({
       where: { resource_action: { resource: def.resource, action: def.action } },
-      update: {},
+      update: { description: def.description },
       create: def,
     });
     permissions.push(permission);
@@ -102,8 +185,17 @@ async function main() {
     },
   });
 
-  const readPermissions = permissions.filter((p) => p.action === "read");
-  for (const perm of readPermissions) {
+  const viewActions = new Set([
+    "read",
+    "view",
+    "view_list",
+    "view_detail",
+    "view_logs",
+    "view_stats",
+  ]);
+
+  const viewerPermissions = permissions.filter((p) => viewActions.has(p.action));
+  for (const perm of viewerPermissions) {
     await prisma.rolePermission.upsert({
       where: {
         roleId_permissionId: {
@@ -233,11 +325,11 @@ const viewerUser = await prisma.user.upsert({
 
   // ─── 7. Create Product Categories ────────────────────
   const categoriesDefs = [
-    { name: "Solar Panels", description: "Photovoltaic solar panels", sort: 1 },
-    { name: "Inverters", description: "Power inverters for solar systems", sort: 2 },
-    { name: "Batteries", description: "Energy storage batteries", sort: 3 },
-    { name: "Charge Controllers", description: "Solar charge controllers", sort: 4 },
-    { name: "Accessories", description: "Cables, connectors, and mounting equipment", sort: 5 },
+    { name: "Solar Panels", description: "Photovoltaic solar panels", sort: 1, isActive: true },
+    { name: "Inverters", description: "Power inverters for solar systems", sort: 2, isActive: true },
+    { name: "Batteries", description: "Energy storage batteries", sort: 3, isActive: true },
+    { name: "Charge Controllers", description: "Solar charge controllers", sort: 4, isActive: true },
+    { name: "Accessories", description: "Cables, connectors, and mounting equipment", sort: 5, isActive: true },
   ];
 
   const createdCategories = [];
@@ -364,8 +456,8 @@ const viewerUser = await prisma.user.upsert({
       stockQuantity: 45,
     },
     {
-      name: "Out of Stock Panel",
-      description: "This product is intentionally out of stock for testing",
+      name: "400W Mono Solar Panel",
+      description: "Premium monocrystalline panel for commercial installations",
       categoryId: createdCategories[0].id,
       companyId: createdCompanies[0].id,
       price: 50000,
@@ -551,13 +643,15 @@ const viewerUser = await prisma.user.upsert({
 
   console.log("  ✅ Demo customer user created (customer@power8.dev / customer123)");
 
-  const testimonialDefs = [
+const testimonialDefs = [
   {
     title: "Adeola Ogunlesi",
     description: "Since installing Power-8, my electricity bills have dropped by 80%. The pay-small-small option made it affordable. Best investment I've made for my home!",
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/women/1.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Chidi Okonkwo",
@@ -565,6 +659,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/men/2.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Fatima Abubakar",
@@ -572,6 +668,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 4,
     imageUrl: "https://randomuser.me/api/portraits/women/3.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Oluwaseun Adeyemi",
@@ -579,6 +677,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/men/4.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Ngozi Eze",
@@ -586,6 +686,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/women/5.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
   {
     title: "Ibrahim Musa",
@@ -593,6 +695,8 @@ const viewerUser = await prisma.user.upsert({
     rating: 5,
     imageUrl: "https://randomuser.me/api/portraits/men/6.jpg",
     userId: customerUser.id,
+    role: null,
+    status: "pending",
   },
 ];
 
