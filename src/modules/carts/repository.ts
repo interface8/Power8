@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import type { CartDto } from "./types";
+import type { CartDto, AddToCartInput } from "./types";
 
 const cartWithItems = {
   include: {
     items: {
-      include: { product: true },
+      include: {
+        product: true,
+        bundle: true,
+      },
     },
   },
 } as const;
@@ -14,24 +17,41 @@ function toCartDto(cart: {
   userId: string;
   items: Array<{
     id: string;
-    productId: string;
+    itemType: string;
+    productId: string | null;
+    bundleId: string | null;
     quantity: number;
     product: {
       name: string;
       imageUrls: string[];
       price: { toNumber: () => number };
-    };
+    } | null;
+    bundle: {
+      name: string;
+      totalPrice: { toNumber: () => number };
+    } | null;
   }>;
 }): CartDto {
-  const items = cart.items.map((item) => ({
-    id: item.id,
-    productId: item.productId,
-    productName: item.product.name,
-    productImage: item.product.imageUrls[0] || null,
-    price: item.product.price.toNumber(),
-    quantity: item.quantity,
-    subtotal: item.product.price.toNumber() * item.quantity,
-  }));
+  const items = cart.items.map((item) => {
+    const price = item.product
+      ? item.product.price.toNumber()
+      : item.bundle
+        ? item.bundle.totalPrice.toNumber()
+        : 0;
+
+    return {
+      id: item.id,
+      itemType: item.itemType as "PRODUCT" | "BUNDLE",
+      productId: item.productId,
+      productName: item.product?.name ?? null,
+      productImage: item.product?.imageUrls[0] ?? null,
+      bundleId: item.bundleId,
+      bundleName: item.bundle?.name ?? null,
+      price,
+      quantity: item.quantity,
+      subtotal: price * item.quantity,
+    };
+  });
 
   return {
     cartId: cart.id,
@@ -51,22 +71,41 @@ export async function findCartByUserId(userId: string): Promise<CartDto | null> 
 
 export async function upsertCartItem(
   userId: string,
-  productId: string,
-  quantity: number,
+  input: AddToCartInput,
 ): Promise<CartDto> {
-  // Find or create the user's cart
   const cart = await prisma.cart.upsert({
     where: { userId },
     create: { userId },
     update: {},
   });
 
-  // Add item if new, update quantity if already exists
-  await prisma.cartItem.upsert({
-    where: { cartId_productId: { cartId: cart.id, productId } },
-    create: { cartId: cart.id, productId, quantity },
-    update: { quantity },
-  });
+  if (input.itemType === "PRODUCT" && input.productId) {
+    await prisma.cartItem.upsert({
+      where: {
+        cartId_productId: { cartId: cart.id, productId: input.productId },
+      },
+      create: {
+        cartId: cart.id,
+        itemType: "PRODUCT",
+        productId: input.productId,
+        quantity: input.quantity,
+      },
+      update: { quantity: input.quantity },
+    });
+  } else if (input.itemType === "BUNDLE" && input.bundleId) {
+    await prisma.cartItem.upsert({
+      where: {
+        cartId_bundleId: { cartId: cart.id, bundleId: input.bundleId },
+      },
+      create: {
+        cartId: cart.id,
+        itemType: "BUNDLE",
+        bundleId: input.bundleId,
+        quantity: input.quantity,
+      },
+      update: { quantity: input.quantity },
+    });
+  }
 
   const updatedCart = await prisma.cart.findUnique({
     where: { userId },
@@ -75,7 +114,6 @@ export async function upsertCartItem(
 
   return toCartDto(updatedCart!);
 }
-
 
 export async function updateCartItem(
   itemId: string,

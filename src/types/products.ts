@@ -48,9 +48,12 @@ export interface Company {
 
 export interface CartItem {
   id: string;
-  productId: string;
-  productName: string;
+  itemType: "PRODUCT" | "BUNDLE";
+  productId: string | null;
+  productName: string | null;
   productImage: string | null;
+  bundleId: string | null;
+  bundleName: string | null;
   price: number;
   quantity: number;
   subtotal: number;

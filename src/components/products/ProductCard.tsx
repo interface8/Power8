@@ -27,6 +27,7 @@ const ProductCard = ({ product }: Props) => {
     try {
       await addToCart(
         {
+          itemType: "PRODUCT",
           productId: product.id,
           productName: product.name,
           price: product.price,

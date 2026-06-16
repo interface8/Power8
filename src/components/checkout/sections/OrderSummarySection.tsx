@@ -7,7 +7,8 @@ import { formatCurrency } from "../checkoutUtils";
 interface OrderSummarySectionProps {
   items: {
     id: string;
-    productName: string;
+    productName: string | null;
+    bundleName: string | null;
     quantity: number;
     price: number;
   }[];

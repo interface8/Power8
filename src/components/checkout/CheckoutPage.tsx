@@ -24,21 +24,15 @@ import { IdentityVerificationSection } from "./sections/IdentityVerificationSect
 import { OrderSummarySection } from "./sections/OrderSummarySection";
 
 type PaymentMethod = "full" | "installment";
-
 type PaymentChannel = "bank_transfer" | "paystack" | "card";
 
 export default function CheckoutPage() {
   const router = useRouter();
-
   const { cart } = useCart();
 
   const [loading, setLoading] = useState(false);
-
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
-
-  const [paymentChannel, setPaymentChannel] =
-    useState<PaymentChannel>("paystack");
-
+  const [paymentChannel, setPaymentChannel] = useState<PaymentChannel>("paystack");
 
   const [installationAddress, setInstallationAddress] = useState<AddressData>({
     street: "",
@@ -63,7 +57,6 @@ export default function CheckoutPage() {
     bvn: "",
     nin: "",
   });
-
 
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
@@ -94,37 +87,27 @@ export default function CheckoutPage() {
   };
 
   const handleCreditChange = (field: keyof CreditDetails, value: number) => {
-    setCreditDetails((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setCreditDetails((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleIdentityChange = (field: keyof IdentityData, value: string) => {
-    setIdentity((prev) => ({
-      ...prev,
-      [field]: sanitizeInput(value),
-    }));
+    setIdentity((prev) => ({ ...prev, [field]: sanitizeInput(value) }));
   };
 
-
-  const items = useMemo(() => {
-    return cart?.items ?? [];
-  }, [cart]);
-
+  const items = useMemo(() => cart?.items ?? [], [cart]);
 
   /* -----------------------------
    PRICING
   ----------------------------- */
 
   const subtotal = useMemo(() => {
-    return items.reduce((acc, item) => {
-      return acc + (item.price ?? 0) * (item.quantity ?? 0);
-    }, 0);
+    return items.reduce(
+      (acc, item) => acc + (item.price ?? 0) * (item.quantity ?? 0),
+      0,
+    );
   }, [items]);
 
   const vat = subtotal * 0.075;
-
   const total = subtotal + vat;
 
   /* -----------------------------
@@ -144,9 +127,7 @@ export default function CheckoutPage() {
   ----------------------------- */
 
   const isBVNValid = validateBVN(identity.bvn);
-
   const isNINValid = validateNIN(identity.nin);
-
   const isIdentityVerified = isBVNValid && isNINValid;
 
   const isInstallationAddressValid =
@@ -174,50 +155,60 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     if (!canSubmit) {
       toast.error("Please complete all required fields");
-
       return;
     }
 
     try {
       setLoading(true);
 
-      const payload = {
-        paymentMethod,
-        paymentChannel,
+      // ── STEP 1: Build payload to match createOrderSchema ─────────────
+      const orderPayload = {
+        // "full" → "FULL", "installment" → "CREDIT"
+        paymentType: paymentMethod === "full" ? "FULL" : "CREDIT",
 
-        installationAddress: {
-          street: sanitizeInput(installationAddress.street),
-          city: sanitizeInput(installationAddress.city),
-          state: sanitizeInput(installationAddress.state),
-          phoneNumber: sanitizeInput(installationAddress.phoneNumber),
-        },
+        // Schema expects flat strings, not an object
+        installationAddress: sanitizeInput(installationAddress.street),
+        city: sanitizeInput(installationAddress.city),
+        state: sanitizeInput(installationAddress.state),
 
-        deliveryAddress: {
-          street: sanitizeInput(deliveryAddress.street),
-          city: sanitizeInput(deliveryAddress.city),
-          state: sanitizeInput(deliveryAddress.state),
-          phoneNumber: sanitizeInput(deliveryAddress.phoneNumber),
-        },
-
-        items,
-
-        pricing: {
-          subtotal,
-          vat,
-          total,
-        },
-
-        ...(paymentMethod === "installment" && {
-          creditDetails,
-          identity,
-          creditBreakdown,
-        }),
+        // Schema expects { itemType, productId?, bundleId?, quantity }
+        // Adjust item.itemType / item.productId / item.bundleId to match
+        // whatever field names your cart provider uses
+        items: items.map((item) => ({
+          itemType: item.itemType ?? "PRODUCT",       // "PRODUCT" | "BUNDLE"
+          productId: item.productId ?? undefined,
+          bundleId: item.bundleId ?? undefined,
+          quantity: item.quantity,
+        })),
       };
 
-      console.log("Checkout Payload:", payload);
+      // ── STEP 2: Create the order ──────────────────────────────────────
+      const orderRes = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderPayload),
+      });
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (!orderRes.ok) {
+        const errorData = await orderRes.json().catch(() => null);
+        throw new Error(errorData?.message ?? "Order creation failed");
+      }
 
+      const order = await orderRes.json();
+
+      // ── STEP 3: Initiate payment (bypass auto-confirms in dev) ────────
+      const paymentRes = await fetch("/api/payments/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+
+      if (!paymentRes.ok) {
+        const errorData = await paymentRes.json().catch(() => null);
+        throw new Error(errorData?.message ?? "Payment initiation failed");
+      }
+
+      // ── STEP 4: Done ──────────────────────────────────────────────────
       toast.success(
         paymentMethod === "full"
           ? "Order placed successfully"
@@ -225,16 +216,21 @@ export default function CheckoutPage() {
       );
 
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push(`/dashboard/orders/${order.id}`);
       }, 1800);
+
     } catch (error) {
       console.error(error);
-
-      toast.error("Something went wrong. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div
@@ -257,37 +253,19 @@ export default function CheckoutPage() {
           >
             Checkout
           </h1>
-
-          <p
-            className="
-              mt-2 text-sm text-gray-500
-              sm:text-base
-            "
-          >
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">
             Complete your order securely
           </p>
         </div>
 
-        <div
-          className="
-            grid grid-cols-1 gap-6
-            xl:grid-cols-3
-          "
-        >
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           {/* LEFT SIDE */}
-          <div
-            className="
-              space-y-6
-              xl:col-span-2
-            "
-          >
-            {/* PAYMENT METHOD */}
+          <div className="space-y-6 xl:col-span-2">
             <PaymentMethodSection
               paymentMethod={paymentMethod}
               onChange={handlePaymentMethodChange}
             />
 
-            {/* CREDIT DETAILS */}
             {paymentMethod === "installment" && (
               <>
                 <CreditDetailsSection
@@ -295,7 +273,6 @@ export default function CheckoutPage() {
                   values={creditDetails}
                   onChange={handleCreditChange}
                 />
-
                 <IdentityVerificationSection
                   values={identity}
                   onChange={handleIdentityChange}
@@ -305,13 +282,11 @@ export default function CheckoutPage() {
               </>
             )}
 
-            {/* PAYMENT CHANNEL */}
             <PaymentChannelSection
               paymentChannel={paymentChannel}
               onChange={handlePaymentChannelChange}
             />
 
-            {/* INSTALLATION ADDRESS */}
             <AddressSection
               title="Installation Address"
               description="Where the solar system will be installed"
@@ -319,7 +294,6 @@ export default function CheckoutPage() {
               onChange={handleInstallationAddressChange}
             />
 
-            {/* DELIVERY ADDRESS */}
             <AddressSection
               title="Delivery Address"
               description="Where the equipment should be delivered"
@@ -329,12 +303,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* RIGHT SIDE */}
-          <div
-            className="
-              xl:sticky xl:top-6
-              h-fit
-            "
-          >
+          <div className="xl:sticky xl:top-6 h-fit">
             <OrderSummarySection
               items={items}
               subtotal={subtotal}
@@ -359,20 +328,10 @@ export default function CheckoutPage() {
               shadow-sm
             "
           >
-            <h3
-              className="
-                text-lg font-semibold
-                text-gray-900
-              "
-            >
+            <h3 className="text-lg font-semibold text-gray-900">
               Your cart is empty
             </h3>
-
-            <p
-              className="
-                mt-2 text-sm text-gray-500
-              "
-            >
+            <p className="mt-2 text-sm text-gray-500">
               Add products to continue checkout
             </p>
           </div>

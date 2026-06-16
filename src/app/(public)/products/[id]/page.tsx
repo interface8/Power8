@@ -95,6 +95,7 @@ export default function ProductDetailsPage({
             console.log("Add to Cart clicked:", { productId, quantity, productName: product.name });
             return addToCart(
               {
+                itemType: "PRODUCT",
                 productId,
                 productName: product.name,
                 price: product.price,
