@@ -38,7 +38,7 @@ model Product {
   name          String
   description   String?
   categoryId    String
-  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   companyId     String
   company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   price         Decimal         @db.Decimal(10, 2)
