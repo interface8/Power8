@@ -32,6 +32,7 @@ export default function ProductsPage() {
 
           return addToCart(
             {
+              itemType: "PRODUCT",
               productId: product.id,
               productName: product.name,
               price: product.price,

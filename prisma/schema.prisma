@@ -57,26 +57,26 @@ model Product {
 }
 
 model Order {
-  id               String             @id @default(cuid())
-  userId           String
-  totalAmount      Decimal            @db.Decimal(10, 2)
-  paymentType      PaymentType
-  status           OrderStatus        @default(PENDING)
-  paymentStatus    OrderPaymentStatus @default(PENDING)
-  shippingStatus   ShippingStatus     @default(PENDING)
-  trackingNumber   String?
-  shippingProvider String?
+  id                  String             @id @default(cuid())
+  userId              String
+  totalAmount         Decimal            @db.Decimal(10, 2)
+  paymentType         PaymentType
+  status              OrderStatus        @default(PENDING)
+  paymentStatus       OrderPaymentStatus @default(PENDING)
+  shippingStatus      ShippingStatus     @default(PENDING)
+  trackingNumber      String?
+  shippingProvider    String?
   installationAddress String?
-  city             String?
-  state            String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  user             User               @relation(fields: [userId], references: [id])
-  items            OrderItem[]
-  payments         Payment[]
-  solarSystems     SolarSystem[]
-  credit           CreditAccount?
-  adminAuditLogs   AdminAuditLog[]
+  city                String?
+  state               String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  user                User               @relation(fields: [userId], references: [id])
+  items               OrderItem[]
+  payments            Payment[]
+  solarSystems        SolarSystem[]
+  credit              CreditAccount?
+  adminAuditLogs      AdminAuditLog[]
 
   @@map("orders")
 }
@@ -98,15 +98,15 @@ model OrderItem {
 }
 
 model CreditAccount {
-  id               String          @id @default(cuid())
-  orderId          String          @unique
-  totalAmount      Decimal         @db.Decimal(10, 2)
-  balanceRemaining Decimal         @db.Decimal(10, 2)
+  id               String            @id @default(cuid())
+  orderId          String            @unique
+  totalAmount      Decimal           @db.Decimal(10, 2)
+  balanceRemaining Decimal           @db.Decimal(10, 2)
   durationMonths   Int
-  status           CreditStatus    @default(ACTIVE)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  order            Order           @relation(fields: [orderId], references: [id])
+  status           CreditStatus      @default(ACTIVE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  order            Order             @relation(fields: [orderId], references: [id])
   schedules        PaymentSchedule[]
 
   @@map("credit_accounts")
@@ -142,16 +142,16 @@ model Payment {
 }
 
 model SolarSystem {
-  id        String           @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
   orderId   String
   bundleId  String
-  status    SystemStatus     @default(ACTIVE)
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  user      User             @relation(fields: [userId], references: [id])
-  order     Order            @relation(fields: [orderId], references: [id])
-  bundle    ProductBundle    @relation(fields: [bundleId], references: [id])
+  status    SystemStatus       @default(ACTIVE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  user      User               @relation(fields: [userId], references: [id])
+  order     Order              @relation(fields: [orderId], references: [id])
+  bundle    ProductBundle      @relation(fields: [bundleId], references: [id])
   logs      SystemControlLog[]
   savings   UserSaving[]
 
@@ -194,16 +194,20 @@ model Cart {
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   cartId    String
-  productId String
+  itemType  ItemType
+  productId String?
+  bundleId  String?
   quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product?       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  bundle    ProductBundle? @relation(fields: [bundleId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, productId])
+  @@unique([cartId, bundleId])
   @@map("cart_items")
 }
 
@@ -217,6 +221,7 @@ model ProductBundle {
   items            BundleItem[]
   orderItems       OrderItem[]
   solarSystems     SolarSystem[]
+  cartItems        CartItem[]
 
   @@map("product_bundles")
 }
@@ -285,8 +290,8 @@ model Permission {
 model UserRole {
   userId String
   roleId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@map("user_roles")
