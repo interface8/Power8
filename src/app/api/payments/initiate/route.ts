@@ -25,6 +25,12 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message === "Order not found") {
       return errorResponse("Order not found", 404);
     }
+    if (
+      error instanceof Error &&
+      error.message === "Credit account not found"
+    ) {
+      return errorResponse("Credit account not found", 400);
+    }
     return errorResponse("Internal server error", 500);
   }
 }

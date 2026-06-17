@@ -13,8 +13,8 @@ interface OrderStatusControlProps {
 const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
   CONFIRMED: ["PROCESSING", "CANCELLED"],
-  PROCESSING: ["SHIPPED", "CANCELLED"],
-  SHIPPED: ["DELIVERED"],
+  PROCESSING: ["CANCELLED"],
+  SHIPPED: [],
   DELIVERED: ["COMPLETED"],
   COMPLETED: [],
   CANCELLED: [],
