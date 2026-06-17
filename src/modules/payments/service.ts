@@ -28,6 +28,10 @@ export async function initiatePayment(
     },
   });
 
+  if (order.paymentType === "CREDIT" && !credit) {
+    throw new Error("Credit account not found");
+  }
+
   if (credit && credit.schedules.length > 0) {
     // Credit order: use the next scheduled payment amount
     amount = credit.schedules[0].amountDue.toNumber();
@@ -125,28 +129,23 @@ export async function handleWebhook(reference: string) {
       }
     }
 
-    // Update order status
-    if (credit) {
-      if (newBalance <= 0) {
-        // Last payment — mark order as COMPLETED
-        await tx.order.updateMany({
-          where: { id: payment.orderId },
-          data: { status: "COMPLETED" },
-        });
-      } else {
-        // First payment — activate the order
-        await tx.order.updateMany({
-          where: { id: payment.orderId, status: "PENDING" },
-          data: { status: "PROCESSING" },
-        });
-      }
-    } else {
-      // Full payment — straight to COMPLETED
-      await tx.order.updateMany({
-        where: { id: payment.orderId, status: "PENDING" },
-        data: { status: "COMPLETED" },
-      });
-    }
+    await tx.order.update({
+      where: { id: payment.orderId },
+      data: {
+        paymentStatus: credit
+          ? newBalance <= 0
+            ? "PAID"
+            : "PARTIALLY_PAID"
+          : "PAID",
+      },
+    });
+
+    // A successful payment confirms the order. Fulfillment completion remains
+    // an admin-controlled step after processing, shipping, and delivery.
+    await tx.order.updateMany({
+      where: { id: payment.orderId, status: "PENDING" },
+      data: { status: "CONFIRMED" },
+    });
 
     return {
       id: payment.id,

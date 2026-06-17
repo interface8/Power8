@@ -21,6 +21,9 @@ export interface OrderDto {
   installationAddress: string | null;
   city: string | null;
   state: string | null;
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
   items: OrderItemDto[];
   createdAt: Date;
   updatedAt: Date;
@@ -38,5 +41,8 @@ export interface CreateOrderInput {
   installationAddress: string;
   city: string;
   state: string;
+  deliveryAddress: string;
+  deliveryCity: string;
+  deliveryState: string;
   items: CreateOrderItemInput[];
 }

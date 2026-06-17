@@ -77,9 +77,9 @@ function OrderCard({ order }: { order: OrderDto }) {
 }
 
 export default function OrdersPage() {
-  const { data, isLoading } = useOrders();
+  const { data, isLoading, isError } = useOrders();
 
-  const orders: OrderDto[] = (data as OrderDto[]) ?? [];
+  const orders: OrderDto[] = Array.isArray(data) ? data : [];
 
   return (
     <div className="space-y-6 px-4 md:px-0">
@@ -98,6 +98,12 @@ export default function OrdersPage() {
               className="h-20 animate-pulse rounded-2xl bg-gray-100"
             />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center">
+          <p className="text-sm font-medium text-red-600">
+            We could not load your orders right now.
+          </p>
         </div>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-white py-16 text-center">

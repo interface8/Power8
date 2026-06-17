@@ -27,7 +27,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Failed to update shipping status";
     if (msg === "Order not found") return errorResponse(msg, 404);
-    if (msg.startsWith("Invalid shipping status transition")) return errorResponse(msg, 400);
+    if (
+      msg.startsWith("Invalid shipping status transition") ||
+      msg.includes("must") ||
+      msg.includes("cannot")
+    )
+      return errorResponse(msg, 400);
     return errorResponse(msg, 500);
   }
 }

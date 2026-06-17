@@ -28,15 +28,11 @@ type AddToCartInput =
 export function useCart() {
   const [cart, setCart] = useState<Cart>(emptyCart);
   const [loading] = useState(false);
-
   const isAddingRef = useRef(false);
 
-  // Load cart from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setCart(JSON.parse(stored));
-    }
+    if (stored) setCart(JSON.parse(stored));
   }, []);
 
   const persist = (data: Cart) => {
@@ -44,7 +40,6 @@ export function useCart() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   };
 
-  // ADD TO CART
   const addToCart = useCallback(async (input: AddToCartInput, quantity = 1) => {
     if (isAddingRef.current) return false;
     isAddingRef.current = true;
@@ -109,7 +104,6 @@ export function useCart() {
 
         const newCart = { ...prev, items: updatedItems, total };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newCart));
-
         return newCart;
       });
 
@@ -119,48 +113,47 @@ export function useCart() {
     }
   }, []);
 
-  // UPDATE CART ITEM
-  const updateCartItem = useCallback(async (itemId: string, quantity: number) => {
-    if (quantity < 1) return false;
+  const updateCartItem = useCallback(
+    async (itemId: string, quantity: number) => {
+      if (quantity < 1) return false;
 
-    setCart((prev) => {
-      const updatedItems = prev.items.map((item) =>
-        item.id === itemId
-          ? { ...item, quantity, subtotal: quantity * item.price }
-          : item,
-      );
+      setCart((prev) => {
+        const updatedItems = prev.items.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity, subtotal: quantity * item.price }
+            : item,
+        );
+        const total = updatedItems.reduce(
+          (acc, item) => acc + item.quantity * item.price,
+          0,
+        );
+        const newCart = { ...prev, items: updatedItems, total };
+        persist(newCart);
+        return newCart;
+      });
 
-      const total = updatedItems.reduce(
-        (acc, item) => acc + item.quantity * item.price,
-        0,
-      );
+      return true;
+    },
+    [],
+  );
 
-      const newCart = { ...prev, items: updatedItems, total };
-      persist(newCart);
-
-      return newCart;
-    });
-
-    return true;
-  }, []);
-
-  // REMOVE CART ITEM
   const removeCartItem = useCallback(async (itemId: string) => {
     setCart((prev) => {
       const updatedItems = prev.items.filter((i) => i.id !== itemId);
-
       const total = updatedItems.reduce(
         (acc, item) => acc + item.quantity * item.price,
         0,
       );
-
       const newCart = { ...prev, items: updatedItems, total };
       persist(newCart);
-
       return newCart;
     });
-
     return true;
+  }, []);
+
+  // ← new
+  const clearCart = useCallback(() => {
+    persist(emptyCart);
   }, []);
 
   const count = cart.items.reduce((acc, i) => acc + i.quantity, 0);
@@ -171,6 +164,7 @@ export function useCart() {
     addToCart,
     updateCartItem,
     removeCartItem,
+    clearCart,
     count,
   };
 }
