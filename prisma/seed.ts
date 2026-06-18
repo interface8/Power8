@@ -96,6 +96,7 @@ async function main() {
     { resource: "solar_systems", action: "limit", description: "Limit solar system" },
     { resource: "solar_systems", action: "disable", description: "Disable solar system" },
     { resource: "solar_systems", action: "view_logs", description: "View solar system logs" },
+    { resource: "solar_systems", action: "view_detail", description: "View solar system details" },
 
     { resource: "carousel", action: "view", description: "View carousel slides" },
     { resource: "carousel", action: "create", description: "Create carousel slides" },
