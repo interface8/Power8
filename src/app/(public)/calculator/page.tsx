@@ -78,6 +78,7 @@ export default function CalculatorPage() {
       for (const item of recommendedBundle.items) {
         await addToCart(
           {
+            itemType: "PRODUCT",
             productId: item.product.id,
             productName: item.product.name,
             price: item.product.price,

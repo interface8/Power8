@@ -28,6 +28,10 @@ export async function initiatePayment(
     },
   });
 
+  if (order.paymentType === "CREDIT" && !credit) {
+    throw new Error("Credit account not found");
+  }
+
   if (credit && credit.schedules.length > 0) {
     // Credit order: use the next scheduled payment amount
     amount = credit.schedules[0].amountDue.toNumber();
@@ -40,7 +44,7 @@ export async function initiatePayment(
   const reference = `PAY-${randomUUID()}`;
 
   // Create a pending-style payment record (status FAILED until webhook confirms)
-  const payment = await paymentRepo.createPayment({
+  await paymentRepo.createPayment({
     userId,
     orderId: input.orderId,
     amount,
@@ -48,13 +52,26 @@ export async function initiatePayment(
     status: "FAILED",
   });
 
+  // ─── TEMP: payment-gateway bypass (testing only) ───────────────────────────
+  // No gateway provider wired up yet, so no webhook will ever fire. Auto-confirm
+  // the payment immediately by running the same logic the real webhook would,
+  // which advances the order (and credit schedules) just like a real payment.
+  // DELETE this block and uncomment the return below once a provider is added.
+  const confirmed = await handleWebhook(reference);
+  return {
+    payment: confirmed,
+    reference,
+  };
+  // ───────────────────────────────────────────────────────────────────────────
+
   // In a real app, you'd call Paystack/Flutterwave here to initialize
   // and return their checkout URL. For now, return the reference.
-  return {
-    payment,
-    reference,
-    // checkoutUrl: "https://paystack.com/pay/..." ← would come from provider
-  };
+  // (When restoring, capture the record above: `const payment = await paymentRepo.createPayment(...)`)
+  // return {
+  //   payment,
+  //   reference,
+  //   // checkoutUrl: "https://paystack.com/pay/..." ← would come from provider
+  // };
 }
 
 export async function handleWebhook(reference: string) {
@@ -112,28 +129,23 @@ export async function handleWebhook(reference: string) {
       }
     }
 
-    // Update order status
-    if (credit) {
-      if (newBalance <= 0) {
-        // Last payment — mark order as COMPLETED
-        await tx.order.updateMany({
-          where: { id: payment.orderId },
-          data: { status: "COMPLETED" },
-        });
-      } else {
-        // First payment — activate the order
-        await tx.order.updateMany({
-          where: { id: payment.orderId, status: "PENDING" },
-          data: { status: "PROCESSING" },
-        });
-      }
-    } else {
-      // Full payment — straight to COMPLETED
-      await tx.order.updateMany({
-        where: { id: payment.orderId, status: "PENDING" },
-        data: { status: "COMPLETED" },
-      });
-    }
+    await tx.order.update({
+      where: { id: payment.orderId },
+      data: {
+        paymentStatus: credit
+          ? newBalance <= 0
+            ? "PAID"
+            : "PARTIALLY_PAID"
+          : "PAID",
+      },
+    });
+
+    // A successful payment confirms the order. Fulfillment completion remains
+    // an admin-controlled step after processing, shipping, and delivery.
+    await tx.order.updateMany({
+      where: { id: payment.orderId, status: "PENDING" },
+      data: { status: "CONFIRMED" },
+    });
 
     return {
       id: payment.id,

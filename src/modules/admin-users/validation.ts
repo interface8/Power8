@@ -13,3 +13,7 @@ export const adminUserListFiltersSchema = z.object({
 export const adminUpdateUserStatusSchema = z.object({
   isActive: z.coerce.boolean(),
 });
+
+export const adminAssignUserRoleSchema = z.object({
+  roleId: z.string().min(1, "Role ID is required"),
+});

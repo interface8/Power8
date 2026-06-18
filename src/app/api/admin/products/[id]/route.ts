@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { productService, updateProductSchema } from "@/modules/products";
 
@@ -7,9 +7,8 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("products", "delete");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const { id } = await params;
@@ -28,9 +27,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("products", "edit");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const { id } = await params;

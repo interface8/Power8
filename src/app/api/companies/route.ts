@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { companyService, createCompanySchema } from "@/modules/companies";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/companies — list all ()
@@ -16,7 +16,7 @@ export async function GET() {
 
 // POST /api/companies — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermission("companies.create");
+  const guard = await requireApiPermissionFor("companies", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { systemService } from "@/modules/systems";
-import { requireApiPermission, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // POST /api/systems/:id/enable — admin
@@ -8,7 +8,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiPermission("systems.control");
+  const guard = await requireApiPermissionFor("systems", "control");
   if (isErrorResponse(guard)) return guard;
 
   try {

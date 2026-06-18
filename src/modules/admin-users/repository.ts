@@ -1,6 +1,41 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import type { AdminUserListFilters, AdminUsersListDto, AdminUserDetailsDto } from "./types";
+import type {
+  AdminUserListFilters,
+  AdminUsersListDto,
+  AdminUserDetailsDto,
+  AdminUserRoleDto,
+} from "./types";
+
+type RolePermissionRow = {
+  permission: {
+    id: string;
+    resource: string;
+    action: string;
+    description: string | null;
+  };
+};
+
+type RoleWithPermissionsRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  permissions: RolePermissionRow[];
+};
+
+function mapRole(role: RoleWithPermissionsRow): AdminUserRoleDto {
+  return {
+    id: role.id,
+    name: role.name,
+    description: role.description,
+    permissions: role.permissions.map((rp) => ({
+      id: rp.permission.id,
+      resource: rp.permission.resource,
+      action: rp.permission.action,
+      description: rp.permission.description,
+    })),
+  };
+}
 
 export async function findUsers(filters: AdminUserListFilters): Promise<AdminUsersListDto> {
   const { search, isActive, page, limit } = filters;
@@ -32,7 +67,7 @@ export async function findUsers(filters: AdminUserListFilters): Promise<AdminUse
         phone: true,
         isActive: true,
         createdAt: true,
-      }, // IMPORTANT: password is not selected
+      },
     }),
   ]);
 
@@ -47,7 +82,9 @@ export async function findUsers(filters: AdminUserListFilters): Promise<AdminUse
   };
 }
 
-export async function findUserDetailsById(userId: string): Promise<AdminUserDetailsDto | null> {
+export async function findUserDetailsById(
+  userId: string,
+): Promise<AdminUserDetailsDto | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -58,7 +95,20 @@ export async function findUserDetailsById(userId: string): Promise<AdminUserDeta
       isActive: true,
       createdAt: true,
       updatedAt: true,
-    }, // IMPORTANT: no password selected
+      roles: {
+        include: {
+          role: {
+            include: {
+              permissions: {
+                include: {
+                  permission: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!user) return null;
@@ -75,7 +125,6 @@ export async function findUserDetailsById(userId: string): Promise<AdminUserDeta
         createdAt: true,
       },
     }),
-
     prisma.solarSystem.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -86,7 +135,6 @@ export async function findUserDetailsById(userId: string): Promise<AdminUserDeta
         bundle: { select: { name: true } },
       },
     }),
-
     prisma.creditAccount.findMany({
       where: { order: { userId } },
       orderBy: { createdAt: "desc" },
@@ -98,7 +146,6 @@ export async function findUserDetailsById(userId: string): Promise<AdminUserDeta
         createdAt: true,
       },
     }),
-
     prisma.userSaving.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -112,7 +159,16 @@ export async function findUserDetailsById(userId: string): Promise<AdminUserDeta
   ]);
 
   return {
-    user,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+    roles: user.roles.map((ur) => mapRole(ur.role)),
     orders: orders.map((o) => ({
       id: o.id,
       totalAmount: o.totalAmount.toNumber(),
@@ -177,5 +233,100 @@ export async function updateUserStatusWithAudit(params: {
     });
 
     return { previousIsActive, ...updated };
+  });
+}
+
+export async function findUserById(userId: string) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+}
+
+export async function findRoleById(roleId: string) {
+  return prisma.role.findUnique({
+    where: { id: roleId },
+    select: { id: true },
+  });
+}
+
+export async function findUserRoleAssignment(userId: string, roleId: string) {
+  return prisma.userRole.findUnique({
+    where: {
+      userId_roleId: {
+        userId,
+        roleId,
+      },
+    },
+  });
+}
+
+export async function findUserRolesByUserId(
+  userId: string,
+): Promise<AdminUserRoleDto[]> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      roles: {
+        include: {
+          role: {
+            include: {
+              permissions: {
+                include: {
+                  permission: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!user) return [];
+
+  return user.roles.map((ur) => mapRole(ur.role));
+}
+
+export async function findRolesNotAssignedToUser(
+  userId: string,
+): Promise<AdminUserRoleDto[]> {
+  const roles = await prisma.role.findMany({
+    where: {
+      users: {
+        none: {
+          userId,
+        },
+      },
+    },
+    include: {
+      permissions: {
+        include: {
+          permission: true,
+        },
+      },
+    },
+  });
+
+  return roles.map((role) => mapRole(role));
+}
+
+export async function assignRoleToUser(userId: string, roleId: string) {
+  await prisma.userRole.create({
+    data: {
+      userId,
+      roleId,
+    },
+  });
+}
+
+export async function removeRoleFromUser(userId: string, roleId: string) {
+  await prisma.userRole.delete({
+    where: {
+      userId_roleId: {
+        userId,
+        roleId,
+      },
+    },
   });
 }

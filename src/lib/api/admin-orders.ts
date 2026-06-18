@@ -142,6 +142,11 @@ import {
 
 const BASE_URL = "/api/admin/orders";
 
+async function throwApiError(response: Response, fallback: string) {
+  const body = await response.json().catch(() => null);
+  throw new Error(body?.message ?? fallback);
+}
+
 function buildQuery(params: OrderFilters) {
   const query = new URLSearchParams();
 
@@ -162,7 +167,7 @@ export async function getOrders(filters: OrderFilters): Promise<OrdersResponse> 
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch orders");
+    await throwApiError(response, "Failed to fetch orders");
   }
 
   return response.json();
@@ -175,7 +180,7 @@ export async function getOrderById(id: string): Promise<{ data: AdminOrderDetail
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch order");
+    await throwApiError(response, "Failed to fetch order");
   }
 
   return response.json();
@@ -190,7 +195,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update order status");
+    await throwApiError(response, "Failed to update order status");
   }
 
   return response.json();
@@ -205,7 +210,7 @@ export async function updatePaymentStatus(id: string, status: PaymentStatus) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update payment status");
+    await throwApiError(response, "Failed to update payment status");
   }
 
   return response.json();
@@ -227,7 +232,7 @@ export async function updateShippingStatus(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update shipping status");
+    await throwApiError(response, "Failed to update shipping status");
   }
 
   return response.json();

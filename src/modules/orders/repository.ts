@@ -21,6 +21,9 @@ function toOrderDto(order: {
   installationAddress: string | null;
   city: string | null;
   state: string | null;
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
   items: {
     id: string;
     itemType: string;
@@ -44,6 +47,9 @@ function toOrderDto(order: {
     installationAddress: order.installationAddress,
     city: order.city,
     state: order.state,
+    deliveryAddress: order.deliveryAddress,
+    deliveryCity: order.deliveryCity,
+    deliveryState: order.deliveryState,
     items: order.items.map(
       (item): OrderItemDto => ({
         id: item.id,
@@ -79,8 +85,10 @@ export async function findOrderById(id: string): Promise<OrderDto | null> {
   return order ? toOrderDto(order) : null;
 }
 
-export async function createOrder(userId: string, input: CreateOrderInput): Promise<OrderDto> {
-  // Batch fetch all products and bundles in two queries
+export async function createOrder(
+  userId: string,
+  input: CreateOrderInput,
+): Promise<OrderDto> {
   const productIds = input.items
     .filter((i) => i.itemType === "PRODUCT" && i.productId)
     .map((i) => i.productId!);
@@ -100,18 +108,19 @@ export async function createOrder(userId: string, input: CreateOrderInput): Prom
   const productMap = new Map(products.map((p) => [p.id, p.price.toNumber()]));
   const bundleMap = new Map(bundles.map((b) => [b.id, b.totalPrice.toNumber()]));
 
-  // Compute prices in-memory
   const itemsWithPrices = input.items.map((item) => {
     let unitPrice = 0;
 
     if (item.itemType === "PRODUCT" && item.productId) {
+      if (!productMap.has(item.productId))
+        throw new Error(`Product not found: ${item.productId}`);
       unitPrice = productMap.get(item.productId) ?? 0;
-      if (!productMap.has(item.productId)) throw new Error(`Product not found: ${item.productId}`);
     }
 
     if (item.itemType === "BUNDLE" && item.bundleId) {
+      if (!bundleMap.has(item.bundleId))
+        throw new Error(`Bundle not found: ${item.bundleId}`);
       unitPrice = bundleMap.get(item.bundleId) ?? 0;
-      if (!bundleMap.has(item.bundleId)) throw new Error(`Bundle not found: ${item.bundleId}`);
     }
 
     return {
@@ -124,7 +133,10 @@ export async function createOrder(userId: string, input: CreateOrderInput): Prom
     };
   });
 
-  const totalAmount = itemsWithPrices.reduce((sum, item) => sum + item.totalPrice, 0);
+  const totalAmount = itemsWithPrices.reduce(
+    (sum, item) => sum + item.totalPrice,
+    0,
+  );
 
   const order = await prisma.order.create({
     data: {
@@ -134,9 +146,10 @@ export async function createOrder(userId: string, input: CreateOrderInput): Prom
       installationAddress: input.installationAddress,
       city: input.city,
       state: input.state,
-      items: {
-        create: itemsWithPrices,
-      },
+      deliveryAddress: input.deliveryAddress,
+      deliveryCity: input.deliveryCity,
+      deliveryState: input.deliveryState,
+      items: { create: itemsWithPrices },
     },
     ...orderWithItems,
   });

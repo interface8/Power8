@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
+import type { OrderDto } from "@/modules/orders/types";
 
 export function useOrders() {
-    return useQuery({
-        queryKey: ["orders"],
-        queryFn: async () => {
-            const res = await fetch("/api/orders");
-            if(!res.ok) throw new Error("Failed to fetch orders")
-
-                const json = await res.json()
-                return json.data;
-        }
-    })
-
-} 
+  return useQuery<OrderDto[]>({
+    queryKey: ["orders"],
+    queryFn: async () => {
+      const orders = await apiClient<OrderDto[] | { data: OrderDto[] }>(
+        "/api/orders",
+      );
+      return Array.isArray(orders) ? orders : orders.data;
+    },
+  });
+}

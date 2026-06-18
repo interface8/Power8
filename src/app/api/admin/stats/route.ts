@@ -1,15 +1,11 @@
 import { adminStatsService } from "@/modules/admin-stats";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 
 // GET /api/admin/stats  (admin-only)
 export async function GET(request: Request) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("dashboard", "view_stats");
   if (isErrorResponse(guard)) return guard;
-
-  if (!guard.roles.includes("admin")) {
-    return errorResponse("Forbidden", 403);
-  }
 
   const { searchParams } = new URL(request.url);
   const raw = searchParams.get("lowStockThreshold");

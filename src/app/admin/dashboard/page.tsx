@@ -34,7 +34,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
+          <h1 className="text-xl font-bold tracking-tight text-gray-900 md:text-3xl">
             Dashboard Overview
           </h1>
 

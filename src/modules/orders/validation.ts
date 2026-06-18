@@ -20,4 +20,7 @@ export const createOrderSchema = z.object({
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
   items: z.array(orderItemSchema).min(1, "Order must have at least one item"),
+  deliveryAddress: z.string().min(5, "Delivery address is too short"),
+  deliveryCity: z.string().min(2, "Delivery city is required"),
+  deliveryState: z.string().min(2, "Delivery state is required"),
 });

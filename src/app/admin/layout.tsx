@@ -22,17 +22,17 @@ export default function AdminLayout({
     return () => observer.disconnect();
   }, []);
 
+  // Updated margins to match new sidebar widths
+  const marginWidth = isExpanded ? "lg:ml-54" : "lg:ml-16";
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <AdminSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
-      {/* Main Content - dynamic margin based on sidebar expansion */}
-      <div className={`transition-all duration-300 ${isExpanded ? "lg:ml-64" : "lg:ml-20"}`}>
+      <div className={`flex flex-col min-h-screen transition-all duration-300 ${marginWidth}`}>
         <AdminHeader setOpen={setSidebarOpen} />
 
-        {/* Main content */}
-        <main className="overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden">
           <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
             <div className="w-full max-w-400 mx-auto">{children}</div>
           </div>

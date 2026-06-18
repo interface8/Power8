@@ -1,12 +1,11 @@
 import { NextRequest } from "next/server";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { bundleService, createBundleSchema } from "@/modules/bundles";
 
 export async function GET() {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("bundles", "view");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const bundles = await bundleService.listBundles();
@@ -18,9 +17,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("bundles", "create");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const body = await request.json();

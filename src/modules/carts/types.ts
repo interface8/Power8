@@ -1,8 +1,11 @@
 export interface CartItemDto {
   id: string;
-  productId: string;
-  productName: string;
+  itemType: "PRODUCT" | "BUNDLE";
+  productId: string | null;
+  productName: string | null;
   productImage: string | null;
+  bundleId: string | null;
+  bundleName: string | null;
   price: number;
   quantity: number;
   subtotal: number;
@@ -16,11 +19,12 @@ export interface CartDto {
 }
 
 export interface AddToCartInput {
-  productId: string;
+  itemType: "PRODUCT" | "BUNDLE";
+  productId?: string;
+  bundleId?: string;
   quantity: number;
 }
 
 export interface UpdateCartItemInput {
   quantity: number;
 }
-
