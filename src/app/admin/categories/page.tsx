@@ -242,7 +242,7 @@ const toggleActiveStatus = async (category: ProductCategory) => {
       setDeletingCategory(null);
       
       toast.custom((t) => (
-        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-[300px]">
+        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-75">
           <span className="text-sm">Category {deletedData.name} deleted</span>
           <Button
             variant="outline"
