@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireApiAuth, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { categoryService, updateProductCategorySchema } from "@/modules/product-categories";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _request: NextRequest,
@@ -60,9 +61,12 @@ export async function DELETE(
 
     const { id } = await params;
     console.log("🔍 DELETE called for category:", id);
-    
-    // ✅ Fixed: Changed from deleteCategoryAdmin to deleteCategory
-    const result = await categoryService.deleteCategory(id);
+
+    // DEBUG: check what the DB sees directly
+    const productCount = await prisma.product.count({ where: { categoryId: id } });
+    console.log("📦 Product count for category:", productCount);
+
+    const result = await categoryService.deleteCategoryAdmin(id);
     console.log("✅ DELETE successful:", result);
     
     return jsonResponse({ message: "Category deleted successfully" });
