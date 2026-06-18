@@ -220,8 +220,18 @@ export async function updateOrderPaymentStatusWithAudit(params: {
     const updated = await tx.order.update({
       where: { id: orderId },
       data: { paymentStatus: newStatus },
-      select: { id: true, paymentStatus: true, updatedAt: true },
+      select: { id: true, paymentStatus: true, status: true, updatedAt: true },
     });
+
+    if (
+      updated.status === "PENDING" &&
+      (newStatus === "PAID" || newStatus === "PARTIALLY_PAID")
+    ) {
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: "CONFIRMED" },
+      });
+    }
 
     await tx.adminAuditLog.create({
       data: {
@@ -247,6 +257,14 @@ export async function updateOrderShippingStatusWithAudit(params: {
   shippingProvider?: string;
 }) {
   const { orderId, adminId, newStatus, trackingNumber, shippingProvider } = params;
+  const nextOrderStatus =
+    newStatus === "PROCESSING"
+      ? "PROCESSING"
+      : newStatus === "SHIPPED"
+        ? "SHIPPED"
+        : newStatus === "DELIVERED"
+          ? "DELIVERED"
+          : null;
 
   return prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
@@ -270,6 +288,7 @@ export async function updateOrderShippingStatusWithAudit(params: {
       where: { id: orderId },
       data: {
         shippingStatus: newStatus,
+        ...(nextOrderStatus ? { status: nextOrderStatus } : {}),
         trackingNumber: trackingNumber ?? order.trackingNumber,
         shippingProvider: shippingProvider ?? order.shippingProvider,
       },

@@ -22,7 +22,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Failed to update order status";
     if (msg === "Order not found") return errorResponse(msg, 404);
-    if (msg.startsWith("Invalid status transition")) return errorResponse(msg, 400);
+    if (msg.startsWith("Invalid status transition") || msg.includes("must be"))
+      return errorResponse(msg, 400);
     return errorResponse(msg, 500);
   }
 }

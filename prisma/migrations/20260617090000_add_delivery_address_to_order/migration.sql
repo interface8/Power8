@@ -1,0 +1,4 @@
+ALTER TABLE "orders"
+ADD COLUMN IF NOT EXISTS "deliveryAddress" TEXT,
+ADD COLUMN IF NOT EXISTS "deliveryCity" TEXT,
+ADD COLUMN IF NOT EXISTS "deliveryState" TEXT;

@@ -54,8 +54,13 @@ export default function AdminOrderDetailsPage() {
           await updateOrderStatusMutation.mutateAsync({ id: orderId, status });
           showToast(`Order status updated to ${status.replace("_", " ")}`, "success");
           refetch();
-        } catch {
-          showToast("Failed to update order status", "error");
+        } catch (error) {
+          showToast(
+            error instanceof Error
+              ? error.message
+              : "Failed to update order status",
+            "error",
+          );
         } finally {
           closeModal();
         }
@@ -73,8 +78,13 @@ export default function AdminOrderDetailsPage() {
           await updatePaymentMutation.mutateAsync({ id: orderId, status });
           showToast(`Payment status updated to ${status.replace("_", " ")}`, "success");
           refetch();
-        } catch {
-          showToast("Failed to update payment status", "error");
+        } catch (error) {
+          showToast(
+            error instanceof Error
+              ? error.message
+              : "Failed to update payment status",
+            "error",
+          );
         } finally {
           closeModal();
         }
@@ -87,8 +97,13 @@ export default function AdminOrderDetailsPage() {
       await updateShippingMutation.mutateAsync({ id: orderId, status, trackingNumber, shippingProvider });
       showToast(`Shipping status updated to ${status}`, "success");
       refetch();
-    } catch {
-      showToast("Failed to update shipping status", "error");
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Failed to update shipping status",
+        "error",
+      );
     }
   };
 
@@ -150,7 +165,11 @@ export default function AdminOrderDetailsPage() {
               currentStatus={order.shipping.status}
               trackingNumber={order.shipping.trackingNumber}
               shippingProvider={order.shipping.shippingProvider}
-              canUpdate={order.orderStatus === "CONFIRMED" || order.orderStatus === "PROCESSING"}
+              canUpdate={
+                order.orderStatus === "CONFIRMED" ||
+                order.orderStatus === "PROCESSING" ||
+                order.orderStatus === "SHIPPED"
+              }
               onUpdateStatus={handleUpdateShippingStatus}
               isLoading={updateShippingMutation.isPending}
             />

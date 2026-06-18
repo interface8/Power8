@@ -12,6 +12,14 @@ interface ShippingActionButtonsProps {
 
 const shippingStatuses: ShippingStatus[] = ["PROCESSING", "SHIPPED", "DELIVERED"];
 
+const allowedTransitions: Record<ShippingStatus, ShippingStatus[]> = {
+  PENDING: ["PROCESSING", "SHIPPED"],
+  PROCESSING: ["SHIPPED"],
+  SHIPPED: ["DELIVERED"],
+  DELIVERED: [],
+  RETURNED: [],
+};
+
 function ActionButton({ 
   status, 
   isActive, 
@@ -54,6 +62,8 @@ function ActionButton({
 }
 
 export function ShippingActionButtons({ currentStatus, canUpdate, isLoading, onStatusClick }: ShippingActionButtonsProps) {
+  const availableStatuses = allowedTransitions[currentStatus] ?? [];
+
   return (
     <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 md:flex-wrap md:overflow-visible">
       {shippingStatuses.map((status) => (
@@ -61,7 +71,12 @@ export function ShippingActionButtons({ currentStatus, canUpdate, isLoading, onS
           key={status}
           status={status}
           isActive={currentStatus === status}
-          disabled={!canUpdate || currentStatus === status || isLoading}
+          disabled={
+            !canUpdate ||
+            currentStatus === status ||
+            !availableStatuses.includes(status) ||
+            isLoading
+          }
           onClick={() => onStatusClick(status)}
         />
       ))}

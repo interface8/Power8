@@ -28,11 +28,12 @@ type PaymentChannel = "bank_transfer" | "paystack" | "card";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart } = useCart();
+  const { cart, clearCart } = useCart(); // ← add clearCart
 
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
-  const [paymentChannel, setPaymentChannel] = useState<PaymentChannel>("paystack");
+  const [paymentChannel, setPaymentChannel] =
+    useState<PaymentChannel>("paystack");
 
   const [installationAddress, setInstallationAddress] = useState<AddressData>({
     street: "",
@@ -58,73 +59,59 @@ export default function CheckoutPage() {
     nin: "",
   });
 
-  const handlePaymentMethodChange = (method: PaymentMethod) => {
+  const handlePaymentMethodChange = (method: PaymentMethod) =>
     setPaymentMethod(method);
-  };
 
-  const handlePaymentChannelChange = (channel: PaymentChannel) => {
+  const handlePaymentChannelChange = (channel: PaymentChannel) =>
     setPaymentChannel(channel);
-  };
 
   const handleInstallationAddressChange = (
     field: keyof AddressData,
     value: string,
-  ) => {
+  ) =>
     setInstallationAddress((prev) => ({
       ...prev,
       [field]: sanitizeInput(value),
     }));
-  };
 
   const handleDeliveryAddressChange = (
     field: keyof AddressData,
     value: string,
-  ) => {
+  ) =>
     setDeliveryAddress((prev) => ({
       ...prev,
       [field]: sanitizeInput(value),
     }));
-  };
 
-  const handleCreditChange = (field: keyof CreditDetails, value: number) => {
+  const handleCreditChange = (field: keyof CreditDetails, value: number) =>
     setCreditDetails((prev) => ({ ...prev, [field]: value }));
-  };
 
-  const handleIdentityChange = (field: keyof IdentityData, value: string) => {
+  const handleIdentityChange = (field: keyof IdentityData, value: string) =>
     setIdentity((prev) => ({ ...prev, [field]: sanitizeInput(value) }));
-  };
 
   const items = useMemo(() => cart?.items ?? [], [cart]);
 
-  /* -----------------------------
-   PRICING
-  ----------------------------- */
-
-  const subtotal = useMemo(() => {
-    return items.reduce(
-      (acc, item) => acc + (item.price ?? 0) * (item.quantity ?? 0),
-      0,
-    );
-  }, [items]);
+  const subtotal = useMemo(
+    () =>
+      items.reduce(
+        (acc, item) => acc + (item.price ?? 0) * (item.quantity ?? 0),
+        0,
+      ),
+    [items],
+  );
 
   const vat = subtotal * 0.075;
   const total = subtotal + vat;
 
-  /* -----------------------------
-   CREDIT BREAKDOWN
-  ----------------------------- */
-
-  const creditBreakdown = useMemo(() => {
-    return calculateCreditBreakdown(
-      total,
-      creditDetails.depositAmount,
-      creditDetails.durationAmount,
-    );
-  }, [total, creditDetails.depositAmount, creditDetails.durationAmount]);
-
-  /* -----------------------------
-   VALIDATIONS
-  ----------------------------- */
+  const creditBreakdown = useMemo(
+    () =>
+      calculateCreditBreakdown(
+        total,
+        creditDetails.depositAmount,
+        creditDetails.durationAmount,
+      ),
+    [total, creditDetails.depositAmount, creditDetails.durationAmount],
+  );
 
   const isBVNValid = validateBVN(identity.bvn);
   const isNINValid = validateNIN(identity.nin);
@@ -148,10 +135,6 @@ export default function CheckoutPage() {
     isDeliveryAddressValid &&
     (paymentMethod === "full" ? true : isIdentityVerified);
 
-  /* -----------------------------
-   SUBMIT
-  ----------------------------- */
-
   const handleSubmit = async () => {
     if (!canSubmit) {
       toast.error("Please complete all required fields");
@@ -161,28 +144,26 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
 
-      // ── STEP 1: Build payload to match createOrderSchema ─────────────
       const orderPayload = {
-        // "full" → "FULL", "installment" → "CREDIT"
         paymentType: paymentMethod === "full" ? "FULL" : "CREDIT",
 
-        // Schema expects flat strings, not an object
         installationAddress: sanitizeInput(installationAddress.street),
         city: sanitizeInput(installationAddress.city),
         state: sanitizeInput(installationAddress.state),
 
-        // Schema expects { itemType, productId?, bundleId?, quantity }
-        // Adjust item.itemType / item.productId / item.bundleId to match
-        // whatever field names your cart provider uses
+        deliveryAddress: sanitizeInput(deliveryAddress.street),
+        deliveryCity: sanitizeInput(deliveryAddress.city),
+        deliveryState: sanitizeInput(deliveryAddress.state),
+
         items: items.map((item) => ({
-          itemType: item.itemType ?? "PRODUCT",       // "PRODUCT" | "BUNDLE"
+          itemType: item.itemType ?? "PRODUCT",
           productId: item.productId ?? undefined,
           bundleId: item.bundleId ?? undefined,
           quantity: item.quantity,
         })),
       };
 
-      // ── STEP 2: Create the order ──────────────────────────────────────
+      // STEP 1: Create order
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -194,9 +175,30 @@ export default function CheckoutPage() {
         throw new Error(errorData?.message ?? "Order creation failed");
       }
 
-      const order = await orderRes.json();
+      const orderJson = await orderRes.json();
+      const order = "data" in orderJson ? orderJson.data : orderJson;
 
-      // ── STEP 3: Initiate payment (bypass auto-confirms in dev) ────────
+      if (!order?.id) {
+        throw new Error("Order creation returned an invalid response");
+      }
+
+      if (paymentMethod === "installment") {
+        const creditRes = await fetch("/api/credit/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.id,
+            durationMonths: creditDetails.durationAmount,
+          }),
+        });
+
+        if (!creditRes.ok) {
+          const errorData = await creditRes.json().catch(() => null);
+          throw new Error(errorData?.message ?? "Credit setup failed");
+        }
+      }
+
+      // STEP 2: Initiate payment
       const paymentRes = await fetch("/api/payments/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -208,7 +210,9 @@ export default function CheckoutPage() {
         throw new Error(errorData?.message ?? "Payment initiation failed");
       }
 
-      // ── STEP 4: Done ──────────────────────────────────────────────────
+      // STEP 3: Clear cart and redirect
+      clearCart(); // ← clear localStorage cart
+
       toast.success(
         paymentMethod === "full"
           ? "Order placed successfully"
@@ -218,7 +222,6 @@ export default function CheckoutPage() {
       setTimeout(() => {
         router.push(`/dashboard/orders/${order.id}`);
       }, 1800);
-
     } catch (error) {
       console.error(error);
       toast.error(
@@ -231,26 +234,11 @@ export default function CheckoutPage() {
     }
   };
 
-
   return (
-    <div
-      className="
-        min-h-screen bg-gray-50
-        px-4 py-6
-        sm:px-6 sm:py-8
-        lg:px-8
-      "
-    >
+    <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* HEADER */}
         <div className="mb-8">
-          <h1
-            className="
-              text-2xl font-bold text-green-950
-              sm:text-3xl
-              lg:text-4xl
-            "
-          >
+          <h1 className="text-2xl font-bold text-green-950 sm:text-3xl lg:text-4xl">
             Checkout
           </h1>
           <p className="mt-2 text-sm text-gray-500 sm:text-base">
@@ -259,7 +247,6 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          {/* LEFT SIDE */}
           <div className="space-y-6 xl:col-span-2">
             <PaymentMethodSection
               paymentMethod={paymentMethod}
@@ -302,7 +289,6 @@ export default function CheckoutPage() {
             />
           </div>
 
-          {/* RIGHT SIDE */}
           <div className="xl:sticky xl:top-6 h-fit">
             <OrderSummarySection
               items={items}
@@ -318,16 +304,8 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* EMPTY CART */}
         {items.length === 0 && (
-          <div
-            className="
-              mt-8 rounded-3xl border
-              border-dashed border-gray-300
-              bg-white p-10 text-center
-              shadow-sm
-            "
-          >
+          <div className="mt-8 rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900">
               Your cart is empty
             </h3>
