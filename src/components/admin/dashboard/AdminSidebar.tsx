@@ -183,19 +183,20 @@ export default function AdminSidebar({ open, setOpen }: Props) {
                         href={link.href}
                         onClick={() => setOpen(false)}
                         className={`
-                          flex items-center gap-3 px-3 py-2.5 rounded-xl
-                          transition-all duration-200 group
-                          ${
-                            active
-                              ? "bg-orange-500 text-white shadow-md"
-                              : "text-white/80 hover:bg-white/10 hover:text-white"
-                          }
-                          ${!isExpanded ? "justify-center" : ""}
-                        `}
+    flex items-center gap-3 px-3 py-2.5 rounded-xl
+    transition-all duration-200 group
+    text-sm sm:text-base md:text-md lg:text-lg tracking-tight
+    ${
+      active
+        ? "bg-orange-500 text-white shadow-md"
+        : "text-white/80 hover:bg-white/10 hover:text-white"
+    }
+    ${!isExpanded ? "justify-center" : ""}
+  `}
                         title={!isExpanded ? link.name : undefined}
                       >
                         <Icon
-                          className={`w-4 h-4 shrink-0 transition-all duration-200 ${
+                          className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 transition-all duration-200 ${
                             active
                               ? "text-white"
                               : "text-white/60 group-hover:text-white"
@@ -204,11 +205,11 @@ export default function AdminSidebar({ open, setOpen }: Props) {
 
                         {isExpanded && (
                           <span
-                            className={`text-xs font-medium ${
-                              active
-                                ? "text-white"
-                                : "text-white/80 group-hover:text-white"
-                            }`}
+                            className={`
+        font-medium
+        text-[10px] sm:text-xs md:text-sm lg:text-base
+        ${active ? "text-white" : "text-white/80 group-hover:text-white"}
+      `}
                           >
                             {link.name}
                           </span>
