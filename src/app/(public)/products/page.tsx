@@ -27,16 +27,13 @@ export default function ProductsPage() {
 
           if (!product) return Promise.resolve(false);
 
-          // Use first image from imageUrls array, fallback to imageUrl
-          const productImage = product.imageUrls?.[0] || product.imageUrl || "";
-
           return addToCart(
             {
               itemType: "PRODUCT",
               productId: product.id,
               productName: product.name,
               price: product.price,
-              productImage: productImage,
+              productImage: product.imageUrl ?? "",
             },
             quantity
           );
