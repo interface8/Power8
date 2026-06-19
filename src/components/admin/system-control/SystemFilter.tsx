@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, ChevronDown, Check } from "lucide-react";
-import { SystemStatus } from "@/types/admin-system";
+import { SystemStatus } from "@/types/admin-solar-system";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,17 +50,25 @@ export function SystemFilters({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex h-11 min-w-40 items-center justify-between gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 transition-all hover:border-orange-300 hover:bg-orange-50/40 focus:outline-none focus:ring-4 focus:ring-orange-100">
-            <span className="truncate">{selectedOption?.label || "All Systems"}</span>
+            <span className="truncate">
+              {selectedOption?.label || "All Systems"}
+            </span>
             <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" sideOffset={8} className="z-50 min-w-40 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg">
+        <DropdownMenuContent
+          align="start"
+          sideOffset={8}
+          className="z-50 min-w-40 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg"
+        >
           {statusOptions.map((option) => {
             const isActive = status === option.value;
             return (
               <DropdownMenuItem
                 key={option.value}
-                onClick={() => onStatusChange(option.value as SystemStatus | "ALL")}
+                onClick={() =>
+                  onStatusChange(option.value as SystemStatus | "ALL")
+                }
                 className={`flex cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? "bg-orange-100 text-orange-700"

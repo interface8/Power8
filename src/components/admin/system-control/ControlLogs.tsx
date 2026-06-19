@@ -1,6 +1,5 @@
 "use client";
-
-import { ControlLog } from "@/types/admin-system";
+import { ControlLog } from "@/types/admin-solar-system";
 import { formatDate, actionConfig } from "./systemUtils";
 import { ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { useState } from "react";
@@ -12,7 +11,7 @@ interface ControlLogsProps {
 export function ControlLogs({ logs }: ControlLogsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (logs.length === 0) {
+  if (!logs || logs.length === 0) {
     return null;
   }
 
@@ -34,7 +33,7 @@ export function ControlLogs({ logs }: ControlLogsProps) {
         )}
       </button>
 
-      {/* Log Entries - Figma style with action on left, admin + date on right */}
+      {/* Log Entries */}
       {isExpanded && (
         <div className="mt-3 space-y-3">
           {displayLogs.map((log, index) => {
@@ -48,11 +47,10 @@ export function ControlLogs({ logs }: ControlLogsProps) {
                     <span className="font-medium text-gray-700">{config.label}</span>
                   </div>
                   <div className="text-right text-xs text-gray-400">
-                    <div className="font-medium text-gray-600">{log.performedBy}</div>
+                    <div className="font-medium text-gray-600">{log.actorName || "System"}</div>
                     <div>{formatDate(log.createdAt)}</div>
                   </div>
                 </div>
-                {/* Divider line between entries - Figma style */}
                 {index < displayLogs.length - 1 && (
                   <hr className="my-3 border-gray-100" />
                 )}

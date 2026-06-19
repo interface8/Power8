@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { X, AlertTriangle, Zap, Power, AlertCircle } from "lucide-react";
-import { System, ControlAction } from "@/types/admin-system";
+import { System, ControlAction } from "@/types/admin-solar-system";
 import { actionConfig, statusConfig } from "./systemUtils";
 
 interface ActionModalProps {
@@ -69,7 +69,7 @@ export function ActionModal({
           className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header - Figma style */}
+          {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div className="flex items-center gap-3">
               <div
@@ -101,9 +101,9 @@ export function ActionModal({
             </button>
           </div>
 
-          {/* Content - Figma style */}
+         
           <div className="p-6">
-            {/* Current Status - Figma shows this */}
+            {/* Current Status */}
             <div className="flex items-center gap-2 mb-4">
               <StatusIcon className="h-4 w-4 text-gray-400" />
               <span className="text-sm text-gray-500">Current Status:</span>
@@ -114,7 +114,6 @@ export function ActionModal({
 
             <p className="text-sm text-gray-600 mb-4">{config.description}</p>
 
-            {/* Warning for Disable - Figma red alert box */}
             {isDisable && (
               <div className="rounded-lg bg-red-50 border border-red-200 p-3 mb-4">
                 <div className="flex items-start gap-2">
@@ -124,7 +123,6 @@ export function ActionModal({
               </div>
             )}
 
-            {/* Buttons - Figma Cancel + Confirm */}
             <div className="flex gap-3 mt-6">
               <button
                 onClick={onClose}

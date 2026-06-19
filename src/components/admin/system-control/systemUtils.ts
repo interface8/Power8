@@ -1,11 +1,11 @@
-import { System, SystemStatus, ControlAction, ControlLog } from "@/types/admin-system";
+import { System, SystemStatus, ControlAction, ControlLog } from "@/types/admin-solar-system";
 import { 
   CheckCircle2, 
   XCircle, 
   AlertTriangle, 
   ShieldCheck,
   ShieldOff,
-  ShieldAlert
+  ShieldAlert,
 } from "lucide-react";
 
 export const statusConfig: Record<SystemStatus, {
@@ -15,6 +15,13 @@ export const statusConfig: Record<SystemStatus, {
   bgColor: string;
   icon: React.ElementType;
 }> = {
+  ACTIVE: {
+    label: "Enabled",
+    color: "text-green-600",
+    dotColor: "bg-green-500",
+    bgColor: "bg-green-100",
+    icon: CheckCircle2,
+  },
   ENABLED: {
     label: "Enabled",
     color: "text-green-600",
@@ -76,9 +83,10 @@ export const formatDate = (date: string) => {
   });
 };
 
-export const getSystemLogs = (systemId: string, logs: ControlLog[]) => {
-  return logs.filter(log => log.systemId === systemId);
-};
+export const getSystemLogs = (
+  _systemId: string,
+  logs: ControlLog[]
+) => logs;
 
 export const getStatusCount = (systems: System[], status: SystemStatus) => {
   return systems.filter(s => s.status === status).length;
@@ -92,7 +100,8 @@ export const filterSystems = (
   return systems.filter(system => {
     const matchesSearch = 
       system.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      system.deviceId.toLowerCase().includes(search.toLowerCase());
+      system.id.toLowerCase().includes(search.toLowerCase()) ||
+      (system.deviceId && system.deviceId.toLowerCase().includes(search.toLowerCase()));
     const matchesStatus = status === "ALL" || system.status === status;
     return matchesSearch && matchesStatus;
   });
