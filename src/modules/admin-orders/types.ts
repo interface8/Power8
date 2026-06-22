@@ -83,11 +83,11 @@ export type AdminOrderItemDetailDto = {
 
 export type AdminOrderDetailsDto = {
   id: string;
-
   customer: {
     id: string;
     name: string;
     email: string;
+    phone?: string;
   };
 
   createdAt: Date;

@@ -51,7 +51,7 @@ export function PaymentActionButtons({
             >
               {Icon}
               <span className="hidden xs:inline">{config.label}</span>
-              <span className="xs:hidden">{config.label.substring(0, 6)}</span>
+              <span className="xs:hidden">{config.label}</span>
             </button>
           );
         })}

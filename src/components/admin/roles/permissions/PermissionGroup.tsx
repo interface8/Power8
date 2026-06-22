@@ -73,7 +73,7 @@ export function PermissionGroup({
                 e.stopPropagation();
                 handleRevokeAll();
               }}
-              className="border border-orange-200 p-2 rounded-md text-xs text-orange-600 hover:text-orange-700 hover:text-red-500 hover:border-red-200 font-medium whitespace-nowrap"
+              className="border border-orange-200 p-2 rounded-md text-xs text-orange-600  hover:text-red-500 hover:border-red-200 font-medium whitespace-nowrap"
             >
               ✓ All granted — click to revoke all
             </button>
