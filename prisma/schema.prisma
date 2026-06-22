@@ -50,7 +50,7 @@ model Product {
   bundleItems   BundleItem[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
-  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@map("products")

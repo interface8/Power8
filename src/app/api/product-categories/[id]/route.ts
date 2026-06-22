@@ -59,11 +59,17 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await categoryService.deleteCategory(id);
+    await categoryService.deleteCategoryAdmin(id);
     return jsonResponse({ message: "Category deleted successfully" });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === "Category not found") {
       return errorResponse("Category not found", 404);
+    }
+    if (error instanceof Error && error.message === "Category has products") {
+      return errorResponse(
+        "Cannot delete category because it has products assigned. Move or delete those products first.",
+        409,
+      );
     }
     return errorResponse("Internal server error", 500);
   }
