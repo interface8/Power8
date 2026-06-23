@@ -10,24 +10,19 @@ import {
   disableSolarSystem,
   limitSolarSystem,
 } from "@/lib/api/admin-solar-systems";
-import {
-  SystemFilters,
-  SystemsResponse,
-  System,
-  ControlLog,
-} from "@/types/admin-solar-system";
+import { SystemFilters } from "@/types/admin-solar-system";
 
 // ============ Queries ============
 
 export function useSolarSystems(filters: SystemFilters) {
-  return useQuery<SystemsResponse>({
+  return useQuery({
     queryKey: ["solar-systems", filters],
     queryFn: () => getSolarSystems(filters),
   });
 }
 
 export function useSolarSystem(id: string) {
-  return useQuery<{ data: System }>({
+  return useQuery({
     queryKey: ["solar-system", id],
     queryFn: () => getSolarSystemById(id),
     enabled: !!id,
@@ -35,7 +30,7 @@ export function useSolarSystem(id: string) {
 }
 
 export function useSolarSystemLogs(id: string) {
-  return useQuery<{ data: ControlLog[] }>({
+  return useQuery({
     queryKey: ["solar-system-logs", id],
     queryFn: () => getSolarSystemLogs(id),
     enabled: !!id,

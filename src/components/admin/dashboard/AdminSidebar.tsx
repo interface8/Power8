@@ -125,7 +125,7 @@ export default function AdminSidebar({ open, setOpen }: Props) {
         {/* Header */}
         <div className="relative h-14 border-b border-white/10 flex items-center justify-between px-3">
           <Link
-            href="/dashboard"
+            href="/"
             className={`flex items-center gap-2 transition-all duration-300 ${!isExpanded ? "justify-center w-full" : ""}`}
           >
             <div className="bg-linear-to-br from-orange-500 to-orange-600 p-1 rounded-lg shadow-lg shadow-orange-500/20">

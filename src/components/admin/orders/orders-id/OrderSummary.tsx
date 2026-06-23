@@ -355,17 +355,17 @@ export function OrderSummary({
                         {trackingNumber}
                       </p>
 
-                        <button
-                      type="button"
-                      onClick={handleCopyTracking}
-                      className="rounded-md border border-gray-200 p-1.5 transition-all hover:border-orange-300 hover:bg-orange-50"
-                    >
-                      {copiedTrackingNumber ? (
-                        <Check className="h-3.5 w-3.5 text-green-600" />
-                      ) : (  
-                        <Copy className="h-3.5 w-3.5 text-gray-500" />
-                      )}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={handleCopyTracking}
+                        className="rounded-md border border-gray-200 p-1.5 transition-all hover:border-orange-300 hover:bg-orange-50"
+                      >
+                        {copiedTrackingNumber ? (
+                          <Check className="h-3.5 w-3.5 text-green-600" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5 text-gray-500" />
+                        )}
+                      </button>
                     </div>
                   </div>
                 )}
@@ -404,7 +404,7 @@ export function OrderSummary({
         {/* Footer Timeline */}
         <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-gray-400 border-t border-gray-100 pt-4">
           <div className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5 text-orange-500"  />
+            <Calendar className="h-3.5 w-3.5 text-orange-500" />
             <span className="font-medium text-gray-600">
               Order placed:{" "}
               <span className="text-gray-600">{formatDate(orderDate)}</span>
@@ -416,7 +416,7 @@ export function OrderSummary({
             <span className="capitalize text-gray-600 font-medium">
               {paymentType === "CREDIT"
                 ? `Credit • ${paymentStatus.toLowerCase().replace("_", " ")}`
-                : `Full Payment • ${paymentStatus.toLowerCase().replace("_", " ") }`}
+                : `Full Payment • ${paymentStatus.toLowerCase().replace("_", " ")}`}
             </span>
           </div>
           {trackingNumber && (

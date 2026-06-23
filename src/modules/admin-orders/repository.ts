@@ -273,79 +273,6 @@ export async function updateOrderPaymentStatusWithAudit(params: {
   });
 }
 
-// export async function updateOrderShippingStatusWithAudit(params: {
-//   orderId: string;
-//   adminId: string;
-//   newStatus: ShippingStatus;
-//   trackingNumber?: string;
-//   shippingProvider?: string;
-// }) {
-//   const { orderId, adminId, newStatus, trackingNumber, shippingProvider } =
-//     params;
-//   const nextOrderStatus =
-//     newStatus === "PROCESSING"
-//       ? "PROCESSING"
-//       : newStatus === "SHIPPED"
-//         ? "SHIPPED"
-//         : newStatus === "DELIVERED"
-//           ? "DELIVERED"
-//           : null;
-
-//   return prisma.$transaction(async (tx) => {
-//     const order = await tx.order.findUnique({
-//       where: { id: orderId },
-//       select: {
-//         id: true,
-//         shippingStatus: true,
-//         trackingNumber: true,
-//         shippingProvider: true,
-//       },
-//     });
-//     if (!order) throw new Error("Order not found");
-
-//     const previous = {
-//       status: order.shippingStatus,
-//       trackingNumber: order.trackingNumber,
-//       shippingProvider: order.shippingProvider,
-//     };
-
-//     const updated = await tx.order.update({
-//       where: { id: orderId },
-//       data: {
-//         shippingStatus: newStatus,
-//         ...(nextOrderStatus ? { status: nextOrderStatus } : {}),
-//         trackingNumber: trackingNumber ?? order.trackingNumber,
-//         shippingProvider: shippingProvider ?? order.shippingProvider,
-//       },
-//       select: {
-//         id: true,
-//         shippingStatus: true,
-//         trackingNumber: true,
-//         shippingProvider: true,
-//         updatedAt: true,
-//       },
-//     });
-
-//     await tx.adminAuditLog.create({
-//       data: {
-//         action: "ORDER_SHIPPING_STATUS_UPDATED",
-//         adminId,
-//         orderId,
-//         metadata: {
-//           previous,
-//           next: {
-//             status: newStatus,
-//             trackingNumber: updated.trackingNumber,
-//             shippingProvider: updated.shippingProvider,
-//           },
-//         } satisfies Prisma.JsonObject,
-//       },
-//     });
-
-//     return { previous, ...updated };
-//   });
-// }
-
 export async function updateOrderShippingStatusWithAudit(params: {
   orderId: string;
   adminId: string;
@@ -355,8 +282,14 @@ export async function updateOrderShippingStatusWithAudit(params: {
 }) {
   const { orderId, adminId, newStatus, trackingNumber, shippingProvider } =
     params;
-
-  // ✅ REMOVED auto-order-status update
+  const nextOrderStatus =
+    newStatus === "PROCESSING"
+      ? "PROCESSING"
+      : newStatus === "SHIPPED"
+        ? "SHIPPED"
+        : newStatus === "DELIVERED"
+          ? "DELIVERED"
+          : null;
 
   return prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
@@ -380,7 +313,7 @@ export async function updateOrderShippingStatusWithAudit(params: {
       where: { id: orderId },
       data: {
         shippingStatus: newStatus,
-        // ✅ No more auto-update: removed ...(nextOrderStatus ? { status: nextOrderStatus } : {}),
+        ...(nextOrderStatus ? { status: nextOrderStatus } : {}),
         trackingNumber: trackingNumber ?? order.trackingNumber,
         shippingProvider: shippingProvider ?? order.shippingProvider,
       },
@@ -412,3 +345,70 @@ export async function updateOrderShippingStatusWithAudit(params: {
     return { previous, ...updated };
   });
 }
+
+// export async function updateOrderShippingStatusWithAudit(params: {
+//   orderId: string;
+//   adminId: string;
+//   newStatus: ShippingStatus;
+//   trackingNumber?: string;
+//   shippingProvider?: string;
+// }) {
+//   const { orderId, adminId, newStatus, trackingNumber, shippingProvider } =
+//     params;
+
+//   // ✅ REMOVED auto-order-status update
+
+//   return prisma.$transaction(async (tx) => {
+//     const order = await tx.order.findUnique({
+//       where: { id: orderId },
+//       select: {
+//         id: true,
+//         shippingStatus: true,
+//         trackingNumber: true,
+//         shippingProvider: true,
+//       },
+//     });
+//     if (!order) throw new Error("Order not found");
+
+//     const previous = {
+//       status: order.shippingStatus,
+//       trackingNumber: order.trackingNumber,
+//       shippingProvider: order.shippingProvider,
+//     };
+
+//     const updated = await tx.order.update({
+//       where: { id: orderId },
+//       data: {
+//         shippingStatus: newStatus,
+//         // ✅ No more auto-update: removed ...(nextOrderStatus ? { status: nextOrderStatus } : {}),
+//         trackingNumber: trackingNumber ?? order.trackingNumber,
+//         shippingProvider: shippingProvider ?? order.shippingProvider,
+//       },
+//       select: {
+//         id: true,
+//         shippingStatus: true,
+//         trackingNumber: true,
+//         shippingProvider: true,
+//         updatedAt: true,
+//       },
+//     });
+
+//     await tx.adminAuditLog.create({
+//       data: {
+//         action: "ORDER_SHIPPING_STATUS_UPDATED",
+//         adminId,
+//         orderId,
+//         metadata: {
+//           previous,
+//           next: {
+//             status: newStatus,
+//             trackingNumber: updated.trackingNumber,
+//             shippingProvider: updated.shippingProvider,
+//           },
+//         } satisfies Prisma.JsonObject,
+//       },
+//     });
+
+//     return { previous, ...updated };
+//   });
+// }

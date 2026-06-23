@@ -1,20 +1,28 @@
-import { System, SystemStatus, ControlAction, ControlLog } from "@/types/admin-solar-system";
-import { 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
+import {
+  System,
+  SystemStatus,
+  ControlAction,
+  ControlLog,
+} from "@/types/admin-solar-system";
+import {
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
   ShieldCheck,
   ShieldOff,
   ShieldAlert,
 } from "lucide-react";
 
-export const statusConfig: Record<SystemStatus, {
-  label: string;
-  color: string;
-  dotColor: string;
-  bgColor: string;
-  icon: React.ElementType;
-}> = {
+export const statusConfig: Record<
+  SystemStatus,
+  {
+    label: string;
+    color: string;
+    dotColor: string;
+    bgColor: string;
+    icon: React.ElementType;
+  }
+> = {
   ACTIVE: {
     label: "Enabled",
     color: "text-green-600",
@@ -45,31 +53,38 @@ export const statusConfig: Record<SystemStatus, {
   },
 };
 
-export const actionConfig: Record<ControlAction, {
-  label: string;
-  color: string;
-  icon: React.ElementType;
-  description: string;
-  warning?: string;
-}> = {
+export const actionConfig: Record<
+  ControlAction,
+  {
+    label: string;
+    color: string;
+    icon: React.ElementType;
+    description: string;
+    warning?: string;
+  }
+> = {
   ENABLE: {
     label: "System Enabled",
     color: "text-green-600",
     icon: ShieldCheck,
-    description: "Enabling this system will restore full solar power to this customer's installation.",
+    description:
+      "Enabling this system will restore full solar power to this customer's installation.",
   },
   DISABLE: {
     label: "System Disabled",
     color: "text-red-600",
     icon: ShieldOff,
-    description: "Disabling this system will completely cut off power to this customer's installation.",
-    warning: "This is a severe action. The customer will immediately lose access to solar power.",
+    description:
+      "Disabling this system will completely cut off power to this customer's installation.",
+    warning:
+      "This is a severe action. The customer will immediately lose access to solar power.",
   },
   LIMIT: {
     label: "System Limited",
     color: "text-orange-600",
     icon: ShieldAlert,
-    description: "Limiting this system will reduce the power output for this customer's installation to a restricted level.",
+    description:
+      "Limiting this system will reduce the power output for this customer's installation to a restricted level.",
   },
 };
 
@@ -83,25 +98,30 @@ export const formatDate = (date: string) => {
   });
 };
 
-export const getSystemLogs = (
-  _systemId: string,
-  logs: ControlLog[]
-) => logs;
+export const getSystemLogs = (systemId: string, logs: ControlLog[]) => {
+  if (logs.length > 0 && "systemId" in logs[0]) {
+    return logs.filter(
+      (log) => (log as { systemId?: string }).systemId === systemId,
+    );
+  }
+  return logs;
+};
 
 export const getStatusCount = (systems: System[], status: SystemStatus) => {
-  return systems.filter(s => s.status === status).length;
+  return systems.filter((s) => s.status === status).length;
 };
 
 export const filterSystems = (
   systems: System[],
   search: string,
-  status: SystemStatus | "ALL"
+  status: SystemStatus | "ALL",
 ) => {
-  return systems.filter(system => {
-    const matchesSearch = 
+  return systems.filter((system) => {
+    const matchesSearch =
       system.customerName.toLowerCase().includes(search.toLowerCase()) ||
       system.id.toLowerCase().includes(search.toLowerCase()) ||
-      (system.deviceId && system.deviceId.toLowerCase().includes(search.toLowerCase()));
+      (system.deviceId &&
+        system.deviceId.toLowerCase().includes(search.toLowerCase()));
     const matchesStatus = status === "ALL" || system.status === status;
     return matchesSearch && matchesStatus;
   });
