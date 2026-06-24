@@ -16,9 +16,9 @@ export default function AdminLayout({
     const observer = new MutationObserver(() => {
       setIsExpanded(document.body.getAttribute("data-sidebar-expanded") === "true");
     });
-    
+
     observer.observe(document.body, { attributes: true });
-    
+
     return () => observer.disconnect();
   }, []);
 

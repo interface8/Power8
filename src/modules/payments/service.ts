@@ -147,6 +147,44 @@ export async function handleWebhook(reference: string) {
       data: { status: "CONFIRMED" },
     });
 
+    // Provision a solar system for each bundle in the order. Runs for both full
+    // and credit payments; for credit it fires on the first installment so the
+    // customer gets a live (ACTIVE) system that admins can later limit/disable.
+    // Idempotent: skips bundles that already have a system for this order, so
+    // subsequent credit installments don't create duplicates.
+    const bundleItems = await tx.orderItem.findMany({
+      where: { orderId: payment.orderId, itemType: "BUNDLE", bundleId: { not: null } },
+      select: { bundleId: true },
+    });
+
+    if (bundleItems.length > 0) {
+      const existingSystems = await tx.solarSystem.findMany({
+        where: { orderId: payment.orderId },
+        select: { bundleId: true },
+      });
+      const provisioned = new Set(existingSystems.map((s) => s.bundleId));
+
+      const systemsToCreate: Array<{
+        userId: string;
+        orderId: string;
+        bundleId: string;
+      }> = [];
+      for (const item of bundleItems) {
+        if (item.bundleId && !provisioned.has(item.bundleId)) {
+          provisioned.add(item.bundleId);
+          systemsToCreate.push({
+            userId: payment.userId,
+            orderId: payment.orderId,
+            bundleId: item.bundleId,
+          });
+        }
+      }
+
+      if (systemsToCreate.length > 0) {
+        await tx.solarSystem.createMany({ data: systemsToCreate });
+      }
+    }
+
     return {
       id: payment.id,
       userId: payment.userId,

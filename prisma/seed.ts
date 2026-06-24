@@ -48,16 +48,10 @@ async function main() {
     { resource: "blogs", action: "update", description: "Update blogs" },
     { resource: "blogs", action: "delete", description: "Delete blogs" },
 
-    // Blog Categories
-    { resource: "blog-categories", action: "create", description: "Create blog categories" },
-
     // Product Categories
     { resource: "product-categories", action: "create", description: "Create product categories" },
     { resource: "product-categories", action: "update", description: "Update product categories" },
     { resource: "product-categories", action: "delete", description: "Delete product categories" },
-
-    // Systems
-    { resource: "systems", action: "control", description: "Control solar systems" },
   ];
 
   const newPermissionDefs = [
@@ -176,44 +170,6 @@ async function main() {
 
   console.log("  ✅ Admin role created with all permissions");
 
-  // ─── 3. Create Viewer Role (read-only) ───────────────
-  const viewerRole = await prisma.role.upsert({
-    where: { name: "viewer" },
-    update: {},
-    create: {
-      name: "viewer",
-      description: "Read-only access",
-    },
-  });
-
-  const viewActions = new Set([
-    "read",
-    "view",
-    "view_list",
-    "view_detail",
-    "view_logs",
-    "view_stats",
-  ]);
-
-  const viewerPermissions = permissions.filter((p) => viewActions.has(p.action));
-  for (const perm of viewerPermissions) {
-    await prisma.rolePermission.upsert({
-      where: {
-        roleId_permissionId: {
-          roleId: viewerRole.id,
-          permissionId: perm.id,
-        },
-      },
-      update: {},
-      create: {
-        roleId: viewerRole.id,
-        permissionId: perm.id,
-      },
-    });
-  }
-
-  console.log("  ✅ Viewer role created with read permissions");
-
   // ─── 3b. Create Customer Role (default) ─────────────────────────
 const customerRole = await prisma.role.upsert({
   where: { name: "Customer" },
@@ -259,38 +215,7 @@ console.log("  ✅ Customer role created");
     },
   });
 
-  console.log("  ✅ Admin user created (admin@power8.dev / admin123)");
-
-  // ─── 5. Create Demo Viewer User ─────────────────────
-const viewerUser = await prisma.user.upsert({
-  where: { email: "viewer@power8.dev" },
-  update: {
-    phone: "+10000000002",
-  },
-  create: {
-    email: "viewer@power8.dev",
-    phone: "+10000000002",
-    password: await hash("viewer123", 12),
-    name: "Demo Viewer",
-    isActive: true,
-  },
-});
-
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: viewerUser.id,
-        roleId: viewerRole.id,
-      },
-    },
-    update: {},
-    create: {
-      userId: viewerUser.id,
-      roleId: viewerRole.id,
-    },
-  });
-
-  console.log("  ✅ Viewer user created (viewer@power8.dev / viewer123)");
+  console.log("  ✅ Admin user created (admin@power8.dev / Admin.123)");
 
   // ─── 6. Create Companies ─────────────────────────────
   const companiesDefs = [

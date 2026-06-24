@@ -19,6 +19,9 @@ export type AdminOrderListRowDto = {
   installationAddress: string | null;
   city: string | null;
   state: string | null;
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
   shippingStatus: ShippingStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -99,6 +102,10 @@ export type AdminOrderDetailsDto = {
   installationAddress: string | null;
   city: string | null;
   state: string | null;
+
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
 
   orderStatus: OrderStatus;
   paymentStatus: OrderPaymentStatus;
