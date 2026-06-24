@@ -39,10 +39,15 @@ export default function AdminOrderDetailsPage() {
     action: () => void;
   }>({ isOpen: false, title: "", message: "", action: () => {} });
 
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
-  const showToast = (message: string, type: "success" | "error") => setToast({ message, type });
-  const closeModal = () => setModalConfig((prev) => ({ ...prev, isOpen: false }));
+  const showToast = (message: string, type: "success" | "error") =>
+    setToast({ message, type });
+  const closeModal = () =>
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
 
   const handleUpdateOrderStatus = (status: OrderStatus) => {
     setModalConfig({
@@ -52,7 +57,10 @@ export default function AdminOrderDetailsPage() {
       action: async () => {
         try {
           await updateOrderStatusMutation.mutateAsync({ id: orderId, status });
-          showToast(`Order status updated to ${status.replace("_", " ")}`, "success");
+          showToast(
+            `Order status updated to ${status.replace("_", " ")}`,
+            "success",
+          );
           refetch();
         } catch (error) {
           showToast(
@@ -76,7 +84,10 @@ export default function AdminOrderDetailsPage() {
       action: async () => {
         try {
           await updatePaymentMutation.mutateAsync({ id: orderId, status });
-          showToast(`Payment status updated to ${status.replace("_", " ")}`, "success");
+          showToast(
+            `Payment status updated to ${status.replace("_", " ")}`,
+            "success",
+          );
           refetch();
         } catch (error) {
           showToast(
@@ -92,9 +103,18 @@ export default function AdminOrderDetailsPage() {
     });
   };
 
-  const handleUpdateShippingStatus = async (status: ShippingStatus, trackingNumber?: string, shippingProvider?: string) => {
+  const handleUpdateShippingStatus = async (
+    status: ShippingStatus,
+    trackingNumber?: string,
+    shippingProvider?: string,
+  ) => {
     try {
-      await updateShippingMutation.mutateAsync({ id: orderId, status, trackingNumber, shippingProvider });
+      await updateShippingMutation.mutateAsync({
+        id: orderId,
+        status,
+        trackingNumber,
+        shippingProvider,
+      });
       showToast(`Shipping status updated to ${status}`, "success");
       refetch();
     } catch (error) {
@@ -113,7 +133,13 @@ export default function AdminOrderDetailsPage() {
 
   return (
     <div className="w-full">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
@@ -121,18 +147,45 @@ export default function AdminOrderDetailsPage() {
         onConfirm={modalConfig.action}
         title={modalConfig.title}
         message={modalConfig.message}
-        isLoading={updateOrderStatusMutation.isPending || updatePaymentMutation.isPending}
+        isLoading={
+          updateOrderStatusMutation.isPending || updatePaymentMutation.isPending
+        }
       />
 
       <div className="space-y-4 sm:space-y-6">
-        <OrderHeader orderId={order.id} orderStatus={order.orderStatus} createdAt={order.createdAt} />
+        <OrderHeader
+          orderId={order.id}
+          orderStatus={order.orderStatus}
+          createdAt={order.createdAt}
+        />
 
-        <OrderSummary
+        {/* <OrderSummary
           customerName={order.customer.name}
           customerEmail={order.customer.email}
           totalAmount={order.totalAmount}
           paymentType={order.paymentType}
           paymentStatus={order.paymentStatus}
+        /> */}
+
+        <OrderSummary
+          customerName={order.customer.name}
+          customerEmail={order.customer.email}
+          customerPhone={order.customer.phone}
+          totalAmount={order.totalAmount}
+          paymentType={order.paymentType}
+          paymentStatus={order.paymentStatus}
+          orderStatus={order.orderStatus}
+          orderDate={order.createdAt}
+          orderId={order.id}
+          installationAddress={order.installationAddress}
+          city={order.city}
+          state={order.state}
+          shippingStatus={order.shipping.status}
+          trackingNumber={order.shipping.trackingNumber}
+          shippingProvider={order.shipping.shippingProvider}
+          totalPaid={order.payment.totalPaid}
+          remainingBalance={order.payment.remainingBalance}
+          itemCount={order.items.length}
         />
 
         <OrderItemsTable items={order.items} totalAmount={order.totalAmount} />

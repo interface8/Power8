@@ -27,7 +27,7 @@ export type ScheduleStatus = "PENDING" | "PAID" | "OVERDUE";
 
 export type CreditStatus = "ACTIVE" | "COMPLETED" | "DEFAULTED";
 
-// Order item from API
+
 export interface OrderItem {
   id: string;
   itemType: "PRODUCT" | "BUNDLE";
@@ -37,7 +37,6 @@ export interface OrderItem {
   subtotal: number;
 }
 
-// Payment history item
 export interface PaymentHistoryItem {
   id: string;
   amount: number;
@@ -47,7 +46,6 @@ export interface PaymentHistoryItem {
   createdAt: string;
 }
 
-// Credit schedule item
 export interface CreditScheduleItem {
   id: string;
   dueDate: string;
@@ -57,7 +55,6 @@ export interface CreditScheduleItem {
   updatedAt: string;
 }
 
-// Credit account
 export interface CreditAccount {
   id: string;
   totalAmount: number;
@@ -67,13 +64,13 @@ export interface CreditAccount {
   schedules: CreditScheduleItem[];
 }
 
-// Full order detail (matches backend response)
 export interface AdminOrderDetail {
   id: string;
   customer: {
     id: string;
     name: string;
     email: string;
+    phone?: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -98,7 +95,6 @@ export interface AdminOrderDetail {
   credit: CreditAccount | null;
 }
 
-// List row (simplified for table)
 export interface AdminOrder {
   id: string;
   customerName: string;

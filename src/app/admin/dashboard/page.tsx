@@ -6,7 +6,7 @@ import DashboardStatsSkeleton from "@/components/admin/dashboard/DashboardStatsS
 import { useAdminStats } from "@/hooks/use-admin-stats";
 import { useAuth } from "@/components/providers/auth-provider";
 import { ArrowUpRight } from "lucide-react";
-import { StateHandler } from "@/components/ui/StateHandler";
+import { ErrorState } from "@/components/ui/states";
 
 export default function DashboardPage() {
   const { data, loading, error, refetch } = useAdminStats();
@@ -16,19 +16,16 @@ export default function DashboardPage() {
     return <DashboardStatsSkeleton />;
   }
 
-  // Error handler using StateHandler
   if (error || !data) {
     return (
-      <StateHandler
-        isError={true}
-        error={error|| "Failed to load dashboard data"}
-        onRetry={refetch}
-        title="Dashboard Error"
-        message="Unable to load dashboard data. Please check your connection and try again."
-      />
+      <div className="space-y-8">
+        <ErrorState
+          error={error || "Failed to load dashboard data"}
+          onRetry={refetch}
+        />
+      </div>
     );
   }
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -39,9 +36,9 @@ export default function DashboardPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500 md:text-base">
-            Welcome back, {user?.name || "Administrator"}.
-            Here’s a real-time overview of your store performance,
-            customer activities, and inventory insights.
+            Welcome back, {user?.name || "Administrator"}. Here’s a real-time
+            overview of your store performance, customer activities, and
+            inventory insights.
           </p>
         </div>
 
@@ -132,9 +129,7 @@ export default function DashboardPage() {
                   key={item.title}
                   className="flex items-start gap-4 rounded-2xl border border-gray-100 p-4 transition hover:bg-gray-50"
                 >
-                  <div
-                    className={`mt-1 h-3 w-3 rounded-full ${item.color}`}
-                  />
+                  <div className={`mt-1 h-3 w-3 rounded-full ${item.color}`} />
 
                   <div>
                     <p className="text-sm font-semibold text-gray-800">

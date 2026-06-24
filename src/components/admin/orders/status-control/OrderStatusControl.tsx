@@ -142,7 +142,7 @@ export function OrderStatusControl({
                 ${statusColors[currentStatus].border}
               `}
             >
-              {currentStatus.replace("_", " ")}
+              {currentStatus}
             </span>
           </div>
 
@@ -193,53 +193,55 @@ export function OrderStatusControl({
         )}
 
         {/* Timeline */}
-        <div className="overflow-x-auto pt-2">
-          <div className="flex min-w-150 items-start">
+        <div className="pt-2 overflow-x-auto">
+          <div className="flex items-start min-w-max sm:min-w-0">
             {timelineSteps.map((step, idx) => {
               const stepIndex = timelineSteps.indexOf(step);
-
               const isCompleted = stepIndex <= currentIndex;
-
               const isCurrent = step === currentStatus;
 
               return (
-                <div key={step} className="flex flex-1 items-center">
-                  <div className="flex w-full flex-col items-center">
+                <div
+                  key={step}
+                  className="flex flex-1 items-center min-w-12.5 sm:min-w-0"
+                >
+                  <div className="flex w-full flex-col items-center px-0.5">
                     {/* Progress line */}
                     <div
                       className={`
-                        h-2 w-full rounded-full transition-all duration-300
-                        ${isCompleted ? "bg-orange-500" : "bg-gray-200"}
-                      `}
+                h-1 w-full rounded-full transition-all duration-300
+                ${isCompleted ? "bg-orange-500" : "bg-gray-200"}
+              `}
                     />
 
                     {/* Label */}
                     <div
                       className={`
-                        mt-3 text-center text-[10px]
-                        font-semibold uppercase tracking-wide
-                        sm:text-xs
+                mt-1.5 text-center text-[7px]
+                font-semibold uppercase tracking-wide
+                sm:text-[9px] md:text-[10px]
 
-                        ${
-                          isCurrent
-                            ? "text-orange-600"
-                            : isCompleted
-                              ? "text-gray-700"
-                              : "text-gray-400"
-                        }
-                      `}
+                ${
+                  isCurrent
+                    ? "text-orange-600"
+                    : isCompleted
+                      ? "text-gray-700"
+                      : "text-gray-400"
+                }
+              `}
                     >
                       {step}
                     </div>
                   </div>
 
-                  {idx < timelineSteps.length - 1 && <div className="w-1.5" />}
+                  {idx < timelineSteps.length - 1 && (
+                    <div className="w-0.5 sm:w-1" />
+                  )}
                 </div>
               );
             })}
           </div>
         </div>
-
         {isCompletedOrder && (
           <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:p-5">
             <div className="flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:text-left">

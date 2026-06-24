@@ -15,6 +15,7 @@ import React from "react";
 interface UserType {
   name?: string | null;
   email?: string | null;
+  roles?: string[];
 }
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
   dropdownRef: React.RefObject<HTMLDivElement>;
   handleLogout: () => Promise<void>;
   mobile?: boolean;
+  isAdmin?: boolean;
 }
 
 function getInitials(name?: string | null) {
@@ -40,6 +42,7 @@ export function UserDropdown({
   dropdownRef,
   handleLogout,
   mobile = false,
+  isAdmin = false,
 }: Props) {
   const router = useRouter();
   const initials = getInitials(user?.name);
@@ -65,14 +68,16 @@ export function UserDropdown({
         className="flex items-center gap-2 px-3 py-2 cursor-pointer bg-green-50 rounded-lg hover:bg-green-100"
       >
         <div
-          className={`relative rounded-full bg-green-950 ring-1 ring-green-600 text-white flex items-center justify-center font-semibold  ${
+          className={`relative rounded-full bg-green-950 ring-1 ring-green-600 text-white flex items-center justify-center font-semibold ${
             mobile ? "w-7 h-7 text-sm" : "w-7 h-7"
           }`}
         >
           {initials}
         </div>
 
-        <p className="hidden sm:block font-medium text-gray-900 truncate">{user?.name}</p>
+        <p className="hidden sm:block font-medium text-gray-900 truncate max-w-32">
+          {user?.name}
+        </p>
 
         <ChevronDown
           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
@@ -106,16 +111,22 @@ export function UserDropdown({
               Actions
             </p>
 
+            {/* Dashboard - Redirects to Admin Dashboard if admin */}
             <button
-              onMouseDown={() => navigate("/dashboard")}
+              onMouseDown={() => navigate(isAdmin ? "/admin/dashboard" : "/dashboard")}
               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition rounded-lg cursor-pointer"
             >
               <div className="p-2 bg-gray-100 rounded-lg">
                 <LayoutDashboard className="w-4 h-4 text-gray-600" />
               </div>
               <span className="text-sm font-medium text-gray-800">
-                Dashboard
+                {isAdmin ? "Admin Dashboard" : "Dashboard"}
               </span>
+              {isAdmin && (
+                <span className="ml-auto text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                  Admin
+                </span>
+              )}
             </button>
 
             <button
