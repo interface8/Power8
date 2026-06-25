@@ -156,8 +156,9 @@ export function MerchantSidebar({ open, setOpen }: MerchantSidebarProps) {
                         href={link.href}
                         onClick={() => setOpen(false)}
                         className={`
-                          group relative flex items-center gap-3 px-3 py-2.5 rounded-xl
-                          transition-all duration-200
+                           flex items-center gap-3 px-3 py-2.5 rounded-xl
+    transition-all duration-200 group
+    text-sm sm:text-base md:text-md lg:text-lg tracking-tight
                           ${
                             active
                               ? "bg-white/20 text-white shadow-lg backdrop-blur-sm"
