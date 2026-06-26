@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, type SessionUser } from "./session";
 import { hasPermission } from "./permissions";
 import { errorResponse } from "@/lib/http";
+import { prisma } from "@/lib/prisma";
 
 // ─── Server Component / Server Action guard ────────────
 
@@ -99,6 +100,30 @@ export async function requireApiAuth(): Promise<SessionUser | Response> {
 
   return user;
 }
+
+/**
+ * API guard for merchant-only routes. Returns the merchant context, or a
+ * 401/403 Response. Only APPROVED merchants pass.
+ */
+export async function requireApiMerchant(): Promise<
+  { user: SessionUser; merchant: { id: string; status: string } } | Response
+> {
+  const user = await getCurrentUser();
+  if (!user) return errorResponse("Unauthorized", 401);
+
+  const merchant = await prisma.merchant.findUnique({
+    where: { userId: user.id },
+    select: { id: true, status: true },
+  });
+
+  if (!merchant) return errorResponse("Forbidden: merchant account required", 403);
+  if (merchant.status !== "APPROVED") {
+    return errorResponse("Your merchant account is not approved", 403);
+  }
+
+  return { user, merchant };
+}
+
 
 /**
  * Type guard to check if the guard result is an error response.
