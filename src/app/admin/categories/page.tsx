@@ -212,7 +212,7 @@ export default function CategoriesPage() {
     }
   };
 
-  // ✅ FIX 1: Changed data.message → data.error to match API response shape
+  
   const handleDelete = async () => {
     if (!deletingCategory) return;
 
@@ -235,7 +235,7 @@ export default function CategoriesPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to delete category"); // ✅ was data.message
+        throw new Error(data.error || "Failed to delete category"); 
       }
 
       await fetchCategories();
@@ -262,7 +262,7 @@ export default function CategoriesPage() {
     }
   };
 
-  // ✅ FIX 2: Bulk delete now reads error body from each failed response
+  
   const handleBulkDelete = async () => {
     if (selectedCategories.size === 0) return;
 
@@ -274,7 +274,7 @@ export default function CategoriesPage() {
           const res = await fetch(`/api/product-categories/${id}`, { method: "DELETE" });
           if (!res.ok) {
             const data = await res.json();
-            return { ok: false, error: data.error || "Failed to delete" }; // ✅ reads error body
+            return { ok: false, error: data.error || "Failed to delete" };
           }
           return { ok: true, error: null };
         })
@@ -1002,7 +1002,7 @@ export default function CategoriesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Single Delete Confirmation Dialog */}
+        {/* Single Delete Confirmation */}
       <AlertDialog open={!!deletingCategory} onOpenChange={() => setDeletingCategory(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

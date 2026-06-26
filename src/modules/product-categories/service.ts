@@ -1,6 +1,3 @@
-
-
-
 import * as categoryRepo from "./repository";
 import type {
   CreateProductCategoryInput,

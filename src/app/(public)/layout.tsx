@@ -30,13 +30,13 @@ export default function PublicLayout({
 }) {
   const pathname = usePathname();
 
-  const hideNavbar = pathname === "/login" || pathname === "/register";
+  const hideNavbar = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password";
 
   return (
     <div className="flex flex-col min-h-screen">
       {!hideNavbar && <PublicNavbar />}
 
-      {/* ✅ Only push content down when navbar exists */}
+      {/* Only push content down when navbar exists */}
       <main className={!hideNavbar ? "pt-10" : ""}>{children}</main>
     </div>
   );
