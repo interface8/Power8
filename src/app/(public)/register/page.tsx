@@ -3,17 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Sun, User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Sun, User, Mail, Phone, Lock, Eye, EyeOff, Check, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuthActions } from "@/hooks/use-auth-actions";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, loading, error } = useAuth();
+  const { register, loading, error } = useAuthActions();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,12 +23,26 @@ export default function RegisterPage() {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
-  
-  // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+
+  //Same password validation rules as Login page
+  const passwordRules = {
+    minLength: password.length >= 8,
+    hasUpperCase: /[A-Z]/.test(password),
+    hasLowerCase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  };
+
+  const allPasswordRulesMet = 
+    passwordRules.minLength &&
+    passwordRules.hasUpperCase &&
+    passwordRules.hasLowerCase &&
+    passwordRules.hasNumber &&
+    passwordRules.hasSpecialChar;
 
   const validateName = (name: string) => {
     if (!name) return "Full name is required";
@@ -49,12 +63,6 @@ export default function RegisterPage() {
     return "";
   };
 
-  const validatePassword = (password: string) => {
-    if (!password) return "Password is required";
-    if (password.length < 8) return "Minimum 8 characters";
-    return "";
-  };
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -63,10 +71,15 @@ export default function RegisterPage() {
       return;
     }
 
-    await register({ name, email, phone, password });
+    if (!allPasswordRulesMet) {
+      return;
+    }
+
+    const success = await register({ name, email, phone, password });
     
-    // Redirect to login page after successful registration
-    router.push("/login");
+    if (success) {
+      router.push("/login");
+    }
   }
 
   const isFormValid =
@@ -78,17 +91,17 @@ export default function RegisterPage() {
     !nameError &&
     !emailError &&
     !phoneError &&
-    !passwordError &&
-    !confirmError;
+    !confirmError &&
+    allPasswordRulesMet;
 
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10 bg-cover bg-center relative"
-      style={{ backgroundImage: "url('/images/power-1.jpg')" }}
+      style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      <Card className="relative z-10 w-full max-w-md lg:max-w-lg p-6 sm:p-8 rounded-2xl shadow-xl bg-white">
+      <Card className="relative z-10 w-full max-w-md lg:max-w-lg p-6 sm:p-8 rounded-2xl shadow-xl bg-white/95">
         <Link
           href="/"
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-6"
@@ -129,7 +142,7 @@ export default function RegisterPage() {
                   setName(e.target.value);
                   setNameError(validateName(e.target.value));
                 }}
-                className="pl-10 h-11 bg-gray-50"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
                 placeholder="John Doe"
               />
             </div>
@@ -138,6 +151,7 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {/* Email */}
           <div>
             <Label>Email</Label>
             <div className="relative mt-1">
@@ -148,7 +162,7 @@ export default function RegisterPage() {
                   setEmail(e.target.value);
                   setEmailError(validateEmail(e.target.value));
                 }}
-                className="pl-10 h-11 bg-gray-50"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
                 placeholder="you@example.com"
               />
             </div>
@@ -157,6 +171,7 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {/* Phone */}
           <div>
             <Label>Phone</Label>
             <div className="relative mt-1">
@@ -167,7 +182,7 @@ export default function RegisterPage() {
                   setPhone(e.target.value);
                   setPhoneError(validatePhone(e.target.value));
                 }}
-                className="pl-10 h-11 bg-gray-50"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
                 placeholder="+234..."
               />
             </div>
@@ -176,7 +191,7 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Password with eye icon */}
+          {/* Password */}
           <div>
             <Label>Password</Label>
             <div className="relative mt-1">
@@ -184,11 +199,9 @@ export default function RegisterPage() {
               <Input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError(validatePassword(e.target.value));
-                }}
-                className="pl-10 pr-10 h-11 bg-gray-50"
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setPasswordFocused(true)}
+                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
                 placeholder="••••••••"
               />
               <button
@@ -203,12 +216,64 @@ export default function RegisterPage() {
                 )}
               </button>
             </div>
-            {passwordError && (
-              <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+
+            {/* ✅ Same password requirements checklist as Login page */}
+            {(passwordFocused || password) && (
+              <div className="mt-2 space-y-1">
+                <p className="text-xs font-medium text-gray-500 mb-1">Password must have:</p>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordRules.minLength ? (
+                    <Check className="w-3 h-3 text-green-500" />
+                  ) : (
+                    <X className="w-3 h-3 text-gray-300" />
+                  )}
+                  <span className={passwordRules.minLength ? "text-green-600" : "text-gray-500"}>
+                    At least 8 characters
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordRules.hasUpperCase ? (
+                    <Check className="w-3 h-3 text-green-500" />
+                  ) : (
+                    <X className="w-3 h-3 text-gray-300" />
+                  )}
+                  <span className={passwordRules.hasUpperCase ? "text-green-600" : "text-gray-500"}>
+                    One uppercase letter (A-Z)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordRules.hasNumber ? (
+                    <Check className="w-3 h-3 text-green-500" />
+                  ) : (
+                    <X className="w-3 h-3 text-gray-300" />
+                  )}
+                  <span className={passwordRules.hasNumber ? "text-green-600" : "text-gray-500"}>
+                    One number (0-9)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordRules.hasSpecialChar ? (
+                    <Check className="w-3 h-3 text-green-500" />
+                  ) : (
+                    <X className="w-3 h-3 text-gray-300" />
+                  )}
+                  <span className={passwordRules.hasSpecialChar ? "text-green-600" : "text-gray-500"}>
+                    One special character (!@#$%^&*)
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/*  Success message when all rules are met */}
+            {allPasswordRulesMet && password && (
+              <div className="mt-2 flex items-center gap-2">
+                <Check className="w-3 h-3 text-green-500" />
+                <p className="text-xs text-green-600">Password meets all requirements</p>
+              </div>
             )}
           </div>
 
-          {/* Confirm Password with eye icon */}
+          {/* Confirm Password */}
           <div>
             <Label>Confirm Password</Label>
             <div className="relative mt-1">
@@ -222,7 +287,7 @@ export default function RegisterPage() {
                     e.target.value !== password ? "Passwords do not match" : "",
                   );
                 }}
-                className="pl-10 pr-10 h-11 bg-gray-50"
+                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
                 placeholder="••••••••"
               />
               <button
@@ -240,12 +305,18 @@ export default function RegisterPage() {
             {confirmError && (
               <p className="text-xs text-red-500 mt-1">{confirmError}</p>
             )}
+            {confirmPassword && !confirmError && password && allPasswordRulesMet && (
+              <div className="mt-1 flex items-center gap-2">
+                <Check className="w-3 h-3 text-green-500" />
+                <p className="text-xs text-green-600">Passwords match</p>
+              </div>
+            )}
           </div>
 
           <Button
             type="submit"
             disabled={!isFormValid || loading}
-            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
+            className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
           >
             {loading ? "Creating account..." : "Create Account"}
           </Button>
@@ -253,7 +324,7 @@ export default function RegisterPage() {
 
         <p className="text-sm text-center text-gray-500 mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-orange-500 font-medium">
+          <Link href="/login" className="text-orange-500 hover:text-orange-600 font-medium">
             Sign in
           </Link>
         </p>
