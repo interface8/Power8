@@ -15,19 +15,10 @@ export interface IdentityData {
   nin: string;
 }
 
-/**
- * Prevent script injection and unsafe characters
- */
 export const sanitizeInput = (value: string): string => {
-  return value
-    .replace(/<script.*?>.*?<\/script>/gi, "")
-    .replace(/[<>]/g, "")
-    .trim();
+  return value.replace(/<script.*?>.*?<\/script>/gi, "").replace(/[<>]/g, "");
 };
 
-/**
- * Nigerian currency formatter
- */
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
@@ -37,25 +28,14 @@ export const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-/**
- * Strict BVN validation
- * Must be exactly 11 digits
- */
 export const validateBVN = (bvn: string): boolean => {
   return /^\d{11}$/.test(bvn.trim());
 };
 
-/**
- * Strict NIN validation
- * Must be exactly 11 digits
- */
 export const validateNIN = (nin: string): boolean => {
   return /^\d{11}$/.test(nin.trim());
 };
 
-/**
- * Credit payment calculation
- */
 export const calculateCreditBreakdown = (
   totalAmount: number,
   depositAmount: number,

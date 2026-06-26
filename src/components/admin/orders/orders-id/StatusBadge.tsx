@@ -89,10 +89,8 @@ export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
       className={`inline-flex items-center gap-1 rounded-full font-medium ${padding} ${textSize} ${config.color}`}
     >
       {config.icon}
-      <span className="hidden xs:inline">{status.replace(/_/g, " ")}</span>
-      <span className="xs:hidden">
-        {status.replace(/_/g, " ").substring(0, 7)}
-      </span>
+      <span className="hidden xs:inline">{status}</span>
+      <span className="xs:hidden">{status}</span>
     </span>
   );
 }

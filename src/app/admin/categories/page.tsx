@@ -128,8 +128,8 @@ export default function CategoriesPage() {
 
     try {
       const url = editingCategory
-        ? `/api/product-categories/${editingCategory.id}`
-        : "/api/product-categories";
+        ? `/api/admin/categories/${editingCategory.id}`
+        : "/api/admin/categories";
       const method = editingCategory ? "PATCH" : "POST";
 
       const res = await fetch(url, {
@@ -146,7 +146,7 @@ export default function CategoriesPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Failed to save category");
+        throw new Error(data.error || data.message || "Failed to save category");
       }
 
       toast.success(editingCategory ? "Category updated" : "Category created");
@@ -158,39 +158,38 @@ export default function CategoriesPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
-const toggleActiveStatus = async (category: ProductCategory) => {
-  const newStatus = !category.isActive;
-  
-  // THIS USES updateCategoryLocally - instant UI update
-  updateCategoryLocally(category.id, { isActive: newStatus });
-  
-  const toastId = toast.loading("Updating status...");
-  
-  try {
-    const res = await fetch(`/api/product-categories/${category.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isActive: newStatus }),
-    });
-
-    if (!res.ok) {
-      // Revert on error
-      updateCategoryLocally(category.id, { isActive: category.isActive });
-      throw new Error("Failed to update status");
-    }
-
-    toast.success(newStatus ? "Category activated" : "Category deactivated", { id: toastId });
+  const toggleActiveStatus = async (category: ProductCategory) => {
+    const newStatus = !category.isActive;
     
-  } catch {
-    toast.error("Failed to update status", { id: toastId });
-    updateCategoryLocally(category.id, { isActive: category.isActive });
-  }
-};
+    updateCategoryLocally(category.id, { isActive: newStatus });
+    
+    const toastId = toast.loading("Updating status...");
+    
+    try {
+      const res = await fetch(`/api/admin/categories/${category.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: newStatus }),
+      });
+
+      if (!res.ok) {
+        updateCategoryLocally(category.id, { isActive: category.isActive });
+        throw new Error("Failed to update status");
+      }
+
+      toast.success(newStatus ? "Category activated" : "Category deactivated", { id: toastId });
+      
+    } catch {
+      toast.error("Failed to update status", { id: toastId });
+      updateCategoryLocally(category.id, { isActive: category.isActive });
+    }
+  };
+
   const undoDelete = async (deletedCategory: DeletedCategory, toastId: string | number) => {
     try {
-      const res = await fetch("/api/product-categories", {
+      const res = await fetch("/api/admin/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -213,6 +212,7 @@ const toggleActiveStatus = async (category: ProductCategory) => {
     }
   };
 
+  // ✅ FIX 1: Changed data.message → data.error to match API response shape
   const handleDelete = async () => {
     if (!deletingCategory) return;
 
@@ -229,20 +229,20 @@ const toggleActiveStatus = async (category: ProductCategory) => {
     };
 
     try {
-      const res = await fetch(`/api/product-categories/${deletingCategory.id}`, {
+      const res = await fetch(`/api/admin/categories/${deletingCategory.id}`, {
         method: "DELETE",
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Failed to delete category");
+        throw new Error(data.message || data.error || "Failed to delete category");
       }
 
       await fetchCategories();
       setDeletingCategory(null);
       
       toast.custom((t) => (
-        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-[300px]">
+        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-75">
           <span className="text-sm">Category {deletedData.name} deleted</span>
           <Button
             variant="outline"
@@ -262,23 +262,37 @@ const toggleActiveStatus = async (category: ProductCategory) => {
     }
   };
 
+  // ✅ FIX 2: Bulk delete now reads error body from each failed response
   const handleBulkDelete = async () => {
     if (selectedCategories.size === 0) return;
 
     setIsSubmitting(true);
 
     try {
-      const deletePromises = Array.from(selectedCategories).map((id) =>
-        fetch(`/api/product-categories/${id}`, { method: "DELETE" })
+      const results = await Promise.all(
+        Array.from(selectedCategories).map(async (id) => {
+          const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
+          if (!res.ok) {
+            const data = await res.json();
+            return { ok: false, error: data.message || data.error || "Failed to delete" };
+          }
+          return { ok: true, error: null };
+        })
       );
 
-      const results = await Promise.all(deletePromises);
-      const failed = results.filter((res) => !res.ok);
+      const failed = results.filter((r) => !r.ok);
+      const succeeded = results.filter((r) => r.ok);
 
-      if (failed.length > 0) {
-        toast.error(`Failed to delete ${failed.length} categories`);
+      if (failed.length > 0 && succeeded.length === 0) {
+        // All failed
+        toast.error(failed[0].error || `Failed to delete ${failed.length} categories`);
+      } else if (failed.length > 0) {
+        // Some failed — likely had products
+        toast.warning(
+          `${succeeded.length} deleted, ${failed.length} could not be deleted — they may have products assigned.`
+        );
       } else {
-        toast.success(`Deleted ${selectedCategories.size} categories successfully`);
+        toast.success(`Deleted ${succeeded.length} categories successfully`);
       }
 
       setSelectedCategories(new Set());
@@ -320,12 +334,10 @@ const toggleActiveStatus = async (category: ProductCategory) => {
     }
   };
 
-  // Filter categories based on search term only (show ALL active + inactive)
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCategories = filteredCategories.slice(startIndex, startIndex + itemsPerPage);
@@ -347,7 +359,6 @@ const toggleActiveStatus = async (category: ProductCategory) => {
     setCurrentPage(1);
   };
 
-  // Loading Skeleton for Desktop Table
   const TableSkeleton = () => (
     <div className="hidden md:block overflow-x-auto">
       <Table>
@@ -371,7 +382,13 @@ const toggleActiveStatus = async (category: ProductCategory) => {
               <TableCell><div className="h-5 bg-gray-200 rounded animate-pulse w-16 mx-auto" /></TableCell>
               <TableCell><div className="h-5 bg-gray-200 rounded animate-pulse w-16 mx-auto" /></TableCell>
               <TableCell><div className="h-5 bg-gray-200 rounded animate-pulse w-24" /></TableCell>
-              <TableCell><div className="flex justify-center gap-2"><div className="h-8 w-8 bg-gray-200 rounded animate-pulse" /><div className="h-8 w-8 bg-gray-200 rounded animate-pulse" /><div className="h-8 w-8 bg-gray-200 rounded animate-pulse" /></div></TableCell>
+              <TableCell>
+                <div className="flex justify-center gap-2">
+                  <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -379,7 +396,6 @@ const toggleActiveStatus = async (category: ProductCategory) => {
     </div>
   );
 
-  // Loading Skeleton for Mobile Cards
   const MobileSkeleton = () => (
     <div className="md:hidden divide-y divide-gray-100">
       {[...Array(3)].map((_, i) => (
@@ -601,7 +617,7 @@ const toggleActiveStatus = async (category: ProductCategory) => {
         </Card>
       </div>
 
-      {/* Categories - Card view on mobile, Table on desktop */}
+      {/* Categories Table */}
       <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto">
@@ -642,8 +658,8 @@ const toggleActiveStatus = async (category: ProductCategory) => {
                 </TableRow>
               ) : (
                 paginatedCategories.map((category) => (
-                  <TableRow 
-                    key={category.id} 
+                  <TableRow
+                    key={category.id}
                     className={`hover:bg-orange-50/50 transition-colors cursor-pointer ${!category.isActive ? 'bg-gray-50 opacity-70' : ''}`}
                     onDoubleClick={() => openEditModal(category)}
                   >
@@ -746,8 +762,8 @@ const toggleActiveStatus = async (category: ProductCategory) => {
             </div>
           ) : (
             paginatedCategories.map((category) => (
-              <div 
-                key={category.id} 
+              <div
+                key={category.id}
                 className={`p-4 hover:bg-orange-50/50 transition-colors cursor-pointer ${!category.isActive ? 'bg-gray-50 opacity-70' : ''}`}
                 onDoubleClick={() => openEditModal(category)}
               >
@@ -865,8 +881,8 @@ const toggleActiveStatus = async (category: ProductCategory) => {
               <span className="font-semibold text-red-600">{selectedCategories.size} categories</span>?
               <br />
               <br />
-              This action <span className="font-semibold">cannot be undone</span>. Deleting these
-              categories may affect products assigned to them.
+              This action <span className="font-semibold">cannot be undone</span>. Categories with
+              products assigned to them will not be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -953,7 +969,6 @@ const toggleActiveStatus = async (category: ProductCategory) => {
               )}
             </div>
 
-            {/* Status Toggle in Modal - Only for Edit */}
             {editingCategory && (
               <div className="flex items-center justify-between pt-2">
                 <Label htmlFor="modal-status" className="text-sm font-semibold">
@@ -997,8 +1012,8 @@ const toggleActiveStatus = async (category: ProductCategory) => {
               <span className="font-semibold text-red-600">{deletingCategory?.name || "this category"}</span>?
               <br />
               <br />
-              This action <span className="font-semibold">cannot be undone</span>. Deleting this
-              category may affect products assigned to it.
+              This action <span className="font-semibold">cannot be undone</span>. Categories with
+              products assigned to them cannot be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

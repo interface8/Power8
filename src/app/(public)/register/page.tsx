@@ -23,12 +23,16 @@ export default function RegisterPage() {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [confirmFocused, setConfirmFocused] = useState(false);
+  
+  // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
 
-  //Same password validation rules as Login page
+  // ✅ Same password validation rules as Login page (ONLY ONCE)
   const passwordRules = {
     minLength: password.length >= 8,
     hasUpperCase: /[A-Z]/.test(password),
@@ -59,19 +63,48 @@ export default function RegisterPage() {
 
   const validatePhone = (phone: string) => {
     if (!phone) return "Phone number is required";
-    if (phone.length < 10) return "Enter a valid phone number";
+    const phoneRegex = /^[\+]?[0-9]{8,15}$/;
+    if (!phoneRegex.test(phone)) return "Enter a valid phone number";
     return "";
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setPasswordError("");
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setConfirmError("Passwords do not match");
+    // Validate name
+    const nameErr = validateName(name);
+    if (nameErr) {
+      setNameError(nameErr);
       return;
     }
 
+    // Validate email
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setEmailError(emailErr);
+      return;
+    }
+
+    // Validate phone
+    const phoneErr = validatePhone(phone);
+    if (phoneErr) {
+      setPhoneError(phoneErr);
+      return;
+    }
+
+    // Validate password meets requirements
     if (!allPasswordRulesMet) {
+      setPasswordError("Password does not meet requirements");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setConfirmError("Passwords do not match");
       return;
     }
 
@@ -91,8 +124,10 @@ export default function RegisterPage() {
     !nameError &&
     !emailError &&
     !phoneError &&
+    !passwordError &&
     !confirmError &&
-    allPasswordRulesMet;
+    allPasswordRulesMet &&
+    password === confirmPassword;
 
   return (
     <div
@@ -131,9 +166,11 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
+          {/* Full Name - Required */}
           <div>
-            <Label>Full Name</Label>
+            <div className="flex justify-between items-center">
+              <Label>Full Name <span className="text-red-500 text-sm">*</span></Label>
+            </div>
             <div className="relative mt-1">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -142,7 +179,9 @@ export default function RegisterPage() {
                   setName(e.target.value);
                   setNameError(validateName(e.target.value));
                 }}
-                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
+                autoComplete="name"
+                name="fullName"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="John Doe"
               />
             </div>
@@ -151,9 +190,11 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Email */}
+          {/* Email - Required */}
           <div>
-            <Label>Email</Label>
+            <div className="flex justify-between items-center">
+              <Label>Email <span className="text-red-500 text-sm">*</span></Label>
+            </div>
             <div className="relative mt-1">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -162,7 +203,9 @@ export default function RegisterPage() {
                   setEmail(e.target.value);
                   setEmailError(validateEmail(e.target.value));
                 }}
-                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
+                autoComplete="email"
+                name="email"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="you@example.com"
               />
             </div>
@@ -171,9 +214,11 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Phone */}
+          {/* Phone - Required */}
           <div>
-            <Label>Phone</Label>
+            <div className="flex justify-between items-center">
+              <Label>Phone <span className="text-red-500 text-sm">*</span></Label>
+            </div>
             <div className="relative mt-1">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -182,8 +227,10 @@ export default function RegisterPage() {
                   setPhone(e.target.value);
                   setPhoneError(validatePhone(e.target.value));
                 }}
-                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
-                placeholder="+234..."
+                autoComplete="tel"
+                name="phone"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                placeholder="+2349012345678"
               />
             </div>
             {phoneError && (
@@ -191,17 +238,22 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Password */}
+          {/* Password - Required */}
           <div>
-            <Label>Password</Label>
+            <div className="flex justify-between items-center">
+              <Label>Password <span className="text-red-500 text-sm">*</span></Label>
+            </div>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 onFocus={() => setPasswordFocused(true)}
-                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
+                onBlur={() => setPasswordFocused(false)}
+                autoComplete="new-password"
+                name="password"
+                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="••••••••"
               />
               <button
@@ -217,8 +269,8 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            {/* ✅ Same password requirements checklist as Login page */}
-            {(passwordFocused || password) && (
+            {/* Password Requirements Checklist */}
+            {passwordFocused && (
               <div className="mt-2 space-y-1">
                 <p className="text-xs font-medium text-gray-500 mb-1">Password must have:</p>
                 <div className="flex items-center gap-2 text-xs">
@@ -264,30 +316,40 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/*  Success message when all rules are met */}
+            {/* Success message when all rules are met */}
             {allPasswordRulesMet && password && (
               <div className="mt-2 flex items-center gap-2">
                 <Check className="w-3 h-3 text-green-500" />
                 <p className="text-xs text-green-600">Password meets all requirements</p>
               </div>
             )}
+
+            {passwordError && (
+              <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+            )}
           </div>
 
-          {/* Confirm Password */}
+          {/* Confirm Password - Required */}
           <div>
-            <Label>Confirm Password</Label>
+            <div className="flex justify-between items-center">
+              <Label>Confirm Password <span className="text-red-500 text-sm">*</span></Label>
+            </div>
             <div className="relative mt-1">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
+                onFocus={() => setConfirmFocused(true)}
+                onBlur={() => setConfirmFocused(false)}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
                   setConfirmError(
                     e.target.value !== password ? "Passwords do not match" : "",
                   );
                 }}
-                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0"
+                autoComplete="off"
+                name="confirmPassword"
+                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="••••••••"
               />
               <button
@@ -305,11 +367,10 @@ export default function RegisterPage() {
             {confirmError && (
               <p className="text-xs text-red-500 mt-1">{confirmError}</p>
             )}
-            {confirmPassword && !confirmError && password && allPasswordRulesMet && (
-              <div className="mt-1 flex items-center gap-2">
-                <Check className="w-3 h-3 text-green-500" />
-                <p className="text-xs text-green-600">Passwords match</p>
-              </div>
+            {confirmFocused && confirmPassword && password === confirmPassword && (
+              <p className="text-xs text-green-500 mt-1 flex items-center gap-1">
+                <Check className="w-3 h-3" /> Passwords match
+              </p>
             )}
           </div>
 

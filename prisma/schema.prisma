@@ -29,6 +29,8 @@ model ProductCategory {
   updatedAt   DateTime  @updatedAt
   isActive    Boolean   @default(true)
   products    Product[]
+  merchantProducts MerchantProduct[]
+
 
   @@map("product_category")
 }
@@ -50,7 +52,7 @@ model Product {
   bundleItems   BundleItem[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
-  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@map("products")
@@ -252,6 +254,8 @@ model User {
   phone             String             @unique
   blogs             Blog[]
   cart              Cart?
+  userType          UserType  @default(CUSTOMER)
+  merchant          Merchant?
   filesCreated      File[]             @relation("FilesCreated")
   filesModified     File[]             @relation("FilesModified")
   files             File[]             @relation("UserFiles")
@@ -428,6 +432,79 @@ model AdminAuditLog {
   @@map("admin_audit_logs")
 }
 
+model Merchant {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  businessName     String
+  businessAddress  String
+  cacNumber        String            @unique
+  cacDocumentUrl   String
+  governmentIdUrl  String
+  logoUrl          String?
+  status           MerchantStatus    @default(PENDING)
+  suspensionReason String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products         MerchantProduct[]
+  bundles          MerchantBundle[]
+
+  @@map("merchants")
+}
+
+model MerchantProduct {
+  id              String                 @id @default(cuid())
+  merchantId      String
+  name            String
+  description     String?
+  categoryId      String
+  price           Decimal                @db.Decimal(10, 2)
+  warranty        Int
+  capacity        Int
+  stockQuantity   Int                    @default(0)
+  approvalStatus  MerchantApprovalStatus @default(PENDING)
+  rejectionReason String?
+  isActive        Boolean                @default(true)
+  images          String[]
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  merchant        Merchant               @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  category        ProductCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  bundleItems     MerchantBundleItem[]
+
+  @@map("merchant_products")
+}
+
+model MerchantBundle {
+  id               String                 @id @default(cuid())
+  merchantId       String
+  name             String
+  totalPrice       Decimal                @db.Decimal(10, 2)
+  systemCapacityKw Decimal?               @db.Decimal(10, 2)
+  description      String?
+  approvalStatus   MerchantApprovalStatus @default(PENDING)
+  rejectionReason  String?
+  isActive         Boolean                @default(true)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  merchant         Merchant               @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  items            MerchantBundleItem[]
+
+  @@map("merchant_bundles")
+}
+
+model MerchantBundleItem {
+  id                String          @id @default(cuid())
+  bundleId          String
+  merchantProductId String
+  quantity          Int
+  bundle            MerchantBundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  merchantProduct   MerchantProduct @relation(fields: [merchantProductId], references: [id], onDelete: Restrict)
+
+  @@map("merchant_bundle_items")
+}
+
+
 enum PaymentType {
   FULL
   CREDIT
@@ -498,4 +575,21 @@ enum ControlAction {
   ENABLE
   LIMIT
   DISABLE
+}
+
+enum UserType {
+  CUSTOMER
+  MERCHANT
+}
+
+enum MerchantStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+}
+
+enum MerchantApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import {
   blogService,
@@ -16,9 +16,8 @@ function getFirstErrorMessage(error: {
 
 // GET /api/admin/blog-categories
 export async function GET() {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("blog_categories", "view");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const data = await blogService.listBlogCategories();
@@ -32,9 +31,8 @@ export async function GET() {
 
 // POST /api/admin/blog-categories
 export async function POST(request: NextRequest) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("blog_categories", "create");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const body = await request.json();

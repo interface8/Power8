@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription, // ✅ ADDED THIS
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,7 +78,6 @@ export default function ProductModal({
         isActive: product.isActive !== undefined ? product.isActive : true,
       });
       
-      // Handle existing images
       const existingImages = product.imageUrls || (product.imageUrl ? [product.imageUrl] : []);
       setImageUrls(existingImages);
       setImagePreviews(existingImages.map(url => ({ url, isUploading: false })));
@@ -127,7 +127,6 @@ export default function ProductModal({
 
     const filesToUpload = fileArray.slice(0, remainingSlots);
     
-    // Add loading placeholders
     const newPreviews: ImageItem[] = filesToUpload.map(file => ({
       url: URL.createObjectURL(file),
       file,
@@ -137,20 +136,17 @@ export default function ProductModal({
     setImagePreviews(prev => [...prev, ...newPreviews]);
     setUploadingImages(true);
 
-    // Upload each file
     const uploadedUrls: string[] = [];
     for (const item of newPreviews) {
       const uploadedUrl = await uploadImage(item.file!);
       if (uploadedUrl) {
         uploadedUrls.push(uploadedUrl);
-        // Update the preview with the actual URL
         setImagePreviews(prev =>
           prev.map(p => 
             p.file === item.file ? { ...p, url: uploadedUrl, isUploading: false } : p
           )
         );
       } else {
-        // Remove failed upload
         setImagePreviews(prev => prev.filter(p => p.file !== item.file));
       }
     }
@@ -229,15 +225,12 @@ export default function ProductModal({
     }
   };
 
-  // Format number for display - shows empty string when value is 0
   const formatNumber = (value: number) => {
     if (value === 0) return "";
     return value.toLocaleString();
   };
 
-  // Handle number field changes - allows empty fields
   const handleNumberChange = (field: 'price' | 'stockQuantity' | 'warranty', value: string) => {
-    // If the field is empty, set value to 0 but show empty in input
     if (value === "") {
       setFormData({ ...formData, [field]: 0 });
       return;
@@ -246,7 +239,6 @@ export default function ProductModal({
     const rawValue = value.replace(/,/g, '');
     const num = field === 'price' ? parseFloat(rawValue) : parseInt(rawValue, 10);
     
-    // Only update if it's a valid number
     if (!isNaN(num)) {
       setFormData({ ...formData, [field]: num });
     }
@@ -259,6 +251,11 @@ export default function ProductModal({
           <DialogTitle className="text-xl md:text-2xl font-bold text-gray-800">
             {product ? "Edit Product" : "Add Product"}
           </DialogTitle>
+          <DialogDescription className="text-sm text-gray-500">
+            {product 
+              ? "Update the product details, category, company, and images." 
+              : "Fill in the details to create a new product. All fields marked with * are required."}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8">

@@ -41,10 +41,10 @@ export default function AdminProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const updateProductLocally = (id: string, updates: Partial<Product>) => {
-  setProducts(prev => prev.map(product => 
-    product.id === id ? { ...product, ...updates } : product
-  ));
-};
+    setProducts(prev => prev.map(product => 
+      product.id === id ? { ...product, ...updates } : product
+    ));
+  };
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -114,54 +114,34 @@ export default function AdminProductsPage() {
     currentPage * itemsPerPage,
   );
 
-  // const toggleProductStatus = async (product: Product) => {
-  //   try {
-  //     const res = await fetch(`/api/products/${product.id}`, {
-  //       method: "PATCH",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ isActive: !product.isActive }),
-  //     });
-  //     if (res.ok) {
-  //       toast.success(
-  //         product.isActive ? "Product deactivated" : "Product activated",
-  //       );
-  //       fetchProducts();
-  //     } else {
-  //       toast.error("Failed to update status");
-  //     }
-  //   } catch {
-  //     toast.error("Failed to update status");
-  //   }
-  // };
-
-
   const toggleProductStatus = async (product: Product) => {
-  const newStatus = !product.isActive;
-  
-  // Update UI instantly
-  updateProductLocally(product.id, { isActive: newStatus });
-  
-  const toastId = toast.loading("Updating status...");
-  
-  try {
-    const res = await fetch(`/api/products/${product.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isActive: newStatus }),
-    });
+    const newStatus = !product.isActive;
     
-    if (!res.ok) {
+    // Update UI instantly
+    updateProductLocally(product.id, { isActive: newStatus });
+    
+    const toastId = toast.loading("Updating status...");
+    
+    try {
+      const res = await fetch(`/api/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: newStatus }),
+      });
+      
+      if (!res.ok) {
+        updateProductLocally(product.id, { isActive: product.isActive });
+        throw new Error("Failed to update status");
+      }
+      
+      toast.success(newStatus ? "Product activated" : "Product deactivated", { id: toastId });
+      
+    } catch {
+      toast.error("Failed to update status", { id: toastId });
       updateProductLocally(product.id, { isActive: product.isActive });
-      throw new Error("Failed to update status");
     }
-    
-    toast.success(newStatus ? "Product activated" : "Product deactivated", { id: toastId });
-    
-  } catch {
-    toast.error("Failed to update status", { id: toastId });
-    updateProductLocally(product.id, { isActive: product.isActive });
-  }
-};
+  };
+
   const handleDeleteConfirm = async () => {
     if (!productToDelete) return;
 
@@ -244,7 +224,7 @@ export default function AdminProductsPage() {
 
   if (loading) {
     return (
-      <div className="p-4 md:p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Products</h1>
 
         {/* Desktop Skeleton */}
@@ -299,12 +279,12 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Products</h1>
 
       {/* Filters Row - Responsive */}
-      <div className="flex flex-col md:flex-row gap-3 mb-6 items-center">
-        <div className="flex-1 bg-white rounded-lg border p-4">
+      <div className="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center">
+        <div className="flex-1 w-full bg-white rounded-lg border p-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -347,7 +327,7 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        <div className="shrink-0">
+        <div className="shrink-0 w-full md:w-auto">
           <Button
             onClick={() => {
               setEditingProduct(null);
@@ -361,88 +341,90 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Desktop Table View */}
+      {/* Desktop Table View - Horizontal scroll on mobile */}
       <div className="hidden md:block border rounded-lg overflow-hidden bg-white">
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="text-base font-semibold">PRODUCT</TableHead>
-                <TableHead className="text-base font-semibold">CATEGORY</TableHead>
-                <TableHead className="text-base font-semibold">PRICE</TableHead>
-                <TableHead className="text-base font-semibold">STOCK</TableHead>
-                <TableHead className="text-base font-semibold">STATUS</TableHead>
-                <TableHead className="text-base font-semibold w-24">ACTIONS</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedProducts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-gray-500 text-base">
-                    No products found
-                  </TableCell>
+          <div className="min-w-[800px]">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="text-base font-semibold">PRODUCT</TableHead>
+                  <TableHead className="text-base font-semibold">CATEGORY</TableHead>
+                  <TableHead className="text-base font-semibold">PRICE</TableHead>
+                  <TableHead className="text-base font-semibold">STOCK</TableHead>
+                  <TableHead className="text-base font-semibold">STATUS</TableHead>
+                  <TableHead className="text-base font-semibold w-24">ACTIONS</TableHead>
                 </TableRow>
-              ) : (
-                paginatedProducts.map((product) => (
-                  <TableRow key={product.id} className="hover:bg-gray-50">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        {product.imageUrl ? (
-                          <Image
-                            src={product.imageUrl}
-                            alt={product.name}
-                            width={40}
-                            height={40}
-                            className="w-10 h-10 rounded-md object-cover"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center">
-                            <span className="text-gray-400 text-xs">No img</span>
-                          </div>
-                        )}
-                        <span className="font-medium text-base">{product.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-base">{product.categoryName}</TableCell>
-                    <TableCell className="text-base">₦{product.price.toLocaleString()}</TableCell>
-                    <TableCell className={`text-base ${product.stockQuantity < 5 && product.stockQuantity > 0 ? "text-orange-600 font-medium" : product.stockQuantity === 0 ? "text-red-500 font-medium" : ""}`}>
-                      {getStockDisplay(product.stockQuantity)}
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        checked={product.isActive}
-                        onCheckedChange={() => toggleProductStatus(product)}
-                        className="data-[state=checked]:bg-orange-500 bg-gray-300"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingProduct(product);
-                            setModalOpen(true);
-                          }}
-                          className="h-9 w-9 p-0 hover:bg-orange-100"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openDeleteDialog(product.id, product.name)}
-                          className="h-9 w-9 p-0 hover:bg-red-100"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {paginatedProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-12 text-gray-500 text-base">
+                      No products found
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  paginatedProducts.map((product) => (
+                    <TableRow key={product.id} className="hover:bg-gray-50">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          {product.imageUrl ? (
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.name}
+                              width={40}
+                              height={40}
+                              className="w-10 h-10 rounded-md object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center">
+                              <span className="text-gray-400 text-xs">No img</span>
+                            </div>
+                          )}
+                          <span className="font-medium text-base">{product.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-base">{product.categoryName}</TableCell>
+                      <TableCell className="text-base">₦{product.price.toLocaleString()}</TableCell>
+                      <TableCell className={`text-base ${product.stockQuantity < 5 && product.stockQuantity > 0 ? "text-orange-600 font-medium" : product.stockQuantity === 0 ? "text-red-500 font-medium" : ""}`}>
+                        {getStockDisplay(product.stockQuantity)}
+                      </TableCell>
+                      <TableCell>
+                        <Switch
+                          checked={product.isActive}
+                          onCheckedChange={() => toggleProductStatus(product)}
+                          className="data-[state=checked]:bg-orange-500 bg-gray-300"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingProduct(product);
+                              setModalOpen(true);
+                            }}
+                            className="h-9 w-9 p-0 hover:bg-orange-100"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openDeleteDialog(product.id, product.name)}
+                            className="h-9 w-9 p-0 hover:bg-red-100"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
 
@@ -517,29 +499,34 @@ export default function AdminProductsPage() {
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination - Responsive */}
       {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-          <div className="text-sm text-gray-500 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+          <div className="text-sm text-gray-500 text-center sm:text-left order-2 sm:order-1">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
             {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of{" "}
             {filteredProducts.length} products
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 order-1 sm:order-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
+              className="gap-1"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
             </Button>
+            <span className="flex items-center px-3 text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
+              className="gap-1"
             >
               Next
               <ChevronRight className="w-4 h-4" />

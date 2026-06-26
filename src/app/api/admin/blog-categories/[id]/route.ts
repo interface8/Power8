@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireApiAuth, isErrorResponse } from "@/lib/auth";
+import { requireApiPermissionFor, isErrorResponse } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import {
   blogService,
@@ -19,9 +19,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("blog_categories", "edit");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     const body = await request.json();
@@ -47,9 +46,8 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const guard = await requireApiAuth();
+  const guard = await requireApiPermissionFor("blog_categories", "delete");
   if (isErrorResponse(guard)) return guard;
-  if (!guard.roles.includes("admin")) return errorResponse("Forbidden", 403);
 
   try {
     await blogService.deleteBlogCategory(params.id);

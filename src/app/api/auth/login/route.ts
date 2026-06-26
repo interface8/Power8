@@ -28,6 +28,20 @@ export async function POST(request: NextRequest) {
       return errorResponse("Invalid email or password", 401);
     }
 
+        // Merchant gate: block login until approved
+    if (user.userType === "MERCHANT") {
+      const status = user.merchant?.status;
+      if (status !== "APPROVED") {
+        if (status === "SUSPENDED") {
+          return errorResponse(
+            user.merchant?.suspensionReason ?? "Your account has been suspended.",
+            403,
+          );
+        }
+        return errorResponse("Your account is pending review.", 403);
+      }
+    }
+
     // after
     const roleNames =
       user.roles?.map((ur: { role: { name: string } }) => ur.role.name) ?? [];

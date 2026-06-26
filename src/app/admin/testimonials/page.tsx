@@ -116,7 +116,7 @@ export default function AdminTestimonialsPage() {
   const SkeletonCard = () => (
     <div className="bg-white rounded-xl border p-10 shadow-sm flex flex-col">
       <div className="flex gap-8">
-        <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse flex-shrink-0" />
+        <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse shrink-0" />
         <div className="flex-1">
           <div className="flex flex-wrap justify-between items-start gap-2">
             <div className="flex-1">
@@ -221,7 +221,7 @@ export default function AdminTestimonialsPage() {
               >
                 <div className="flex gap-8">
                   {/* Avatar */}
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-orange-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden bg-orange-100 flex items-center justify-center shrink-0">
                     {testimonial.imageUrl ? (
                       <Image
                         src={testimonial.imageUrl}
@@ -258,7 +258,7 @@ export default function AdminTestimonialsPage() {
                         </div>
                       </div>
 
-                      <span className="text-xs text-gray-400 flex-shrink-0">
+                      <span className="text-xs text-gray-400 shrink-0">
                         {formatDate(testimonial.createdAt)}
                       </span>
                     </div>
