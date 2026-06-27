@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -30,7 +31,6 @@ export default function ResetPasswordPage() {
     }
   }, [token]);
 
-  // Password validation rules
   const passwordRules = {
     minLength: password.length >= 8,
     hasUpperCase: /[A-Z]/.test(password),
@@ -65,7 +65,6 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      // API call will go here
       await new Promise(resolve => setTimeout(resolve, 1500));
       setSubmitted(true);
       toast.success("Password reset successfully!");
@@ -76,7 +75,6 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Invalid Token State
   if (!isValidToken) {
     return (
       <div
@@ -84,7 +82,6 @@ export default function ResetPasswordPage() {
         style={{ backgroundImage: "url('/images/power-7.jpg')" }}
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
         <Card className="relative z-10 w-full max-w-md p-6 md:p-8 rounded-2xl shadow-xl bg-white/95">
           <Link
             href="/"
@@ -93,25 +90,21 @@ export default function ResetPasswordPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
-
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow">
               <Sun className="w-8 h-8 text-white" />
             </div>
             <span className="text-xl font-semibold text-orange-600">Power-8</span>
           </div>
-
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
               <AlertCircle className="w-8 h-8 text-red-600" />
             </div>
           </div>
-
           <h1 className="text-2xl font-semibold text-center mb-2">Invalid Reset Link</h1>
           <p className="text-gray-600 text-center mb-6 text-sm">
             This password reset link is invalid or has expired.
           </p>
-
           <Button
             className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
             onClick={() => router.push("/forgot-password")}
@@ -123,7 +116,6 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Success State
   if (submitted) {
     return (
       <div
@@ -131,7 +123,6 @@ export default function ResetPasswordPage() {
         style={{ backgroundImage: "url('/images/power-7.jpg')" }}
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
         <Card className="relative z-10 w-full max-w-md p-6 md:p-8 rounded-2xl shadow-xl bg-white/95">
           <Link
             href="/"
@@ -140,25 +131,21 @@ export default function ResetPasswordPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
-
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow">
               <Sun className="w-8 h-8 text-white" />
             </div>
             <span className="text-xl font-semibold text-orange-600">Power-8</span>
           </div>
-
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
           </div>
-
           <h1 className="text-2xl font-semibold text-center mb-2">Password Reset Successful</h1>
           <p className="text-gray-600 text-center mb-6 text-sm">
             Your password has been reset successfully.
           </p>
-
           <Button
             className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
             onClick={() => router.push("/login")}
@@ -170,14 +157,12 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Form State
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative"
       style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
       <Card className="relative z-10 w-full max-w-md p-6 md:p-8 rounded-2xl shadow-xl bg-white/95">
         <Link
           href="/"
@@ -186,30 +171,25 @@ export default function ResetPasswordPage() {
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Link>
-
         <div className="flex items-center justify-center gap-2 mb-6">
           <div className="p-2 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl shadow">
             <Sun className="w-8 h-8 text-white" />
           </div>
           <span className="text-xl font-semibold text-orange-600">Power-8</span>
         </div>
-
         <h1 className="text-2xl md:text-3xl font-semibold text-center mb-2">
           Create New Password
         </h1>
         <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
           Enter your new password below
         </p>
-
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="w-4 h-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Password Field */}
           <div>
             <div className="flex justify-between items-center">
               <Label htmlFor="password">
@@ -238,8 +218,6 @@ export default function ResetPasswordPage() {
                 )}
               </button>
             </div>
-
-            {/* Password Requirements Checklist */}
             {password && (
               <div className="mt-2 space-y-1">
                 <p className="text-xs font-medium text-gray-500 mb-1">Password must have:</p>
@@ -286,8 +264,6 @@ export default function ResetPasswordPage() {
               </div>
             )}
           </div>
-
-          {/* Confirm Password Field */}
           <div>
             <div className="flex justify-between items-center">
               <Label htmlFor="confirm-password">
@@ -315,7 +291,6 @@ export default function ResetPasswordPage() {
               </div>
             )}
           </div>
-
           <Button
             type="submit"
             disabled={!allPasswordRulesMet || !passwordsMatch || loading}
@@ -324,7 +299,6 @@ export default function ResetPasswordPage() {
             {loading ? "Resetting..." : "Reset Password"}
           </Button>
         </form>
-
         <p className="text-center text-sm text-gray-600 mt-6">
           Remember your password?{" "}
           <Link
@@ -336,5 +310,17 @@ export default function ResetPasswordPage() {
         </p>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
