@@ -1,10 +1,26 @@
 import { prisma } from "@/lib/prisma";
-import type { Prisma, OrderStatus, OrderPaymentStatus, ShippingStatus } from "@prisma/client";
+import type {
+  Prisma,
+  OrderStatus,
+  OrderPaymentStatus,
+  ShippingStatus,
+} from "@prisma/client";
 import type { AdminOrderListFilters, AdminOrdersListDto } from "./types";
 import type { AdminOrderDetailsDto } from "./types";
 
-export async function findOrders(filters: AdminOrderListFilters): Promise<AdminOrdersListDto> {
-  const { page, limit, status, paymentType, paymentStatus, startDate, endDate, search } = filters;
+export async function findOrders(
+  filters: AdminOrderListFilters,
+): Promise<AdminOrdersListDto> {
+  const {
+    page,
+    limit,
+    status,
+    paymentType,
+    paymentStatus,
+    startDate,
+    endDate,
+    search,
+  } = filters;
   const skip = (page - 1) * limit;
 
   const where: Prisma.OrderWhereInput = {};
@@ -20,7 +36,6 @@ export async function findOrders(filters: AdminOrderListFilters): Promise<AdminO
   }
 
   if (search) {
-    // partial order id OR partial customer name
     where.OR = [
       { id: { contains: search, mode: "insensitive" } },
       { user: { name: { contains: search, mode: "insensitive" } } },
@@ -34,7 +49,7 @@ export async function findOrders(filters: AdminOrderListFilters): Promise<AdminO
       skip,
       take: limit,
       orderBy: { createdAt: "desc" },
-      include: { user: { select: { name: true, email: true } } },
+      include: { user: { select: { name: true, email: true, phone: true } } },
     }),
   ]);
 
@@ -43,12 +58,16 @@ export async function findOrders(filters: AdminOrderListFilters): Promise<AdminO
       id: o.id,
       customerName: o.user.name,
       customerEmail: o.user.email,
+      customerPhone: o.user.phone,
       totalAmount: o.totalAmount.toNumber(),
       paymentType: o.paymentType,
       paymentStatus: o.paymentStatus,
       installationAddress: o.installationAddress,
       city: o.city,
       state: o.state,
+      deliveryAddress: o.deliveryAddress,
+      deliveryCity: o.deliveryCity,
+      deliveryState: o.deliveryState,
       orderStatus: o.status,
       shippingStatus: o.shippingStatus,
       createdAt: o.createdAt,
@@ -63,11 +82,13 @@ export async function findOrders(filters: AdminOrderListFilters): Promise<AdminO
   };
 }
 
-export async function findOrderDetailsById(orderId: string): Promise<AdminOrderDetailsDto | null> {
+export async function findOrderDetailsById(
+  orderId: string,
+): Promise<AdminOrderDetailsDto | null> {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
-      user: { select: { id: true, name: true, email: true } },
+      user: { select: { id: true, name: true, email: true, phone: true } },
       items: {
         include: {
           product: { select: { name: true } },
@@ -88,7 +109,10 @@ export async function findOrderDetailsById(orderId: string): Promise<AdminOrderD
   if (!order) return null;
 
   const items = order.items.map((i) => {
-    const name = i.itemType === "PRODUCT" ? (i.product?.name ?? "Unknown product") : (i.bundle?.name ?? "Unknown bundle");
+    const name =
+      i.itemType === "PRODUCT"
+        ? (i.product?.name ?? "Unknown product")
+        : (i.bundle?.name ?? "Unknown bundle");
     return {
       id: i.id,
       itemType: i.itemType,
@@ -105,7 +129,8 @@ export async function findOrderDetailsById(orderId: string): Promise<AdminOrderD
 
   const remainingBalance =
     order.paymentType === "CREDIT"
-      ? (order.credit?.balanceRemaining.toNumber() ?? Math.max(order.totalAmount.toNumber() - totalPaid, 0))
+      ? (order.credit?.balanceRemaining.toNumber() ??
+        Math.max(order.totalAmount.toNumber() - totalPaid, 0))
       : Math.max(order.totalAmount.toNumber() - totalPaid, 0);
 
   return {
@@ -114,6 +139,7 @@ export async function findOrderDetailsById(orderId: string): Promise<AdminOrderD
       id: order.user.id,
       name: order.user.name,
       email: order.user.email,
+      phone: order.user.phone,
     },
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
@@ -122,6 +148,9 @@ export async function findOrderDetailsById(orderId: string): Promise<AdminOrderD
     installationAddress: order.installationAddress,
     city: order.city,
     state: order.state,
+    deliveryAddress: order.deliveryAddress,
+    deliveryCity: order.deliveryCity,
+    deliveryState: order.deliveryState,
     orderStatus: order.status,
     paymentStatus: order.paymentStatus,
     shipping: {
@@ -142,23 +171,24 @@ export async function findOrderDetailsById(orderId: string): Promise<AdminOrderD
         createdAt: p.createdAt,
       })),
     },
-    credit: order.paymentType === "CREDIT" && order.credit
-      ? {
-          id: order.credit.id,
-          totalAmount: order.credit.totalAmount.toNumber(),
-          balanceRemaining: order.credit.balanceRemaining.toNumber(),
-          durationMonths: order.credit.durationMonths,
-          status: order.credit.status,
-          schedules: order.credit.schedules.map((s) => ({
-            id: s.id,
-            dueDate: s.dueDate,
-            amountDue: s.amountDue.toNumber(),
-            status: s.status,
-            createdAt: s.createdAt,
-            updatedAt: s.updatedAt,
-          })),
-        }
-      : null,
+    credit:
+      order.paymentType === "CREDIT" && order.credit
+        ? {
+            id: order.credit.id,
+            totalAmount: order.credit.totalAmount.toNumber(),
+            balanceRemaining: order.credit.balanceRemaining.toNumber(),
+            durationMonths: order.credit.durationMonths,
+            status: order.credit.status,
+            schedules: order.credit.schedules.map((s) => ({
+              id: s.id,
+              dueDate: s.dueDate,
+              amountDue: s.amountDue.toNumber(),
+              status: s.status,
+              createdAt: s.createdAt,
+              updatedAt: s.updatedAt,
+            })),
+          }
+        : null,
   };
 }
 
@@ -256,7 +286,8 @@ export async function updateOrderShippingStatusWithAudit(params: {
   trackingNumber?: string;
   shippingProvider?: string;
 }) {
-  const { orderId, adminId, newStatus, trackingNumber, shippingProvider } = params;
+  const { orderId, adminId, newStatus, trackingNumber, shippingProvider } =
+    params;
   const nextOrderStatus =
     newStatus === "PROCESSING"
       ? "PROCESSING"
@@ -320,3 +351,70 @@ export async function updateOrderShippingStatusWithAudit(params: {
     return { previous, ...updated };
   });
 }
+
+// export async function updateOrderShippingStatusWithAudit(params: {
+//   orderId: string;
+//   adminId: string;
+//   newStatus: ShippingStatus;
+//   trackingNumber?: string;
+//   shippingProvider?: string;
+// }) {
+//   const { orderId, adminId, newStatus, trackingNumber, shippingProvider } =
+//     params;
+
+//   // ✅ REMOVED auto-order-status update
+
+//   return prisma.$transaction(async (tx) => {
+//     const order = await tx.order.findUnique({
+//       where: { id: orderId },
+//       select: {
+//         id: true,
+//         shippingStatus: true,
+//         trackingNumber: true,
+//         shippingProvider: true,
+//       },
+//     });
+//     if (!order) throw new Error("Order not found");
+
+//     const previous = {
+//       status: order.shippingStatus,
+//       trackingNumber: order.trackingNumber,
+//       shippingProvider: order.shippingProvider,
+//     };
+
+//     const updated = await tx.order.update({
+//       where: { id: orderId },
+//       data: {
+//         shippingStatus: newStatus,
+//         // ✅ No more auto-update: removed ...(nextOrderStatus ? { status: nextOrderStatus } : {}),
+//         trackingNumber: trackingNumber ?? order.trackingNumber,
+//         shippingProvider: shippingProvider ?? order.shippingProvider,
+//       },
+//       select: {
+//         id: true,
+//         shippingStatus: true,
+//         trackingNumber: true,
+//         shippingProvider: true,
+//         updatedAt: true,
+//       },
+//     });
+
+//     await tx.adminAuditLog.create({
+//       data: {
+//         action: "ORDER_SHIPPING_STATUS_UPDATED",
+//         adminId,
+//         orderId,
+//         metadata: {
+//           previous,
+//           next: {
+//             status: newStatus,
+//             trackingNumber: updated.trackingNumber,
+//             shippingProvider: updated.shippingProvider,
+//           },
+//         } satisfies Prisma.JsonObject,
+//       },
+//     });
+
+//     return { previous, ...updated };
+//   });
+// }

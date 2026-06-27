@@ -28,7 +28,7 @@ type PaymentChannel = "bank_transfer" | "paystack" | "card";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, clearCart } = useCart(); // ← add clearCart
+  const { cart, clearCart } = useCart();
 
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
@@ -48,6 +48,8 @@ export default function CheckoutPage() {
     state: "",
     phoneNumber: "",
   });
+
+  const [isDeliverySame, setIsDeliverySame] = useState(true);
 
   const [creditDetails, setCreditDetails] = useState<CreditDetails>({
     depositAmount: 0,
@@ -82,6 +84,20 @@ export default function CheckoutPage() {
       ...prev,
       [field]: sanitizeInput(value),
     }));
+
+  
+  const handleDeliveryToggle = (checked: boolean) => {
+    setIsDeliverySame(checked);
+    if (checked) {
+      // When checked, copy installation address to delivery address
+      setDeliveryAddress({
+        street: installationAddress.street,
+        city: installationAddress.city,
+        state: installationAddress.state,
+        phoneNumber: installationAddress.phoneNumber,
+      });
+    }
+  };
 
   const handleCreditChange = (field: keyof CreditDetails, value: number) =>
     setCreditDetails((prev) => ({ ...prev, [field]: value }));
@@ -124,10 +140,11 @@ export default function CheckoutPage() {
     installationAddress.phoneNumber.trim().length >= 11;
 
   const isDeliveryAddressValid =
-    deliveryAddress.street.trim().length > 3 &&
-    deliveryAddress.city.trim().length > 1 &&
-    deliveryAddress.state.trim().length > 1 &&
-    deliveryAddress.phoneNumber.trim().length >= 11;
+    isDeliverySame ||
+    (deliveryAddress.street.trim().length > 3 &&
+      deliveryAddress.city.trim().length > 1 &&
+      deliveryAddress.state.trim().length > 1 &&
+      deliveryAddress.phoneNumber.trim().length >= 11);
 
   const canSubmit =
     items.length > 0 &&
@@ -151,9 +168,15 @@ export default function CheckoutPage() {
         city: sanitizeInput(installationAddress.city),
         state: sanitizeInput(installationAddress.state),
 
-        deliveryAddress: sanitizeInput(deliveryAddress.street),
-        deliveryCity: sanitizeInput(deliveryAddress.city),
-        deliveryState: sanitizeInput(deliveryAddress.state),
+        deliveryAddress: isDeliverySame
+          ? sanitizeInput(installationAddress.street)
+          : sanitizeInput(deliveryAddress.street),
+        deliveryCity: isDeliverySame
+          ? sanitizeInput(installationAddress.city)
+          : sanitizeInput(deliveryAddress.city),
+        deliveryState: isDeliverySame
+          ? sanitizeInput(installationAddress.state)
+          : sanitizeInput(deliveryAddress.state),
 
         items: items.map((item) => ({
           itemType: item.itemType ?? "PRODUCT",
@@ -163,7 +186,6 @@ export default function CheckoutPage() {
         })),
       };
 
-      // STEP 1: Create order
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -198,7 +220,6 @@ export default function CheckoutPage() {
         }
       }
 
-      // STEP 2: Initiate payment
       const paymentRes = await fetch("/api/payments/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -210,8 +231,7 @@ export default function CheckoutPage() {
         throw new Error(errorData?.message ?? "Payment initiation failed");
       }
 
-      // STEP 3: Clear cart and redirect
-      clearCart(); // ← clear localStorage cart
+      clearCart();
 
       toast.success(
         paymentMethod === "full"
@@ -274,18 +294,16 @@ export default function CheckoutPage() {
               onChange={handlePaymentChannelChange}
             />
 
+            {/* Single Address Section with Toggle */}
             <AddressSection
               title="Installation Address"
               description="Where the solar system will be installed"
-              values={installationAddress}
-              onChange={handleInstallationAddressChange}
-            />
-
-            <AddressSection
-              title="Delivery Address"
-              description="Where the equipment should be delivered"
-              values={deliveryAddress}
-              onChange={handleDeliveryAddressChange}
+              installationAddress={installationAddress}
+              deliveryAddress={deliveryAddress}
+              onInstallationChange={handleInstallationAddressChange}
+              onDeliveryChange={handleDeliveryAddressChange}
+              isDeliverySame={isDeliverySame}
+              onToggleChange={handleDeliveryToggle}
             />
           </div>
 

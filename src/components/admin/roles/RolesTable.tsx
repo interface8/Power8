@@ -58,14 +58,14 @@ function MobileRoleCard({
         </button>
       </div>
       {role.description && (
-        <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+        <p className="text-base text-gray-600 mt-2 line-clamp-2">
           {role.description}
         </p>
       )}
       <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-gray-100">
         <div className="flex items-center gap-1.5">
           <Key className="h-3.5 w-3.5 text-gray-400" />
-          <span className="text-sm text-gray-600">
+          <span className="text-base text-gray-600">
             {role.permissionsCount} permissions
           </span>
         </div>
@@ -75,7 +75,7 @@ function MobileRoleCard({
         </div>
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5 text-gray-400" />
-          <span className="text-sm text-gray-500">
+          <span className="text-base text-gray-500">
             {formatDate(role.createdAt)}
           </span>
         </div>
@@ -123,7 +123,7 @@ function TableHeader() {
         {headers.map((header) => (
           <th
             key={header}
-            className="px-4 py-3 text-left text-xs font-semibold text-gray-600"
+            className="px-4 py-3 text-left text-base font-semibold text-gray-600"
           >
             {header}
           </th>

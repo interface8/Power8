@@ -54,7 +54,7 @@ export function PaymentHeader({
           <span className="flex items-center gap-1 sm:gap-1.5">
             {Icon}
             <span className="hidden xs:inline">{config.label}</span>
-            <span className="xs:hidden">{config.label.substring(0, 8)}</span>
+            <span className="xs:hidden">{config.label}</span>
           </span>
         </div>
       </div>

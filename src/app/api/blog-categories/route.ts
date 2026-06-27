@@ -16,7 +16,7 @@ export async function GET() {
 
 // POST /api/blog-categories — create (admin)
 export async function POST(request: NextRequest) {
-  const guard = await requireApiPermissionFor("blog-categories", "create");
+  const guard = await requireApiPermissionFor("blog_categories", "create");
   if (isErrorResponse(guard)) return guard;
 
   try {

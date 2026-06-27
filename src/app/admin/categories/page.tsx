@@ -128,8 +128,8 @@ export default function CategoriesPage() {
 
     try {
       const url = editingCategory
-        ? `/api/product-categories/${editingCategory.id}`
-        : "/api/product-categories";
+        ? `/api/admin/categories/${editingCategory.id}`
+        : "/api/admin/categories";
       const method = editingCategory ? "PATCH" : "POST";
 
       const res = await fetch(url, {
@@ -168,7 +168,7 @@ export default function CategoriesPage() {
     const toastId = toast.loading("Updating status...");
     
     try {
-      const res = await fetch(`/api/product-categories/${category.id}`, {
+      const res = await fetch(`/api/admin/categories/${category.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: newStatus }),
@@ -189,7 +189,7 @@ export default function CategoriesPage() {
 
   const undoDelete = async (deletedCategory: DeletedCategory, toastId: string | number) => {
     try {
-      const res = await fetch("/api/product-categories", {
+      const res = await fetch("/api/admin/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -229,20 +229,20 @@ export default function CategoriesPage() {
     };
 
     try {
-      const res = await fetch(`/api/product-categories/${deletingCategory.id}`, {
+      const res = await fetch(`/api/admin/categories/${deletingCategory.id}`, {
         method: "DELETE",
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to delete category"); 
+        throw new Error(data.message || data.error || "Failed to delete category");
       }
 
       await fetchCategories();
       setDeletingCategory(null);
       
       toast.custom((t) => (
-        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-[300px]">
+        <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg p-4 min-w-75">
           <span className="text-sm">Category {deletedData.name} deleted</span>
           <Button
             variant="outline"
@@ -271,10 +271,10 @@ export default function CategoriesPage() {
     try {
       const results = await Promise.all(
         Array.from(selectedCategories).map(async (id) => {
-          const res = await fetch(`/api/product-categories/${id}`, { method: "DELETE" });
+          const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
           if (!res.ok) {
             const data = await res.json();
-            return { ok: false, error: data.error || "Failed to delete" };
+            return { ok: false, error: data.message || data.error || "Failed to delete" };
           }
           return { ok: true, error: null };
         })

@@ -36,7 +36,7 @@ export default function PublicLayout({
     <div className="flex flex-col min-h-screen">
       {!hideNavbar && <PublicNavbar />}
 
-      {/* Only push content down when navbar exists */}
+    
       <main className={!hideNavbar ? "pt-10" : ""}>{children}</main>
     </div>
   );
