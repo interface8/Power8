@@ -21,39 +21,40 @@ model Company {
 }
 
 model ProductCategory {
-  id          String    @id @default(cuid())
-  name        String
-  description String?
-  sort        Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isActive    Boolean   @default(true)
-  products    Product[]
+  id               String            @id @default(cuid())
+  name             String
+  description      String?
+  sort             Int
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  isActive         Boolean           @default(true)
+  products         Product[]
   merchantProducts MerchantProduct[]
-
 
   @@map("product_category")
 }
 
 model Product {
-  id            String          @id @default(cuid())
-  name          String
-  description   String?
-  price         Decimal         @db.Decimal(10, 2)
-  stockQuantity Int             @default(0)
-  isActive      Boolean         @default(true)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  capacity      Int
-  categoryId    String
-  companyId     String
-  warranty      Int
-  imageUrls     String[]
-  bundleItems   BundleItem[]
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
-  category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id                String           @id @default(cuid())
+  name              String
+  description       String?
+  price             Decimal          @db.Decimal(10, 2)
+  stockQuantity     Int              @default(0)
+  isActive          Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  capacity          Int
+  categoryId        String
+  companyId         String
+  warranty          Int
+  imageUrls         String[]
+  bundleItems       BundleItem[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  merchantProductId String?          @unique
+  merchantProduct   MerchantProduct? @relation(fields: [merchantProductId], references: [id], onDelete: SetNull)
+  category          ProductCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  company           Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
@@ -169,7 +170,7 @@ model SystemControlLog {
   action    ControlAction
   createdAt DateTime      @default(now())
   actorId   String?
-  actor     User? @relation(fields: [actorId], references: [id])
+  actor     User?         @relation(fields: [actorId], references: [id])
   system    SolarSystem   @relation(fields: [systemId], references: [id])
 
   @@map("system_control_logs")
@@ -218,12 +219,14 @@ model CartItem {
 }
 
 model ProductBundle {
-  id               String        @id @default(cuid())
+  id               String          @id @default(cuid())
   name             String
-  totalPrice       Decimal       @db.Decimal(10, 2)
-  systemCapacityKw Decimal?      @db.Decimal(10, 2)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  totalPrice       Decimal         @db.Decimal(10, 2)
+  systemCapacityKw Decimal?        @db.Decimal(10, 2)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  merchantBundleId String?         @unique
+  merchantBundle   MerchantBundle? @relation(fields: [merchantBundleId], references: [id], onDelete: SetNull)
   items            BundleItem[]
   cartItems        CartItem[]
   orderItems       OrderItem[]
@@ -254,7 +257,7 @@ model User {
   phone             String             @unique
   blogs             Blog[]
   cart              Cart?
-  userType          UserType  @default(CUSTOMER)
+  userType          UserType           @default(CUSTOMER)
   merchant          Merchant?
   filesCreated      File[]             @relation("FilesCreated")
   filesModified     File[]             @relation("FilesModified")
@@ -433,19 +436,20 @@ model AdminAuditLog {
 }
 
 model Merchant {
-  id               String            @id @default(cuid())
-  userId           String            @unique
+  id               String                @id @default(cuid())
+  userId           String                @unique
   businessName     String
   businessAddress  String
-  cacNumber        String            @unique
+  cacNumber        String                @unique
   cacDocumentUrl   String
   governmentIdUrl  String
   logoUrl          String?
-  status           MerchantStatus    @default(PENDING)
+  status           MerchantStatus        @default(PENDING)
   suspensionReason String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityLogs     MerchantActivityLog[]
   products         MerchantProduct[]
   bundles          MerchantBundle[]
 
@@ -464,6 +468,7 @@ model MerchantProduct {
   stockQuantity   Int                    @default(0)
   approvalStatus  MerchantApprovalStatus @default(PENDING)
   rejectionReason String?
+  product         Product?
   isActive        Boolean                @default(true)
   images          String[]
   createdAt       DateTime               @default(now())
@@ -482,6 +487,7 @@ model MerchantBundle {
   totalPrice       Decimal                @db.Decimal(10, 2)
   systemCapacityKw Decimal?               @db.Decimal(10, 2)
   description      String?
+  productBundle    ProductBundle?
   approvalStatus   MerchantApprovalStatus @default(PENDING)
   rejectionReason  String?
   isActive         Boolean                @default(true)
@@ -504,6 +510,17 @@ model MerchantBundleItem {
   @@map("merchant_bundle_items")
 }
 
+model MerchantActivityLog {
+  id         String               @id @default(cuid())
+  merchantId String
+  type       MerchantActivityType
+  message    String
+  createdAt  DateTime             @default(now())
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@map("merchant_activity_logs")
+}
 
 enum PaymentType {
   FULL
@@ -592,4 +609,17 @@ enum MerchantApprovalStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum MerchantActivityType {
+  PRODUCT_SUBMITTED
+  PRODUCT_APPROVED
+  PRODUCT_REJECTED
+  BUNDLE_SUBMITTED
+  BUNDLE_APPROVED
+  BUNDLE_REJECTED
+  MERCHANT_APPROVED
+  MERCHANT_SUSPENDED
+  MERCHANT_REINSTATED
+  NEW_ORDER
 }

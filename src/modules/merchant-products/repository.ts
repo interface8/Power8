@@ -54,3 +54,18 @@ export async function updateStock(id: string, stockQuantity: number) {
 export async function deactivate(id: string) {
   return prisma.merchantProduct.update({ where: { id }, data: { isActive: false } });
 }
+
+export async function setApprovalStatus(
+  id: string,
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED",
+  rejectionReason: string | null = null,
+) {
+  return prisma.merchantProduct.update({
+    where: { id },
+    data: {
+      approvalStatus,
+      rejectionReason,
+      isActive: approvalStatus !== "REJECTED",
+    },
+  });
+}

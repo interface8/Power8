@@ -71,6 +71,20 @@ async function main() {
     { resource: "products", action: "delete", description: "Delete products" },
     { resource: "products", action: "update_stock", description: "Update product stock" },
 
+    { resource: "merchant_products", action: "approve", description: "Approve merchant products" },
+    { resource: "merchant_products", action: "reject", description: "Reject merchant products" },
+
+    { resource: "merchants", action: "view_list", description: "View merchants list" },
+    { resource: "merchants", action: "view_detail", description: "View merchant details" },
+    { resource: "merchants", action: "approve", description: "Approve merchants" },
+    { resource: "merchants", action: "suspend", description: "Suspend merchants" },
+    { resource: "merchants", action: "reinstate", description: "Reinstate merchants" },
+
+    { resource: "merchant_products", action: "view_pending", description: "View pending merchant products" },
+    { resource: "merchant_bundles", action: "view_pending", description: "View pending merchant bundles" },
+    { resource: "merchant_bundles", action: "approve", description: "Approve merchant bundles" },
+    { resource: "merchant_bundles", action: "reject", description: "Reject merchant bundles" },
+
     { resource: "categories", action: "view", description: "View categories" },
     { resource: "categories", action: "create", description: "Create categories" },
     { resource: "categories", action: "edit", description: "Edit categories" },
