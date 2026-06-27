@@ -212,7 +212,7 @@ export default function CategoriesPage() {
     }
   };
 
-  // ✅ FIX 1: Changed data.message → data.error to match API response shape
+  
   const handleDelete = async () => {
     if (!deletingCategory) return;
 
@@ -262,7 +262,7 @@ export default function CategoriesPage() {
     }
   };
 
-  // ✅ FIX 2: Bulk delete now reads error body from each failed response
+  
   const handleBulkDelete = async () => {
     if (selectedCategories.size === 0) return;
 
@@ -1002,7 +1002,7 @@ export default function CategoriesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Single Delete Confirmation Dialog */}
+        {/* Single Delete Confirmation */}
       <AlertDialog open={!!deletingCategory} onOpenChange={() => setDeletingCategory(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuthActions } from "@/hooks/use-auth-actions";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, loading, error } = useAuth();
+  const { register, loading, error } = useAuthActions();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,7 +32,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Password validation rules
+  // ✅ Same password validation rules as Login page (ONLY ONCE)
   const passwordRules = {
     minLength: password.length >= 8,
     hasUpperCase: /[A-Z]/.test(password),
@@ -41,7 +41,6 @@ export default function RegisterPage() {
     hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
 
-  // Check if all password rules are met
   const allPasswordRulesMet = 
     passwordRules.minLength &&
     passwordRules.hasUpperCase &&
@@ -109,10 +108,11 @@ export default function RegisterPage() {
       return;
     }
 
-    await register({ name, email, phone, password });
+    const success = await register({ name, email, phone, password });
     
-    // Redirect to login page after successful registration
-    router.push("/login");
+    if (success) {
+      router.push("/login");
+    }
   }
 
   const isFormValid =
@@ -124,17 +124,19 @@ export default function RegisterPage() {
     !nameError &&
     !emailError &&
     !phoneError &&
+    !passwordError &&
+    !confirmError &&
     allPasswordRulesMet &&
     password === confirmPassword;
 
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10 bg-cover bg-center relative"
-      style={{ backgroundImage: "url('/images/power-1.jpg')" }}
+      style={{ backgroundImage: "url('/images/power-7.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      <Card className="relative z-10 w-full max-w-md lg:max-w-lg p-6 sm:p-8 rounded-2xl shadow-xl bg-white">
+      <Card className="relative z-10 w-full max-w-md lg:max-w-lg p-6 sm:p-8 rounded-2xl shadow-xl bg-white/95">
         <Link
           href="/"
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-6"
@@ -179,7 +181,7 @@ export default function RegisterPage() {
                 }}
                 autoComplete="name"
                 name="fullName"
-                className="pl-10 h-11 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="John Doe"
               />
             </div>
@@ -203,7 +205,7 @@ export default function RegisterPage() {
                 }}
                 autoComplete="email"
                 name="email"
-                className="pl-10 h-11 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="you@example.com"
               />
             </div>
@@ -227,7 +229,7 @@ export default function RegisterPage() {
                 }}
                 autoComplete="tel"
                 name="phone"
-                className="pl-10 h-11 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                className="pl-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="+2349012345678"
               />
             </div>
@@ -251,7 +253,7 @@ export default function RegisterPage() {
                 onBlur={() => setPasswordFocused(false)}
                 autoComplete="new-password"
                 name="password"
-                className="pl-10 pr-10 h-11 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="••••••••"
               />
               <button
@@ -267,7 +269,7 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            {/* Password Requirements Checklist - Only shows when focused */}
+            {/* Password Requirements Checklist */}
             {passwordFocused && (
               <div className="mt-2 space-y-1">
                 <p className="text-xs font-medium text-gray-500 mb-1">Password must have:</p>
@@ -314,7 +316,7 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Success message when all rules are met - Always shows if password is valid */}
+            {/* Success message when all rules are met */}
             {allPasswordRulesMet && password && (
               <div className="mt-2 flex items-center gap-2">
                 <Check className="w-3 h-3 text-green-500" />
@@ -347,7 +349,7 @@ export default function RegisterPage() {
                 }}
                 autoComplete="off"
                 name="confirmPassword"
-                className="pl-10 pr-10 h-11 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
+                className="pl-10 pr-10 h-12 bg-gray-50 border-0 focus:outline-none focus:ring-0 focus:border-transparent"
                 placeholder="••••••••"
               />
               <button
@@ -375,7 +377,7 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={!isFormValid || loading}
-            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
+            className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg"
           >
             {loading ? "Creating account..." : "Create Account"}
           </Button>
@@ -383,7 +385,7 @@ export default function RegisterPage() {
 
         <p className="text-sm text-center text-gray-500 mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-orange-500 font-medium">
+          <Link href="/login" className="text-orange-500 hover:text-orange-600 font-medium">
             Sign in
           </Link>
         </p>
