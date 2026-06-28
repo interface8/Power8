@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { OrderStatus } from "@prisma/client";
-import { requireApiMerchant, isErrorResponse } from "@/lib/auth";
+import { requireApiMerchant } from "@/lib/auth";
 import { jsonResponse, errorResponse } from "@/lib/http";
 import { merchantDashboardService } from "@/modules/merchant-dashboard";
 
