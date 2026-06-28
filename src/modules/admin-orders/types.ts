@@ -19,6 +19,9 @@ export type AdminOrderListRowDto = {
   installationAddress: string | null;
   city: string | null;
   state: string | null;
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
   shippingStatus: ShippingStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -83,11 +86,11 @@ export type AdminOrderItemDetailDto = {
 
 export type AdminOrderDetailsDto = {
   id: string;
-
   customer: {
     id: string;
     name: string;
     email: string;
+    phone?: string;
   };
 
   createdAt: Date;
@@ -99,6 +102,10 @@ export type AdminOrderDetailsDto = {
   installationAddress: string | null;
   city: string | null;
   state: string | null;
+
+  deliveryAddress: string | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
 
   orderStatus: OrderStatus;
   paymentStatus: OrderPaymentStatus;

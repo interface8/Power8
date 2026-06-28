@@ -48,16 +48,10 @@ async function main() {
     { resource: "blogs", action: "update", description: "Update blogs" },
     { resource: "blogs", action: "delete", description: "Delete blogs" },
 
-    // Blog Categories
-    { resource: "blog-categories", action: "create", description: "Create blog categories" },
-
     // Product Categories
     { resource: "product-categories", action: "create", description: "Create product categories" },
     { resource: "product-categories", action: "update", description: "Update product categories" },
     { resource: "product-categories", action: "delete", description: "Delete product categories" },
-
-    // Systems
-    { resource: "systems", action: "control", description: "Control solar systems" },
   ];
 
   const newPermissionDefs = [
@@ -76,6 +70,20 @@ async function main() {
     { resource: "products", action: "edit", description: "Edit products" },
     { resource: "products", action: "delete", description: "Delete products" },
     { resource: "products", action: "update_stock", description: "Update product stock" },
+
+    { resource: "merchant_products", action: "approve", description: "Approve merchant products" },
+    { resource: "merchant_products", action: "reject", description: "Reject merchant products" },
+
+    { resource: "merchants", action: "view_list", description: "View merchants list" },
+    { resource: "merchants", action: "view_detail", description: "View merchant details" },
+    { resource: "merchants", action: "approve", description: "Approve merchants" },
+    { resource: "merchants", action: "suspend", description: "Suspend merchants" },
+    { resource: "merchants", action: "reinstate", description: "Reinstate merchants" },
+
+    { resource: "merchant_products", action: "view_pending", description: "View pending merchant products" },
+    { resource: "merchant_bundles", action: "view_pending", description: "View pending merchant bundles" },
+    { resource: "merchant_bundles", action: "approve", description: "Approve merchant bundles" },
+    { resource: "merchant_bundles", action: "reject", description: "Reject merchant bundles" },
 
     { resource: "categories", action: "view", description: "View categories" },
     { resource: "categories", action: "create", description: "Create categories" },
@@ -96,6 +104,7 @@ async function main() {
     { resource: "solar_systems", action: "limit", description: "Limit solar system" },
     { resource: "solar_systems", action: "disable", description: "Disable solar system" },
     { resource: "solar_systems", action: "view_logs", description: "View solar system logs" },
+    { resource: "solar_systems", action: "view_detail", description: "View solar system details" },
 
     { resource: "carousel", action: "view", description: "View carousel slides" },
     { resource: "carousel", action: "create", description: "Create carousel slides" },
@@ -175,44 +184,6 @@ async function main() {
 
   console.log("  ✅ Admin role created with all permissions");
 
-  // ─── 3. Create Viewer Role (read-only) ───────────────
-  const viewerRole = await prisma.role.upsert({
-    where: { name: "viewer" },
-    update: {},
-    create: {
-      name: "viewer",
-      description: "Read-only access",
-    },
-  });
-
-  const viewActions = new Set([
-    "read",
-    "view",
-    "view_list",
-    "view_detail",
-    "view_logs",
-    "view_stats",
-  ]);
-
-  const viewerPermissions = permissions.filter((p) => viewActions.has(p.action));
-  for (const perm of viewerPermissions) {
-    await prisma.rolePermission.upsert({
-      where: {
-        roleId_permissionId: {
-          roleId: viewerRole.id,
-          permissionId: perm.id,
-        },
-      },
-      update: {},
-      create: {
-        roleId: viewerRole.id,
-        permissionId: perm.id,
-      },
-    });
-  }
-
-  console.log("  ✅ Viewer role created with read permissions");
-
   // ─── 3b. Create Customer Role (default) ─────────────────────────
 const customerRole = await prisma.role.upsert({
   where: { name: "Customer" },
@@ -226,12 +197,13 @@ const customerRole = await prisma.role.upsert({
 console.log("  ✅ Customer role created");
 
   // ─── 4. Create Admin User ───────────────────────────
-  const hashedPassword = await hash("admin123", 12);
+  const hashedPassword = await hash("Admin.123", 12);
 
   const adminUser = await prisma.user.upsert({
   where: { email: "admin@power8.dev" },
   update: {
     phone: "+10000000001",
+    password: hashedPassword,
   },
   create: {
     email: "admin@power8.dev",
@@ -257,38 +229,7 @@ console.log("  ✅ Customer role created");
     },
   });
 
-  console.log("  ✅ Admin user created (admin@power8.dev / admin123)");
-
-  // ─── 5. Create Demo Viewer User ─────────────────────
-const viewerUser = await prisma.user.upsert({
-  where: { email: "viewer@power8.dev" },
-  update: {
-    phone: "+10000000002",
-  },
-  create: {
-    email: "viewer@power8.dev",
-    phone: "+10000000002",
-    password: await hash("viewer123", 12),
-    name: "Demo Viewer",
-    isActive: true,
-  },
-});
-
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: viewerUser.id,
-        roleId: viewerRole.id,
-      },
-    },
-    update: {},
-    create: {
-      userId: viewerUser.id,
-      roleId: viewerRole.id,
-    },
-  });
-
-  console.log("  ✅ Viewer user created (viewer@power8.dev / viewer123)");
+  console.log("  ✅ Admin user created (admin@power8.dev / Admin.123)");
 
   // ─── 6. Create Companies ─────────────────────────────
   const companiesDefs = [

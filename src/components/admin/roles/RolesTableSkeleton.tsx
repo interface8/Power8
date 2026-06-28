@@ -6,12 +6,12 @@ export function RolesTableSkeleton() {
       <table className="w-full min-w-[800px]">
         <thead className="border-b border-gray-200 bg-gray-50">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Role Name</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Description</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Permissions</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Users</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Created</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Actions</th>
+            <th className="px-4 py-3 text-left text-base font-semibold text-gray-600">Role Name</th>
+            <th className="px-4 py-3 text-left text-base font-semibold text-gray-600">Description</th>
+            <th className="px-4 py-3 text-left text-base font-semibold text-gray-600">Permissions</th>
+            <th className="px-4 py-3 text-left text-base font-semibold text-gray-600">Users</th>
+            <th className="px-4 py-3 text-left text-base font-semibold text-gray-600">Created</th>
+            <th className="px-4 py-3 text-left text-base font-semibold text-gray-600">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">

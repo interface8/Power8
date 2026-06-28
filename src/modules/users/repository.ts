@@ -106,9 +106,13 @@ export async function findUserById(id: string): Promise<UserDto | null> {
 export async function findUserByEmail(email: string) {
   return prisma.user.findUnique({
     where: { email },
-    ...userWithRoles,
+    include: {
+      roles: { include: { role: { select: { id: true, name: true } } } },
+      merchant: { select: { status: true, suspensionReason: true } },
+    },
   });
 }
+
 
 export async function createUser(input: CreateUserInput): Promise<UserDto> {
   const hashedPassword = await hash(input.password, 12);

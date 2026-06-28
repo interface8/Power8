@@ -8,7 +8,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const guard = await requireApiPermissionFor("systems", "control");
+  const guard = await requireApiPermissionFor("solar_systems", "limit");
   if (isErrorResponse(guard)) return guard;
 
   try {

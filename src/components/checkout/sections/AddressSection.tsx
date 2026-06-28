@@ -1,61 +1,10 @@
 "use client";
 
-import { MapPin, Phone, ChevronDown } from "lucide-react";
+import { MapPin, Phone, ChevronDown, CheckCircle2, Search, Truck, Home } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-
 import { AddressData } from "../checkoutUtils";
+import { useNigeriaLocations } from "@/hooks/use-nigeria-locations";
 
-const NIGERIA_STATES = [
-  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
-  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa",
-  "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger",
-  "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
-  "FCT Abuja"
-];
-
-const STATE_CITIES_MAP: Record<string, string[]> = {
-  "Abia": ["Aba", "Umuahia", "Ohafia", "Arochukwu", "Isiukwuato", "Bende", "Ukwa"],
-  "Adamawa": ["Yola", "Jimeta", "Mubi", "Numan", "Girei", "Mayo Belwa", "Gombi"],
-  "Akwa Ibom": ["Uyo", "Eket", "Ikot Ekpene", "Oron", "Abak", "Etinan", "Mkpat Enin"],
-  "Anambra": ["Awka", "Onitsha", "Nnewi", "Ekwulobia", "Ogidi", "Idemili", "Otuocha"],
-  "Bauchi": ["Bauchi", "Azare", "Misau", "Jama'are", "Darazo", "Tafawa Balewa", "Ningi"],
-  "Bayelsa": ["Yenagoa", "Brass", "Sagbama", "Amassoma", "Ogbia", "Nembe", "Ekeremor"],
-  "Benue": ["Makurdi", "Otukpo", "Gboko", "Katsina-Ala", "Vandeikya", "Okpoga", "Aliade"],
-  "Borno": ["Maiduguri", "Biu", "Gwoza", "Monguno", "Damboa", "Konduga", "Bama"],
-  "Cross River": ["Calabar", "Ugep", "Ikom", "Obudu", "Ogoja", "Akamkpa", "Boki"],
-  "Delta": ["Asaba", "Warri", "Sapele", "Ughelli", "Agbor", "Oleh", "Kokori"],
-  "Ebonyi": ["Abakaliki", "Afikpo", "Onueke", "Ezzamgbo", "Nguzu", "Isu"],
-  "Edo": ["Benin City", "Auchi", "Uromi", "Ekpoma", "Irrua", "Sabongida-Ora", "Igara"],
-  "Ekiti": ["Ado Ekiti", "Ikere Ekiti", "Ilawe", "Oye", "Ise", "Emure", "Idoani"],
-  "Enugu": ["Enugu", "Nsukka", "Awgu", "Oji River", "Udi", "Agbani", "Emene"],
-  "Gombe": ["Gombe", "Biu", "Kumo", "Dukku", "Deba", "Billiri", "Funakaye"],
-  "Imo": ["Owerri", "Orlu", "Okigwe", "Mbaise", "Oguta", "Amaigbo", "Mgbidi"],
-  "Jigawa": ["Dutse", "Hadejia", "Gumel", "Kazaure", "Birnin Kudu", "Babura", "Ringim"],
-  "Kaduna": ["Kaduna", "Zaria", "Kafanchan", "Saminaka", "Kachia", "Birnin Gwari", "Kagoro"],
-  "Kano": ["Kano", "Wudil", "Bichi", "Rano", "Gaya", "Karaye", "Kunchi"],
-  "Katsina": ["Katsina", "Daura", "Funtua", "Malumfashi", "Bakori", "Mani", "Dutsin Ma"],
-  "Kebbi": ["Birnin Kebbi", "Argungu", "Yauri", "Jega", "Zuru", "Kamba", "Bagudo"],
-  "Kogi": ["Lokoja", "Okene", "Kabba", "Idah", "Ajaokuta", "Dekina", "Ankpa"],
-  "Kwara": ["Ilorin", "Offa", "Omu Aran", "Pategi", "Share", "Lafiagi", "Jebba"],
-  "Lagos": [
-    "Ikeja", "Lagos Island", "Victoria Island", "Surulere", "Mushin", "Agege",
-    "Alimosho", "Ajah", "Badagry", "Epe", "Ikorodu", "Ojo", "Festac Town",
-    "Maryland", "Gbagada", "Yaba", "Apapa", "Ikeja GRA"
-  ],
-  "Nasarawa": ["Lafia", "Keffi", "Akwanga", "Karu", "Nasarawa", "Doma", "Wamba"],
-  "Niger": ["Minna", "Suleja", "Bida", "Kontagora", "Kutigi", "Lapai", "Mokwa"],
-  "Ogun": ["Abeokuta", "Ijebu Ode", "Sagamu", "Ilaro", "Ota", "Iperu", "Ifo"],
-  "Ondo": ["Akure", "Ondo City", "Owo", "Ikare", "Okitipupa", "Irele", "Idanre"],
-  "Osun": ["Osogbo", "Ile Ife", "Ilesa", "Ede", "Ikire", "Iwo", "Ejigbo"],
-  "Oyo": ["Ibadan", "Ogbomosho", "Oyo Town", "Saki", "Iseyin", "Fiditi", "Kisi"],
-  "Plateau": ["Jos", "Bukuru", "Pankshin", "Langtang", "Shendam", "Bokkos", "Mangu"],
-  "Rivers": ["Port Harcourt", "Obio-Akpor", "Eleme", "Bonny", "Okrika", "Degema", "Ahoada"],
-  "Sokoto": ["Sokoto", "Tambuwal", "Gwadabawa", "Binji", "Wamako", "Illela", "Sabon Birni"],
-  "Taraba": ["Jalingo", "Wukari", "Ibi", "Takum", "Bali", "Gembu", "Mutum Biyu"],
-  "Yobe": ["Damaturu", "Potiskum", "Gashua", "Nguru", "Buni Yadi", "Geidam", "Yunusari"],
-  "Zamfara": ["Gusau", "Kaura Namoda", "Talata Mafara", "Anka", "Maru", "Shinkafi", "Tsafe"],
-  "FCT Abuja": ["Abuja (Garki)", "Abuja (Wuse)", "Maitama", "Asokoro", "Kubwa", "Gwagwalada", "Nyanya", "Karu", "Bwari", "Lugbe"]
-};
 interface DropdownSelectProps {
   id: string;
   label: string;
@@ -65,6 +14,7 @@ interface DropdownSelectProps {
   onChange: (value: string) => void;
   disabled?: boolean;
   required?: boolean;
+  isLoading?: boolean;
 }
 
 function DropdownSelect({
@@ -76,329 +26,449 @@ function DropdownSelect({
   onChange,
   disabled = false,
   required = false,
+  isLoading = false,
 }: DropdownSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
-;
-  const filteredOptions = options.filter(opt =>
-    opt.toLowerCase().includes(searchTerm.toLowerCase())
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const filtered = options.filter((opt) =>
+    opt.toLowerCase().includes(search.toLowerCase()),
   );
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
-        setSearchTerm("");
+        setSearch("");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue);
-    setIsOpen(false);
-    setSearchTerm("");
-  };
-
-  const displayValue = value || "";
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => searchRef.current?.focus(), 50);
+    } else {
+      setSearch("");
+    }
+  }, [isOpen]);
 
   return (
     <div ref={containerRef} className="relative">
-      <label htmlFor={id} className="mb-2 block text-sm font-medium text-gray-700">
+      <label
+        htmlFor={id}
+        className="mb-2 block text-sm font-medium text-gray-700"
+      >
         {label} {required && <span className="text-red-500">*</span>}
       </label>
-      <div
+
+      <button
+        id={id}
+        type="button"
+        disabled={disabled || isLoading}
+        onClick={() => setIsOpen((prev) => !prev)}
         className={`
           relative h-12 w-full rounded-2xl
           border border-gray-200 bg-gray-50
           transition-all duration-200
-          flex items-center
-          ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}
-          ${isOpen ? "border-green-500 ring-4 ring-green-100 bg-white" : ""}
+          flex items-center justify-between px-4
+          ${disabled || isLoading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}
+          ${isOpen ? "border-green-500 ring-4 ring-green-100 bg-white" : "hover:border-gray-300"}
         `}
-        onClick={() => !disabled && setIsOpen(!isOpen)}
       >
-        <div className="flex-1 px-4 text-sm text-gray-900 truncate">
-          {displayValue || (
-            <span className="text-gray-400">{placeholder}</span>
-          )}
-        </div>
+        <span className={`text-sm truncate ${value ? "text-gray-900" : "text-gray-400"}`}>
+          {value || (isLoading ? "Loading..." : placeholder)}
+        </span>
         <ChevronDown
-          className={`
-            h-4 w-4 mr-3 text-gray-400 transition-transform duration-200
-            ${isOpen ? "rotate-180" : ""}
-          `}
+          className={`h-4 w-4 text-gray-400 shrink-0 ml-2 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
-      </div>
+      </button>
 
-      {/* Dropdown menu with search input */}
-      {isOpen && !disabled && (
-        <div
-          className="
-            absolute z-50 mt-2 w-full
-            rounded-xl border border-gray-200
-            bg-white shadow-xl
-            max-h-72 overflow-hidden
-            flex flex-col
-          "
-        >
-          {/* Search input */}
+      {isOpen && (
+        <div className="absolute bottom-full left-0 right-0 mb-2 z-50 rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+          {/* Search bar */}
           <div className="p-2 border-b border-gray-100">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="
-                w-full rounded-lg border border-gray-200
-                bg-gray-50 px-3 py-2 text-sm
-                outline-none focus:border-green-500
-                focus:ring-2 focus:ring-green-100
-              "
-              onClick={(e) => e.stopPropagation()}
-              autoFocus
-            />
+            <div className="relative flex items-center">
+              <Search className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
+              <input
+                ref={searchRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={`Search ${label.toLowerCase()}...`}
+                className="w-full h-9 rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-100"
+              />
+            </div>
           </div>
-          {/* Options list */}
-          <div className="overflow-y-auto max-h-52">
-            {filteredOptions.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                No results found
-              </div>
-            ) : (
-              filteredOptions.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  className={`
-                    w-full text-left px-4 py-2.5 text-sm
-                    hover:bg-green-50 transition-colors
-                    ${value === opt ? "bg-green-100 text-green-800 font-medium" : "text-gray-700"}
-                  `}
-                  onClick={() => handleSelect(opt)}
-                >
-                  {opt}
-                </button>
-              ))
-            )}
+
+          {/* Options list with custom scrollbar */}
+          <div
+            className="max-h-52 overflow-y-auto p-1.5"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "#16a34a #f0fdf4",
+            }}
+          >
+            <style>{`
+              .dropdown-scroll::-webkit-scrollbar {
+                width: 6px;
+              }
+              .dropdown-scroll::-webkit-scrollbar-track {
+                background: #f0fdf4;
+                border-radius: 99px;
+                margin: 4px;
+              }
+              .dropdown-scroll::-webkit-scrollbar-thumb {
+                background: #16a34a;
+                border-radius: 99px;
+                border: 1px solid #f0fdf4;
+              }
+              .dropdown-scroll::-webkit-scrollbar-thumb:hover {
+                background: #15803d;
+              }
+            `}</style>
+
+            <div className="dropdown-scroll max-h-52 overflow-y-auto">
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-8 text-sm text-gray-400">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
+                  <span>Loading options...</span>
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-1 py-8">
+                  <Search className="h-5 w-5 text-gray-300" />
+                  <p className="text-sm text-gray-400">
+                    {search ? `No results for "${search}"` : "No options available"}
+                  </p>
+                </div>
+              ) : (
+                filtered.map((opt) => {
+                  const isActive = value === opt;
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => {
+                        onChange(opt);
+                        setIsOpen(false);
+                        setSearch("");
+                      }}
+                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                        isActive
+                          ? "bg-green-100 text-green-700"
+                          : "text-gray-700 hover:bg-green-50 hover:text-green-600"
+                      }`}
+                    >
+                      <span>{opt}</span>
+                      {isActive && <CheckCircle2 className="h-4 w-4 shrink-0" />}
+                    </button>
+                  );
+                })
+              )}
+            </div>
           </div>
+
+          {/* Footer count */}
+          {!isLoading && filtered.length > 0 && (
+            <div className="border-t border-gray-100 px-3 py-2">
+              <p className="text-xs text-gray-400 text-center">
+                {filtered.length} {filtered.length === 1 ? "option" : "options"} available
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
+
 interface AddressSectionProps {
   title: string;
   description: string;
-  values: AddressData;
-  onChange: (field: keyof AddressData, value: string) => void;
+  installationAddress: AddressData;
+  deliveryAddress: AddressData;
+  onInstallationChange: (field: keyof AddressData, value: string) => void;
+  onDeliveryChange: (field: keyof AddressData, value: string) => void;
+  isDeliverySame: boolean;
+  onToggleChange: (checked: boolean) => void;
 }
 
 export function AddressSection({
   title,
   description,
-  values,
-  onChange,
+  installationAddress,
+  deliveryAddress,
+  onInstallationChange,
+  onDeliveryChange,
+  isDeliverySame,
+  onToggleChange,
 }: AddressSectionProps) {
-  // Get available cities for selected state
-  const availableCities = values.state ? STATE_CITIES_MAP[values.state] || [] : [];
+  const { states, loadingStates, statesError } = useNigeriaLocations();
 
-  // Auto-reset city if selected state changes and current city is not valid in new state
-  useEffect(() => {
-    if (values.state && values.city) {
-      const validCities = STATE_CITIES_MAP[values.state] || [];
-      if (!validCities.includes(values.city)) {
-        // Only reset if the city is not in the new state's city list
-        onChange("city", "");
-      }
-    } else if (!values.state && values.city) {
-      // If state becomes empty, also clear city
-      onChange("city", "");
-    }
-  }, [values.state, values.city, onChange]);
+  const {
+    cities: installationCities,
+    loadingCities: installationLoadingCities,
+  } = useNigeriaLocations(installationAddress.state);
+
+  const {
+    cities: deliveryCities,
+    loadingCities: deliveryLoadingCities,
+  } = useNigeriaLocations(deliveryAddress.state);
 
   const handleStateChange = (stateValue: string) => {
-    onChange("state", stateValue);
-    // City will be reset via useEffect above, but we also do immediate empty for responsiveness
-    if (values.city) {
-      onChange("city", "");
+    onInstallationChange("state", stateValue);
+    if (installationAddress.city) onInstallationChange("city", "");
+    if (isDeliverySame) {
+      onDeliveryChange("state", stateValue);
+      if (deliveryAddress.city) onDeliveryChange("city", "");
     }
   };
 
+  const handleInstallationFieldChange = (
+    field: keyof AddressData,
+    value: string,
+  ) => {
+    onInstallationChange(field, value);
+    if (isDeliverySame) onDeliveryChange(field, value);
+  };
+
   return (
-    <section
-      className="
-        overflow-hidden rounded-3xl
-        border border-gray-200 bg-white
-        shadow-sm
-      "
-    >
+    <section className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
       {/* Header */}
-      <div
-        className="
-          border-b border-gray-100
-          bg-linear-to-r from-green-50 to-white
-          px-5 py-5
-          sm:px-6
-        "
-      >
+      <div className="border-b border-gray-100 bg-linear-to-r from-green-50 to-white px-5 py-5 sm:px-6">
         <div className="flex items-start gap-4">
-          <div
-            className="
-              flex h-12 w-12 shrink-0
-              items-center justify-center
-              rounded-2xl bg-green-100
-            "
-          >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100">
             <MapPin className="h-5 w-5 text-green-700" />
           </div>
-
           <div className="min-w-0">
-            <h2
-              className="
-                text-base font-semibold
-                text-green-950
-                sm:text-lg
-              "
-            >
+            <h2 className="text-base font-semibold text-green-950 sm:text-lg">
               {title}
             </h2>
-
-            <p
-              className="
-                mt-1 text-sm text-gray-500
-              "
-            >
-              {description}
-            </p>
+            <p className="mt-1 text-sm text-gray-500">{description}</p>
           </div>
         </div>
       </div>
 
-      {/* Content */}
+      {/* Delivery toggle — full-width banner */}
       <div
-        className="
-          space-y-5
-          p-5
-          sm:p-6
-        "
+        onClick={() => onToggleChange(!isDeliverySame)}
+        className={`cursor-pointer border-b transition-colors duration-200 ${
+          isDeliverySame
+            ? "border-green-100 bg-green-50"
+            : "border-amber-100 bg-amber-50"
+        }`}
       >
-        
-        <div>
-          <label
-            htmlFor={`${title}-street`}
-            className="
-              mb-2 block text-sm
-              font-medium text-gray-700
-            "
-          >
-            Street Address
-          </label>
+        <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
+          {/* Left: icon + text */}
+          <div className="flex items-start gap-3">
+            <div
+              className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isDeliverySame ? "bg-green-100" : "bg-amber-100"
+              }`}
+            >
+              {isDeliverySame ? (
+                <Home className={`h-4 w-4 text-green-700`} />
+              ) : (
+                <Truck className={`h-4 w-4 text-amber-600`} />
+              )}
+            </div>
+            <div>
+              <p
+                className={`text-sm font-semibold ${
+                  isDeliverySame ? "text-green-800" : "text-amber-800"
+                }`}
+              >
+                {isDeliverySame
+                  ? "Delivery to installation address"
+                  : "Deliver to a different address"}
+              </p>
+              <p
+                className={`mt-0.5 text-xs leading-relaxed ${
+                  isDeliverySame ? "text-green-600" : "text-amber-600"
+                }`}
+              >
+                {isDeliverySame
+                  ? "Your order will be delivered to the same location where the solar system will be installed. Toggle off if you need delivery elsewhere."
+                  : "Your order will be shipped to a separate address before installation. Fill in the delivery details below."}
+              </p>
+            </div>
+          </div>
 
+          {/* Right: toggle switch */}
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            <label className="relative inline-flex cursor-pointer items-center">
+              <input
+                type="checkbox"
+                checked={isDeliverySame}
+                onChange={(e) => onToggleChange(e.target.checked)}
+                className="peer sr-only"
+              />
+              <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-2 peer-focus:ring-green-300" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Installation Address Form */}
+      <div className="space-y-5 p-5 sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          Installation Address
+        </p>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Street Address <span className="text-red-500">*</span>
+          </label>
           <input
-            id={`${title}-street`}
             type="text"
             autoComplete="street-address"
-            value={values.street}
-            onChange={(event) => onChange("street", event.target.value)}
-            placeholder="Enter street address"
+            value={installationAddress.street}
+            onChange={(e) =>
+              handleInstallationFieldChange("street", e.target.value)
+            }
+            placeholder="e.g. 12 Adeola Odeku Street"
             maxLength={120}
-            className="
-              h-12 w-full rounded-2xl
-              border border-gray-200
-              bg-gray-50 px-4
-              text-sm text-gray-900
-              outline-none transition-all
-              duration-200
-              placeholder:text-gray-400
-              focus:border-green-500
-              focus:bg-white
-              focus:ring-4
-              focus:ring-green-100
-            "
+            className="h-12 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-green-500 focus:bg-white focus:ring-4 focus:ring-green-100"
           />
         </div>
 
-        {/* City + State - now using dropdowns */}
-        <div
-          className="
-            grid grid-cols-1 gap-4
-            md:grid-cols-2
-          "
-        >
-          {/* STATE Dropdown (36 states + FCT) */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <DropdownSelect
-            id={`${title}-state`}
+            id="installation-state"
             label="State"
-            value={values.state}
-            options={NIGERIA_STATES}
-            placeholder="Select your state"
+            value={installationAddress.state}
+            options={states}
+            placeholder={statesError ? "Unable to load states" : "Select your state"}
             onChange={handleStateChange}
             required
+            isLoading={loadingStates}
           />
-
-          {/* CITY Dropdown (depends on selected state) */}
           <DropdownSelect
-            id={`${title}-city`}
+            id="installation-city"
             label="City / Town"
-            value={values.city}
-            options={availableCities}
-            placeholder={values.state ? "Select city" : "Select state first"}
-            onChange={(cityValue) => onChange("city", cityValue)}
-            disabled={!values.state}
+            value={installationAddress.city}
+            options={installationCities}
+            placeholder={
+              installationAddress.state ? "Select your city" : "Select state first"
+            }
+            onChange={(cityValue) =>
+              handleInstallationFieldChange("city", cityValue)
+            }
+            disabled={!installationAddress.state}
             required
+            isLoading={installationLoadingCities}
           />
         </div>
 
-        {/* Phone Number */}
         <div>
-          <label
-            htmlFor={`${title}-phone`}
-            className="
-              mb-2 block text-sm
-              font-medium text-gray-700
-            "
-          >
-            Phone Number
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Phone Number <span className="text-red-500">*</span>
           </label>
-
           <div className="relative">
-            <Phone
-              className="
-                absolute left-4 top-1/2
-                h-4 w-4 -translate-y-1/2
-                text-gray-400
-              "
-            />
-
+            <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
-              id={`${title}-phone`}
               type="tel"
               autoComplete="tel"
-              value={values.phoneNumber}
-              onChange={(event) => onChange("phoneNumber", event.target.value)}
-              placeholder="08012345678"
+              value={installationAddress.phoneNumber}
+              onChange={(e) =>
+                handleInstallationFieldChange("phoneNumber", e.target.value)
+              }
+              placeholder="e.g. 08012345678"
               maxLength={15}
-              className="
-                h-12 w-full rounded-2xl
-                border border-gray-200
-                bg-gray-50 pl-11 pr-4
-                text-sm text-gray-900
-                outline-none transition-all
-                duration-200
-                placeholder:text-gray-400
-                focus:border-green-500
-                focus:bg-white
-                focus:ring-4
-                focus:ring-green-100
-              "
+              className="h-12 w-full rounded-2xl border border-gray-200 bg-gray-50 pl-11 pr-4 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-green-500 focus:bg-white focus:ring-4 focus:ring-green-100"
             />
           </div>
         </div>
       </div>
+
+      {/* Delivery Address — only when different */}
+      {!isDeliverySame && (
+        <>
+          <div className="border-t border-gray-100 bg-gray-50/60 px-5 py-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              <Truck className="h-4 w-4 text-amber-500" />
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                Delivery Address
+              </p>
+            </div>
+            <p className="mt-1 text-xs text-gray-400 ml-6">
+              This is where your order will be physically shipped to.
+            </p>
+          </div>
+
+          <div className="space-y-5 p-5 sm:p-6">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Street Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                autoComplete="street-address"
+                value={deliveryAddress.street}
+                onChange={(e) => onDeliveryChange("street", e.target.value)}
+                placeholder="e.g. 5 Marina Road"
+                maxLength={120}
+                className="h-12 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-green-500 focus:bg-white focus:ring-4 focus:ring-green-100"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <DropdownSelect
+                id="delivery-state"
+                label="State"
+                value={deliveryAddress.state}
+                options={states}
+                placeholder="Select delivery state"
+                onChange={(stateValue) => {
+                  onDeliveryChange("state", stateValue);
+                  if (deliveryAddress.city) onDeliveryChange("city", "");
+                }}
+                required
+                isLoading={loadingStates}
+              />
+              <DropdownSelect
+                id="delivery-city"
+                label="City / Town"
+                value={deliveryAddress.city}
+                options={deliveryCities}
+                placeholder={
+                  deliveryAddress.state ? "Select your city" : "Select state first"
+                }
+                onChange={(cityValue) => onDeliveryChange("city", cityValue)}
+                disabled={!deliveryAddress.state}
+                required
+                isLoading={deliveryLoadingCities}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="tel"
+                  autoComplete="tel"
+                  value={deliveryAddress.phoneNumber}
+                  onChange={(e) =>
+                    onDeliveryChange("phoneNumber", e.target.value)
+                  }
+                  placeholder="e.g. 08012345678"
+                  maxLength={15}
+                  className="h-12 w-full rounded-2xl border border-gray-200 bg-gray-50 pl-11 pr-4 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-green-500 focus:bg-white focus:ring-4 focus:ring-green-100"
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </section>
   );
 }
