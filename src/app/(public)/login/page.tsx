@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Sun, Mail, Lock, Eye, EyeOff, Check, X } from "lucide-react";
+import { ArrowLeft, Sun, Mail, Lock, Eye, EyeOff, Check, X, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,8 @@ import { useAuthActions } from "@/hooks/use-auth-actions";
 
 export default function LoginPage() {
   const { login, loading, error } = useAuthActions();
+  const searchParams = useSearchParams();
+  const merchantPending = searchParams.get("merchant") === "pending";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -100,6 +103,16 @@ export default function LoginPage() {
         <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
           Login to your account
         </p>
+
+        {merchantPending && (
+          <div className="mb-4 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Application submitted!</p>
+              <p className="text-xs text-amber-700 mt-0.5">Your merchant application is under review. You'll be able to log in once an admin approves your account.</p>
+            </div>
+          </div>
+        )}
 
         {error && (
           <Alert variant="destructive" className="mb-4">

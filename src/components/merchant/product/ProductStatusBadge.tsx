@@ -1,7 +1,9 @@
 "use client";
 
+import type { ProductApprovalStatus } from "@/types/merchant-product";
+
 interface ProductStatusBadgeProps {
-  status: "approved" | "pending" | "rejected";
+  status: ProductApprovalStatus | string;
   onViewReason?: () => void;
 }
 
@@ -9,22 +11,24 @@ export function ProductStatusBadge({
   status,
   onViewReason,
 }: ProductStatusBadgeProps) {
-  const config = {
-    approved: {
+  const config: Record<ProductApprovalStatus, { label: string; className: string }> = {
+    APPROVED: {
       label: "Approved",
       className: "bg-green-100 text-green-700",
     },
-    pending: {
+    PENDING: {
       label: "Pending",
       className: "bg-yellow-100 text-yellow-700",
     },
-    rejected: {
+    REJECTED: {
       label: "Rejected",
       className: "bg-red-100 text-red-700",
     },
   };
 
-  const { label, className } = config[status];
+  const normalizedStatus = status.toUpperCase() as ProductApprovalStatus;
+  const { label, className } =
+    config[normalizedStatus] ?? config.PENDING;
 
   return (
     <div className="flex flex-col items-start gap-0.5">
@@ -33,7 +37,7 @@ export function ProductStatusBadge({
       >
         {label}
       </span>
-      {status === "rejected" && onViewReason && (
+      {normalizedStatus === "REJECTED" && onViewReason && (
         <button
           type="button"
           onClick={onViewReason}

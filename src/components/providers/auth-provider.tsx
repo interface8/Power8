@@ -7,6 +7,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 type User = {
   name: string;
   email: string;
+  userType?: string;
   permissions: string[];
   roles: string[];
 };

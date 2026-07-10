@@ -30,9 +30,9 @@ interface ProductSubmitData {
   price: number;
   warranty: number;
   stockQuantity: number;
-  capacity: string | null;
+  capacity: number;
   isActive: boolean;
-  imageUrls: string[];
+  images: string[];
 }
 
 export default function EditProductPage() {

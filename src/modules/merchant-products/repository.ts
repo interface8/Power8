@@ -21,6 +21,13 @@ export async function findByMerchant(merchantId: string, filters: ListMerchantPr
     prisma.merchantProduct.count({ where }),
     prisma.merchantProduct.findMany({
       where,
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: "desc" },

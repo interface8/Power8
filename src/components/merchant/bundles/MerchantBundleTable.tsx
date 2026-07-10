@@ -1,7 +1,8 @@
 "use client";
 
-import { Trash2, Package, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Trash2, Package, CheckCircle2, Clock, XCircle, Pencil } from "lucide-react";
 import { MerchantBundle } from "@/types/merchant-bundles";
+import Link from "next/link";
 
 interface MerchantBundleTableProps {
   bundles: MerchantBundle[];
@@ -88,13 +89,22 @@ const TableRow = ({ bundle, onDelete }: { bundle: MerchantBundle; onDelete?: (id
       {formatDate(bundle.createdAt)}
     </td>
     <td className="px-3 sm:px-4 py-4">
-      <button
-        onClick={() => onDelete?.(bundle.id)}
-        className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-400 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 hover:scale-105 active:scale-95"
-        aria-label="Delete bundle"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1">
+        <Link
+          href={`/merchant/bundles/edit/${bundle.id}`}
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-400 transition-all hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
+          aria-label="Edit bundle"
+        >
+          <Pencil className="h-4 w-4" />
+        </Link>
+        <button
+          onClick={() => onDelete?.(bundle.id)}
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-400 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 hover:scale-105 active:scale-95"
+          aria-label="Delete bundle"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
     </td>
   </tr>
 );

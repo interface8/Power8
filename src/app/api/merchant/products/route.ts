@@ -8,11 +8,24 @@ export async function GET(request: NextRequest) {
   if (auth instanceof Response) return auth;
 
   const { searchParams } = new URL(request.url);
-  const parsed = listMerchantProductsSchema.safeParse(Object.fromEntries(searchParams));
+  const query = Object.fromEntries(searchParams);
+  if (!query.approvalStatus && typeof query.status === "string") {
+    query.approvalStatus = query.status.toUpperCase();
+  }
+
+  const parsed = listMerchantProductsSchema.safeParse(query);
   if (!parsed.success) return errorResponse("Invalid query parameters", 400);
 
-  const data = await merchantProductService.listProducts(auth.merchant.id, parsed.data);
-  return jsonResponse(data);
+  const result = await merchantProductService.listProducts(auth.merchant.id, parsed.data);
+
+  const data = result.data.map((product) => ({
+    ...product,
+    status: product.approvalStatus,
+    categoryName: product.category?.name ?? "Uncategorized",
+    primaryImage: product.images[0] ?? null,
+  }));
+
+  return jsonResponse({ data, pagination: result.pagination });
 }
 
 export async function POST(request: NextRequest) {

@@ -1,14 +1,18 @@
+export interface MerchantOrderItem {
+  id: string;
+  itemType: "PRODUCT" | "BUNDLE";
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 export interface MerchantOrder {
   id: string;
-  customerName: string;
-  customerEmail: string;
-  totalAmount: number;
-  paymentType: "FULL" | "CREDIT";
-  paymentStatus: "PENDING" | "PAID" | "FAILED" | "REFUNDED";
+  customerFirstName: string;
+  customerLastName: string;
+  orderDate: string;
   orderStatus: "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED";
-  shippingStatus: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED";
-  createdAt: string;
-  updatedAt: string;
+  items: MerchantOrderItem[];
 }
 
 export interface MerchantOrderStats {
@@ -16,13 +20,4 @@ export interface MerchantOrderStats {
   pendingOrders: number;
   processingOrders: number;
   completedOrders: number;
-}
-
-export interface MerchantOrderFilters {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: string;
-  paymentType?: string;
-  paymentStatus?: string;
 }

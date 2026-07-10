@@ -8,6 +8,7 @@ export interface JwtPayload {
   sub: string; // userId
   email: string;
   role?: string;
+  userType?: string; // "CUSTOMER" | "MERCHANT"
   iat?: number;
   exp?: number;
 }
@@ -17,6 +18,7 @@ export interface SessionUser {
   email: string;
   name: string;
   isActive: boolean;
+  userType: string; // "CUSTOMER" | "MERCHANT"
   permissions: string[]; // e.g. ["users.read", "users.create"]
   roles: string[];       // role names
 }
@@ -119,6 +121,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     email: user.email,
     name: user.name,
     isActive: user.isActive,
+    userType: user.userType,
     permissions,
     roles,
   };

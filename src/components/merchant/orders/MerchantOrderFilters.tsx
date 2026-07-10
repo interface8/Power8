@@ -117,22 +117,6 @@ export function MerchantOrderFilters({
         options={statusOptions}
         placeholder="All Statuses"
       />
-
-      {/* Payment Type Filter */}
-      <FilterSelect
-        value={paymentType}
-        onChange={onPaymentTypeChange}
-        options={paymentTypeOptions}
-        placeholder="All Payment Types"
-      />
-
-      {/* Payment Status Filter */}
-      <FilterSelect
-        value={paymentStatus}
-        onChange={onPaymentStatusChange}
-        options={paymentStatusOptions}
-        placeholder="All Payment Status"
-      />
     </div>
   );
 }
