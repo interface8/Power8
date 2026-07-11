@@ -45,16 +45,16 @@ interface ProductSubmitData {
   price: number;
   warranty: number;
   stockQuantity: number;
-  capacity: string | null;
+  capacity: number;
   isActive: boolean;
-  imageUrls: string[];
+  images: string[];
 }
 
 interface ProductFormProps {
   initialData?: ProductFormData & { id?: string };
   categories: Category[];
   isEdit?: boolean;
-  status?: "approved" | "pending" | "rejected";
+  status?: "APPROVED" | "PENDING" | "REJECTED";
   rejectionReason?: string | null;
   existingImages?: string[];
   onSubmit: (data: ProductSubmitData) => Promise<void>;
@@ -191,6 +191,13 @@ export function ProductForm({
       return;
     }
 
+    const trimmedCapacity = formData.capacity.trim();
+    const normalizedCapacity = trimmedCapacity === "" ? 0 : Number(trimmedCapacity);
+    if (!Number.isFinite(normalizedCapacity) || normalizedCapacity < 0) {
+      toast.error("Capacity must be a valid number");
+      return;
+    }
+
     setLoading(true);
     try {
       const submitData: ProductSubmitData = {
@@ -200,9 +207,9 @@ export function ProductForm({
         price: formData.price,
         warranty: formData.warranty,
         stockQuantity: formData.stockQuantity,
-        capacity: formData.capacity || null,
+        capacity: normalizedCapacity,
         isActive: formData.isActive,
-        imageUrls,
+        images: imageUrls,
       };
       await onSubmit(submitData);
     } catch {
@@ -230,9 +237,9 @@ export function ProductForm({
   };
 
   const statusConfig = {
-    approved: { label: "Approved", className: "bg-green-100 text-green-700" },
-    pending: { label: "Pending Review", className: "bg-yellow-100 text-yellow-700" },
-    rejected: { label: "Rejected", className: "bg-red-100 text-red-700" },
+    APPROVED: { label: "Approved", className: "bg-green-100 text-green-700" },
+    PENDING: { label: "Pending Review", className: "bg-yellow-100 text-yellow-700" },
+    REJECTED: { label: "Rejected", className: "bg-red-100 text-red-700" },
   };
 
   return (
@@ -255,7 +262,7 @@ export function ProductForm({
             <span className={`${statusConfig[status].className} text-base`}>
               {statusConfig[status].label}
             </span>
-            {status === "rejected" && rejectionReason && (
+            {status === "REJECTED" && rejectionReason && (
               <p className="text-base text-gray-600 ml-4">
                 Reason: {rejectionReason}
               </p>

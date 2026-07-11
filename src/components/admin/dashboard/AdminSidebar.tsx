@@ -18,6 +18,8 @@ import {
   ShieldCheck,
   CreditCard,
   ChevronLeft,
+  Store,
+  ClipboardCheck,
 } from "lucide-react";
 
 const sections = [
@@ -44,6 +46,17 @@ const sections = [
         name: "Testimonials",
         href: "/admin/testimonials",
         icon: MessageSquareQuote,
+      },
+    ],
+  },
+  {
+    title: "MERCHANTS",
+    links: [
+      { name: "Merchants", href: "/admin/merchants", icon: Store },
+      {
+        name: "Product Approvals",
+        href: "/admin/merchant-approvals",
+        icon: ClipboardCheck,
       },
     ],
   },

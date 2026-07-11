@@ -6,6 +6,7 @@ type RawProduct = {
   description: string | null;
   imageUrls: string[];
   imageUrl?: string;
+  merchantName: string | null;
   price: number;
   stockQuantity: number;
   categoryId: string;
@@ -43,6 +44,7 @@ export const getProducts = async (): Promise<Product[]> => {
       categoryName: item.categoryName,
       companyId: item.companyId,
       companyName: item.companyName,
+      merchantName: item.merchantName,
       warranty: item.warranty,
       capacity: item.capacity,
       isActive: item.isActive,

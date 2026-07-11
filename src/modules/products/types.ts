@@ -8,6 +8,7 @@ export interface ProductDto {
   categoryName: string;
   companyId: string;
   companyName: string;
+  merchantName: string | null;
   price: number;
   warranty: number;
   capacity: number;

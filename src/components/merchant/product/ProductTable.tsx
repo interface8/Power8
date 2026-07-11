@@ -9,17 +9,9 @@ import {
 } from "@/components/ui/table";
 import { ProductTableRow } from "./ProductTableRow";
 import { ProductMobileCard } from "./ProductMobileCard";
+import type { MerchantProduct } from "@/types/merchant-product";
 
-interface Product {
-  id: string;
-  name: string;
-  categoryName: string;
-  price: number;
-  stockQuantity: number;
-  status: "approved" | "pending" | "rejected";
-  primaryImage: string | null;
-  createdAt: string;
-}
+type Product = MerchantProduct & { rejectionReason?: string | null };
 
 interface ProductTableProps {
   products: Product[];

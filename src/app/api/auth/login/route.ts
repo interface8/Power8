@@ -46,7 +46,12 @@ export async function POST(request: NextRequest) {
     const roleNames =
       user.roles?.map((ur: { role: { name: string } }) => ur.role.name) ?? [];
     const role = roleNames.includes("admin") ? "admin" : undefined;
-    const token = await signJwt({ sub: user.id, email: user.email, role });
+    const token = await signJwt({
+      sub: user.id,
+      email: user.email,
+      role,
+      userType: user.userType,
+    });
 
     await setAuthCookie(token);
 
@@ -56,6 +61,7 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
+        userType: user.userType,
         roles: roleNames,
         permissions: []
       },

@@ -41,9 +41,9 @@ export function ProductFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All statuses</SelectItem>
-          <SelectItem value="approved">Approved</SelectItem>
-          <SelectItem value="pending">Pending</SelectItem>
-          <SelectItem value="rejected">Rejected</SelectItem>
+          <SelectItem value="APPROVED">Approved</SelectItem>
+          <SelectItem value="PENDING">Pending</SelectItem>
+          <SelectItem value="REJECTED">Rejected</SelectItem>
         </SelectContent>
       </Select>
     </div>

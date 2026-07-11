@@ -9,25 +9,34 @@ import { ProductTableSkeleton } from "@/components/merchant/product/ProductTable
 import { EmptyState } from "@/components/merchant/product/EmptyState";
 import { RejectionReasonModal } from "@/components/merchant/product/RejectionReasonModal";
 import { toast } from "sonner";
+import type { MerchantProduct, ProductApprovalStatus } from "@/types/merchant-product";
 
-interface Product {
-  id: string;
-  name: string;
-  categoryName: string;
-  price: number;
-  stockQuantity: number;
-  status: "approved" | "pending" | "rejected";
-  primaryImage: string | null;
-  createdAt: string;
-  rejectionReason?: string | null;
-}
+type Product = MerchantProduct & { rejectionReason?: string | null };
 
 interface ApiResponse {
-  data: Product[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+  data: Array<{
+    id: string;
+    name: string;
+    categoryId: string;
+    categoryName?: string;
+    price: number | string;
+    warranty: number;
+    capacity: number;
+    stockQuantity: number;
+    status?: ProductApprovalStatus;
+    approvalStatus: ProductApprovalStatus | Lowercase<ProductApprovalStatus>;
+    rejectionReason?: string | null;
+    images?: string[];
+    primaryImage?: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export default function MerchantProductsPage() {
@@ -47,7 +56,7 @@ export default function MerchantProductsPage() {
     try {
       const params = new URLSearchParams();
       if (searchTerm) params.set("search", searchTerm);
-      if (statusFilter !== "all") params.set("status", statusFilter);
+      if (statusFilter !== "all") params.set("approvalStatus", statusFilter);
       params.set("page", currentPage.toString());
       params.set("limit", itemsPerPage.toString());
 
@@ -55,9 +64,21 @@ export default function MerchantProductsPage() {
       const json: ApiResponse = await res.json();
 
       if (res.ok) {
-        setProducts(json.data);
-        setTotalPages(json.totalPages);
-        setTotalProducts(json.total);
+        const mappedProducts: Product[] = (json.data ?? []).map((product) => ({
+          id: product.id,
+          name: product.name,
+          categoryName: product.categoryName ?? "Uncategorized",
+          price: Number(product.price),
+          stockQuantity: product.stockQuantity,
+          status: (product.status ?? product.approvalStatus.toUpperCase()) as ProductApprovalStatus,
+          primaryImage: product.primaryImage ?? product.images?.[0] ?? null,
+          createdAt: product.createdAt,
+          rejectionReason: product.rejectionReason ?? null,
+        }));
+
+        setProducts(mappedProducts);
+        setTotalPages(json.pagination?.totalPages ?? 1);
+        setTotalProducts(json.pagination?.total ?? mappedProducts.length);
       } else {
         toast.error("Failed to load products");
       }

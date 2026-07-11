@@ -5,6 +5,7 @@ const AUTH_COOKIE_NAME = "power8_token";
 const PUBLIC_ROUTES = ["/login", "/register", "/forgot-password"];
 const PROTECTED_ROUTE_PREFIX = "/dashboard";
 const ADMIN_ROUTE_PREFIX = "/admin";
+const MERCHANT_ROUTE_PREFIX = "/merchant";
 
 function getSecret() {
   const secret = process.env.JWT_SECRET;
@@ -28,11 +29,15 @@ export async function middleware(request: NextRequest) {
 
   // ─── Validate token ──────────────────────────────────
   let isAuthenticated = false;
+  let userType: string | undefined;
 
   if (token) {
     try {
       const { payload } = await jwtVerify(token, getSecret());
       isAuthenticated = !!payload.sub;
+      userType = (payload as { userType?: string }).userType;
+
+      // ─── Admin route guard ───────────────────────────
       if (pathname.startsWith("/admin")) {
         if (!payload?.sub) {
           const loginUrl = new URL("/login", request.url);
@@ -41,11 +46,22 @@ export async function middleware(request: NextRequest) {
         }
 
         if ((payload as { role?: string }).role !== "admin") {
-          return NextResponse.json(
-            { error: "forbidden", message: "Admin access required." },
-            { status: 403 },
-          );
+          return NextResponse.redirect(new URL("/login", request.url));
         }
+      }
+
+      // ─── Merchant route guard ────────────────────────
+      if (pathname.startsWith("/merchant")) {
+        if (userType !== "MERCHANT") {
+          // Non-merchant users cannot access merchant portal
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+      }
+
+      // ─── Customer dashboard guard ────────────────────
+      // Merchants should not access the customer dashboard
+      if (pathname.startsWith("/dashboard") && userType === "MERCHANT") {
+        return NextResponse.redirect(new URL("/merchant/dashboard", request.url));
       }
 
       // Attach user info to headers for downstream use
@@ -53,8 +69,11 @@ export async function middleware(request: NextRequest) {
       response.headers.set("x-user-id", payload.sub as string);
       response.headers.set("x-user-email", (payload.email as string) ?? "");
 
-      // If authenticated user tries to access public routes, redirect to dashboard
+      // If authenticated user tries to access public routes, redirect appropriately
       if (PUBLIC_ROUTES.includes(pathname)) {
+        if (userType === "MERCHANT") {
+          return NextResponse.redirect(new URL("/merchant/dashboard", request.url));
+        }
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
 
@@ -72,6 +91,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
   if (!isAuthenticated && pathname.startsWith(ADMIN_ROUTE_PREFIX)) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+  if (!isAuthenticated && pathname.startsWith(MERCHANT_ROUTE_PREFIX)) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);

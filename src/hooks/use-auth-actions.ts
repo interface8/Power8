@@ -50,9 +50,14 @@ export function useAuthActions() {
 
       toast.success(data.message ?? "Login successful");
 
+      // Redirect based on user type
+      const destination = data.user?.userType === "MERCHANT"
+        ? "/merchant/dashboard"
+        : "/";
+
       // small delay ensures state propagates before navigation
       setTimeout(() => {
-        router.push("/");
+        router.push(destination);
         router.refresh(); //  forces navbar re-render sync
       }, 50);
 

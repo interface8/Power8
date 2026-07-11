@@ -245,6 +245,7 @@ export default function AdminProductsPage() {
                 <TableHeader>
                   <TableRow className="bg-gray-50">
                     <TableHead className="text-base font-semibold">PRODUCT</TableHead>
+                    <TableHead className="text-base font-semibold">MERCHANT</TableHead>
                     <TableHead className="text-base font-semibold">CATEGORY</TableHead>
                     <TableHead className="text-base font-semibold">PRICE</TableHead>
                     <TableHead className="text-base font-semibold">STOCK</TableHead>
@@ -349,6 +350,7 @@ export default function AdminProductsPage() {
               <TableHeader>
                 <TableRow className="bg-gray-50">
                   <TableHead className="text-base font-semibold">PRODUCT</TableHead>
+                    <TableHead className="text-base font-semibold">MERCHANT</TableHead>
                   <TableHead className="text-base font-semibold">CATEGORY</TableHead>
                   <TableHead className="text-base font-semibold">PRICE</TableHead>
                   <TableHead className="text-base font-semibold">STOCK</TableHead>
@@ -359,7 +361,7 @@ export default function AdminProductsPage() {
               <TableBody>
                 {paginatedProducts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-gray-500 text-base">
+                    <TableCell colSpan={7} className="text-center py-12 text-gray-500 text-base">
                       No products found
                     </TableCell>
                   </TableRow>
@@ -383,6 +385,9 @@ export default function AdminProductsPage() {
                           )}
                           <span className="font-medium text-base">{product.name}</span>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-base text-gray-700">
+                        {product.merchantName ?? "In-house"}
                       </TableCell>
                       <TableCell className="text-base">{product.categoryName}</TableCell>
                       <TableCell className="text-base">₦{product.price.toLocaleString()}</TableCell>
@@ -455,6 +460,9 @@ export default function AdminProductsPage() {
                   <h3 className="font-semibold text-base text-gray-900 truncate">
                     {product.name}
                   </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Merchant: {product.merchantName ?? "In-house"}
+                  </p>
                   <p className="text-sm text-gray-500">{product.categoryName}</p>
                   <p className="text-sm font-medium text-gray-900 mt-1">
                     ₦{product.price.toLocaleString()}

@@ -16,7 +16,7 @@ interface Product {
   stockQuantity: number;
   capacity: string;
   isActive: boolean;
-  status: "approved" | "pending" | "rejected";
+  status: "APPROVED" | "PENDING" | "REJECTED";
   rejectionReason: string | null;
   imageUrls: string[];
   createdAt: string;
@@ -30,9 +30,9 @@ interface ProductSubmitData {
   price: number;
   warranty: number;
   stockQuantity: number;
-  capacity: string | null;
+  capacity: number;
   isActive: boolean;
-  imageUrls: string[];
+  images: string[];
 }
 
 export default function EditProductPage() {

@@ -41,6 +41,12 @@ export default function SideDetails({
         {product.name}
       </h1>
 
+      {product.merchantName && (
+        <p className="text-sm md:text-base text-gray-600 mb-4">
+          Sold by: <span className="font-medium text-gray-800">{product.merchantName}</span>
+        </p>
+      )}
+
       {/* Rating Stars */}
       <div className="flex items-center gap-2.5 mb-3">
         <div className="flex items-center gap-1">
