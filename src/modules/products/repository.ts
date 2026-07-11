@@ -217,10 +217,100 @@ import { prisma } from "@/lib/prisma";
 import type { ProductDto, CreateProductInput, UpdateProductInput, ProductFilters, AdminProductFilters, PaginatedProducts } from "./types";
 import type { Prisma } from "@prisma/client";
 
+const MARKETPLACE_COMPANY_NAME = "Marketplace Merchants";
+
+async function getMarketplaceCompanyId() {
+  const existing = await prisma.company.findFirst({
+    where: { name: MARKETPLACE_COMPANY_NAME },
+    select: { id: true },
+  });
+
+  if (existing) return existing.id;
+
+  const created = await prisma.company.create({
+    data: {
+      name: MARKETPLACE_COMPANY_NAME,
+      description: "Approved products sold by marketplace merchants",
+      address: "Marketplace",
+      contactNumber: "N/A",
+    },
+    select: { id: true },
+  });
+
+  return created.id;
+}
+
+async function backfillApprovedMerchantProducts() {
+  const unmapped = await prisma.merchantProduct.findMany({
+    where: {
+      approvalStatus: "APPROVED",
+      isActive: true,
+      product: null,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      categoryId: true,
+      price: true,
+      warranty: true,
+      capacity: true,
+      stockQuantity: true,
+      images: true,
+    },
+  });
+
+  if (unmapped.length === 0) return;
+
+  const companyId = await getMarketplaceCompanyId();
+
+  await prisma.$transaction(
+    unmapped.map((merchantProduct) =>
+      prisma.product.upsert({
+        where: { merchantProductId: merchantProduct.id },
+        create: {
+          merchantProductId: merchantProduct.id,
+          name: merchantProduct.name,
+          description: merchantProduct.description,
+          categoryId: merchantProduct.categoryId,
+          companyId,
+          price: merchantProduct.price,
+          warranty: merchantProduct.warranty,
+          capacity: merchantProduct.capacity,
+          imageUrls: merchantProduct.images,
+          stockQuantity: merchantProduct.stockQuantity,
+          isActive: true,
+        },
+        update: {
+          name: merchantProduct.name,
+          description: merchantProduct.description,
+          categoryId: merchantProduct.categoryId,
+          companyId,
+          price: merchantProduct.price,
+          warranty: merchantProduct.warranty,
+          capacity: merchantProduct.capacity,
+          imageUrls: merchantProduct.images,
+          stockQuantity: merchantProduct.stockQuantity,
+          isActive: true,
+        },
+      }),
+    ),
+  );
+}
+
 const productWithRelations = {
   include: {
     category: { select: { name: true } },
     company: { select: { name: true } },
+    merchantProduct: {
+      select: {
+        merchant: {
+          select: {
+            businessName: true,
+          },
+        },
+      },
+    },
   },
 } as const;
 
@@ -232,6 +322,7 @@ function toProductDto(product: {
   category: { name: string };
   companyId: string;
   company: { name: string };
+  merchantProduct?: { merchant: { businessName: string } } | null;
   price: { toNumber: () => number };
   warranty: number;
   capacity: number;
@@ -251,10 +342,11 @@ function toProductDto(product: {
     categoryName: product.category.name,
     companyId: product.companyId,
     companyName: product.company.name,
+    merchantName: product.merchantProduct?.merchant.businessName ?? null,
     price: product.price.toNumber(),
     warranty: product.warranty,
     capacity: product.capacity,
-    imageUrl: imageUrls[0],
+    imageUrl: imageUrls[0] ?? null,
     imageUrls,
     stockQuantity: product.stockQuantity,
     isActive: product.isActive,
@@ -264,6 +356,8 @@ function toProductDto(product: {
 }
 
 export async function findProducts(filters: ProductFilters = {}): Promise<PaginatedProducts> {
+  await backfillApprovedMerchantProducts();
+
   const { search, categoryId, companyId, minCapacity, page = 1, limit = 12 } = filters;
 
   const where = {
@@ -348,6 +442,8 @@ export async function findProductByName(name: string): Promise<ProductDto | null
 export async function findProductsAdmin(
   filters: AdminProductFilters = {},
 ): Promise<PaginatedProducts> {
+  await backfillApprovedMerchantProducts();
+
   const {
     search,
     categoryId,

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  ClipboardCheck,
   Package,
   Layers3,
   CheckCircle2,
@@ -12,9 +11,7 @@ import {
   ChevronRight,
   Loader2,
   ImageIcon,
-  AlertTriangle,
   Building2,
-  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,7 +106,7 @@ function RejectModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reject "{name}"</DialogTitle>
+          <DialogTitle>Reject &quot;{name}&quot;</DialogTitle>
         </DialogHeader>
         <div className="py-2">
           <p className="text-sm text-gray-600 mb-3">

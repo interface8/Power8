@@ -16,7 +16,7 @@ interface Product {
   stockQuantity: number;
   capacity: string;
   isActive: boolean;
-  status: "approved" | "pending" | "rejected";
+  status: "APPROVED" | "PENDING" | "REJECTED";
   rejectionReason: string | null;
   imageUrls: string[];
   createdAt: string;

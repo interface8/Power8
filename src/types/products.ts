@@ -6,6 +6,7 @@ export type Product = {
   categoryName: string;
   companyId: string;
   companyName: string;
+  merchantName: string | null;
   price: number;
   warranty: number;
   capacity: number;

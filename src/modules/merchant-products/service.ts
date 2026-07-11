@@ -61,11 +61,13 @@ export async function deleteProduct(merchantId: string, id: string) {
 }
 
 export async function approveProduct(id: string) {
-  const product = await repo.findById(id);
+  const product = await repo.findByIdWithCatalogProduct(id);
   if (!product) throw new Error("Product not found");
-  if (product.approvalStatus === "APPROVED") throw new Error("Product already approved");
+  if (product.approvalStatus === "APPROVED" && product.product?.id) {
+    throw new Error("Product already approved");
+  }
 
-  const updated = await repo.setApprovalStatus(id, "APPROVED", null);
+  const updated = await repo.approveAndPublish(id);
 
   await merchantActivityService.recordMerchantActivity({
     merchantId: updated.merchantId,

@@ -72,6 +72,7 @@ const ProductCard = ({ product }: Props) => {
               {product.warranty === 1 ? "year" : "years"}
             </p>
           )}
+          {product.merchantName && <p>Merchant: {product.merchantName}</p>}
           {product.companyName && <p>Brand: {product.companyName}</p>}
         </div>
 

@@ -30,20 +30,20 @@ const statusOptions = [
   { value: "CANCELLED", label: "Cancelled" },
 ];
 
-const paymentTypeOptions = [
-  { value: "", label: "All Payment Types" },
-  { value: "FULL", label: "Full Payment" },
-  { value: "CREDIT", label: "Credit" },
-];
+// const paymentTypeOptions = [
+//   { value: "", label: "All Payment Types" },
+//   { value: "FULL", label: "Full Payment" },
+//   { value: "CREDIT", label: "Credit" },
+// ];
 
-const paymentStatusOptions = [
-  { value: "", label: "All Payment Status" },
-  { value: "PENDING", label: "Pending" },
-  { value: "PARTIALLY_PAID", label: "Partially Paid" },
-  { value: "PAID", label: "Paid" },
-  { value: "FAILED", label: "Failed" },
-  { value: "REFUNDED", label: "Refunded" },
-];
+// const paymentStatusOptions = [
+//   { value: "", label: "All Payment Status" },
+//   { value: "PENDING", label: "Pending" },
+//   { value: "PARTIALLY_PAID", label: "Partially Paid" },
+//   { value: "PAID", label: "Paid" },
+//   { value: "FAILED", label: "Failed" },
+//   { value: "REFUNDED", label: "Refunded" },
+// ];
 
 interface FilterSelectProps {
   value: string;
@@ -91,10 +91,10 @@ export function MerchantOrderFilters({
   onSearchChange,
   status,
   onStatusChange,
-  paymentType,
-  onPaymentTypeChange,
-  paymentStatus,
-  onPaymentStatusChange,
+  // paymentType,
+  // onPaymentTypeChange,
+  // paymentStatus,
+  // onPaymentStatusChange,
 }: MerchantOrderFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">

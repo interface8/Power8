@@ -22,7 +22,6 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -380,7 +379,7 @@ export default function AdminMerchantDetailPage() {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-4"><ShoppingCart className="w-4 h-4" />Orders</h3>
             <p className="text-3xl font-bold text-gray-900 mb-1">{ordersSummary.totalOrders}</p>
-            <p className="text-xs text-gray-400 mb-4">Total orders containing this merchant's items</p>
+            <p className="text-xs text-gray-400 mb-4">Total orders containing this merchant&apos;s items</p>
             {ordersSummary.recentOrders.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Recent</p>

@@ -193,7 +193,7 @@ export default function MerchantProfilePage() {
         {profile.status === "PENDING" && (
           <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex gap-2">
             <Clock className="w-4 h-4 text-yellow-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-yellow-700">Your application is under review. You'll be notified once it's approved.</p>
+            <p className="text-sm text-yellow-700">Your application is under review. You&apos;ll be notified once it&apos;s approved.</p>
           </div>
         )}
       </div>

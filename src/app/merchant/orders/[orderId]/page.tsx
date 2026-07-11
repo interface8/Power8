@@ -124,7 +124,7 @@ export default function MerchantOrderDetailPage() {
         </div>
 
         <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-700">
-          You are viewing only the items from your store. Payment and full customer contact details are managed by SolarPay admin.
+          You are viewing only the items from your store. Payment and full customer contact details are managed by Power-8 admin.
         </div>
       </div>
 
