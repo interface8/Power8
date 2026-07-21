@@ -116,6 +116,17 @@ export async function findBundleById(id: string) {
       merchantId: true,
       name: true,
       approvalStatus: true,
+      items: {
+        select: {
+          merchantProductId: true,
+          quantity: true,
+          merchantProduct: {
+            select: {
+              product: { select: { id: true } },
+            },
+          },
+        },
+      },
     },
   });
 }
@@ -134,10 +145,95 @@ export async function setBundleApprovalStatus(params: {
         id: true,
         merchantId: true,
         name: true,
+        totalPrice: true,
+        systemCapacityKw: true,
+        items: {
+          select: {
+            merchantProductId: true,
+            quantity: true,
+            merchantProduct: {
+              select: {
+                product: { select: { id: true } },
+              },
+            },
+          },
+        },
       },
     });
 
     if (!bundle) throw new Error("Bundle not found");
+
+    if (approvalStatus === "APPROVED") {
+      // Check every item has a synced Product record
+      const unsyncedItems = bundle.items.filter(
+        (item) => !item.merchantProduct.product?.id,
+      );
+
+      if (unsyncedItems.length > 0) {
+        throw new Error(
+          `Cannot approve this bundle yet. ${unsyncedItems.length} product(s) in this bundle have not been approved yet. Please approve all products in this bundle before approving the bundle.`,
+        );
+      }
+
+      const productBundleItems = bundle.items.map((item) => ({
+        productId: item.merchantProduct.product!.id,
+        quantity: item.quantity,
+      }));
+
+      // Check if a ProductBundle already exists linked to this MerchantBundle
+      // ProductBundle has merchantBundleId pointing to MerchantBundle
+      const existingProductBundle = await tx.productBundle.findUnique({
+        where: { merchantBundleId: bundleId },
+        select: { id: true },
+      });
+
+      if (existingProductBundle) {
+        // Already linked — update name/price to stay in sync
+        // Also refresh items: delete old ones and recreate
+        await tx.bundleItem.deleteMany({
+          where: { bundleId: existingProductBundle.id },
+        });
+        await tx.productBundle.update({
+          where: { id: existingProductBundle.id },
+          data: {
+            name: bundle.name,
+            totalPrice: bundle.totalPrice,
+            systemCapacityKw: bundle.systemCapacityKw,
+            items: {
+              create: productBundleItems,
+            },
+          },
+        });
+      } else {
+        // First approval — create a new ProductBundle linked to this MerchantBundle
+        await tx.productBundle.create({
+          data: {
+            name: bundle.name,
+            totalPrice: bundle.totalPrice,
+            systemCapacityKw: bundle.systemCapacityKw,
+            merchantBundleId: bundleId, // this field IS on ProductBundle
+            items: {
+              create: productBundleItems,
+            },
+          },
+        });
+      }
+    }
+
+    if (approvalStatus === "REJECTED") {
+      // Unlink the ProductBundle if one exists — don't delete it
+      // as it may be referenced in existing orders
+      const existingProductBundle = await tx.productBundle.findUnique({
+        where: { merchantBundleId: bundleId },
+        select: { id: true },
+      });
+      if (existingProductBundle) {
+        await tx.productBundle.update({
+          where: { id: existingProductBundle.id },
+          data: { merchantBundleId: null },
+        });
+      }
+    }
 
     const updated = await tx.merchantBundle.update({
       where: { id: bundleId },
@@ -163,8 +259,8 @@ export async function setBundleApprovalStatus(params: {
         type: approvalStatus === "APPROVED" ? "BUNDLE_APPROVED" : "BUNDLE_REJECTED",
         message:
           approvalStatus === "APPROVED"
-            ? `Bundle "${bundle.name}" approved.`
-            : `Bundle "${bundle.name}" rejected.${rejectionReason ? ` Reason: ${rejectionReason}` : ""}`,
+            ? `Your bundle "${bundle.name}" has been approved and is now live on the platform.`
+            : `Your bundle "${bundle.name}" was rejected.${rejectionReason ? ` Reason: ${rejectionReason}` : ""}`,
       },
     });
 

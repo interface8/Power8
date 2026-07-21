@@ -15,10 +15,8 @@ export async function GET(
     const bundle = await bundleService.getBundleById(id);
     return jsonResponse({ data: bundle });
   } catch (e: unknown) {
-    if (e instanceof Error && e.message === "Bundle not found") {
-      return errorResponse("Bundle not found", 404);
-    }
     const msg = e instanceof Error ? e.message : "Failed to fetch bundle";
+    if (msg === "Bundle not found") return errorResponse(msg, 404);
     return errorResponse(msg, 500);
   }
 }
@@ -34,15 +32,17 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     const parsed = updateBundleSchema.safeParse(body);
-    if (!parsed.success) return errorResponse("Validation failed", 400);
-
+    if (!parsed.success) {
+      const firstError =
+        Object.values(parsed.error.flatten().fieldErrors).flat()[0] ??
+        "Validation failed";
+      return errorResponse(firstError, 400);
+    }
     const bundle = await bundleService.updateBundle(id, parsed.data);
     return jsonResponse({ data: bundle });
   } catch (e: unknown) {
-    if (e instanceof Error && e.message === "Bundle not found") {
-      return errorResponse("Bundle not found", 404);
-    }
     const msg = e instanceof Error ? e.message : "Failed to update bundle";
+    if (msg === "Bundle not found") return errorResponse(msg, 404);
     return errorResponse(msg, 500);
   }
 }
@@ -59,10 +59,8 @@ export async function DELETE(
     await bundleService.deleteBundle(id);
     return jsonResponse({ message: "Bundle deleted successfully" });
   } catch (e: unknown) {
-    if (e instanceof Error && e.message === "Bundle not found") {
-      return errorResponse("Bundle not found", 404);
-    }
     const msg = e instanceof Error ? e.message : "Failed to delete bundle";
+    if (msg === "Bundle not found") return errorResponse(msg, 404);
     return errorResponse(msg, 500);
   }
 }

@@ -11,6 +11,7 @@ export function useProducts(filters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hasFetched, setHasFetched] = useState(false);
   const [pagination, setPagination] = useState<Pagination>({
     total: 0,
     totalPages: 0,
@@ -58,6 +59,7 @@ export function useProducts(filters?: ProductFilters) {
         setPagination({ total: 0, totalPages: 0 });
       } finally {
         setLoading(false);
+        setHasFetched(true);
       }
     },
     [],
@@ -67,7 +69,7 @@ export function useProducts(filters?: ProductFilters) {
     fetchProducts();
   }, [fetchProducts]);
 
-  return { products, loading, error, fetchProducts, pagination };
+  return { products, loading, error, fetchProducts, pagination, hasFetched };
 }
 
 export function useProductDetails(productId: string) {

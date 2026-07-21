@@ -356,7 +356,12 @@ function toProductDto(product: {
 }
 
 export async function findProducts(filters: ProductFilters = {}): Promise<PaginatedProducts> {
-  await backfillApprovedMerchantProducts();
+    try {
+    await backfillApprovedMerchantProducts();
+  } catch (err) {
+    console.error("backfillApprovedMerchantProducts failed:", err);
+    // Don't block the product list if backfill fails
+  }
 
   const { search, categoryId, companyId, minCapacity, page = 1, limit = 12 } = filters;
 
@@ -442,7 +447,11 @@ export async function findProductByName(name: string): Promise<ProductDto | null
 export async function findProductsAdmin(
   filters: AdminProductFilters = {},
 ): Promise<PaginatedProducts> {
-  await backfillApprovedMerchantProducts();
+  try {
+    await backfillApprovedMerchantProducts();
+  } catch (err) {
+    console.error("backfillApprovedMerchantProducts failed:", err);
+  }
 
   const {
     search,

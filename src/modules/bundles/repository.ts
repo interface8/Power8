@@ -2,9 +2,19 @@ import { prisma } from "@/lib/prisma";
 import type { BundleDto, BundleItemDto, CreateBundleInput, UpdateBundleInput } from "./types";
 
 const bundleWithItems = {
-  include: {
+  select: {
+    id: true,
+    name: true,
+    totalPrice: true,
+    systemCapacityKw: true,
+    merchantBundleId: true, // ADD THIS
+    createdAt: true,
+    updatedAt: true,
     items: {
-      include: {
+      select: {
+        id: true,
+        productId: true,
+        quantity: true,
         product: { select: { name: true, price: true } },
       },
     },
@@ -16,6 +26,7 @@ function toBundleDto(bundle: {
   name: string;
   totalPrice: { toNumber: () => number };
   systemCapacityKw: { toNumber: () => number } | null;
+  merchantBundleId: string | null;
   items: {
     id: string;
     productId: string;
@@ -30,6 +41,7 @@ function toBundleDto(bundle: {
     name: bundle.name,
     totalPrice: bundle.totalPrice.toNumber(),
     systemCapacityKw: bundle.systemCapacityKw?.toNumber() ?? null,
+    merchantBundleId: bundle.merchantBundleId,
     items: bundle.items.map(
       (item): BundleItemDto => ({
         id: item.id,

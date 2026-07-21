@@ -56,12 +56,24 @@ export default function ProductsContent({
     [fetchProducts],
   );
 
-  // Refetch when category or company changes (instant), reset page
-  useEffect(() => {
-    setPage(1);
-    triggerFetch(search, categoryId, companyId, 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryId, companyId]);
+  // // Refetch when category or company changes (instant), reset page
+  // useEffect(() => {
+  //   setPage(1);
+  //   triggerFetch(search, categoryId, companyId, 1);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [categoryId, companyId]);
+
+  const isFirstRender = useRef(true);
+
+useEffect(() => {
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
+    return; // skip — useProducts already fetched on mount
+  }
+  setPage(1);
+  triggerFetch(search, categoryId, companyId, 1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [categoryId, companyId]);
 
   // Debounced search, reset page
   const handleSearchChange = (value: string) => {
