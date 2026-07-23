@@ -86,7 +86,7 @@ export default function MerchantProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch("/api/merchant/profile");
+        const res = await fetch("/api/merchants/profile");
         if (!res.ok) return;
         const json = await res.json();
         const d: MerchantProfile = json.data;
@@ -122,7 +122,7 @@ export default function MerchantProfilePage() {
     if (!businessAddress.trim()) { toast.error("Business address is required"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/merchant/profile", {
+      const res = await fetch("/api/merchants/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

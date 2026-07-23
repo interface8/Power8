@@ -46,7 +46,7 @@ export default function NewBundlePage() {
   useEffect(() => {
     const fetchApprovedProducts = async () => {
       try {
-        const res = await fetch("/api/merchant/products?approvalStatus=APPROVED&limit=100");
+        const res = await fetch("/api/merchants/products?approvalStatus=APPROVED&limit=100");
         const json = await res.json();
         if (res.ok) {
           setApprovedProducts(
@@ -90,7 +90,7 @@ export default function NewBundlePage() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/merchant/bundles", {
+      const res = await fetch("/api/merchants/bundles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ShoppingCart, Loader2, Zap, Package } from "lucide-react";
 import type { BundleDto } from "@/modules/bundles/types";
 import { useCart } from "../providers/cart-providers";
+import Link from "next/link";
 
 type Props = {
   bundle: BundleDto;
@@ -111,6 +112,12 @@ const BundleCard = ({ bundle }: Props) => {
             "Add to Cart"
           )}
         </button>
+        <Link
+          href={`/bundles/${bundle.id}`}
+          className="w-full bg-gray-300 hover:bg-gray-400 text-white text-sm py-2.5 rounded-lg flex items-center justify-center mt-2 transition"
+        >
+          View Details
+        </Link>
       </div>
     </div>
   );
