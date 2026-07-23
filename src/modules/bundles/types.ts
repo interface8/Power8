@@ -11,6 +11,7 @@ export interface BundleDto {
   name: string;
   totalPrice: number;
   systemCapacityKw: number | null;
+  merchantBundleId: string | null;
   items: BundleItemDto[];
   createdAt: Date;
   updatedAt: Date;

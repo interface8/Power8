@@ -9,6 +9,7 @@ export interface ProductDto {
   companyId: string;
   companyName: string;
   merchantName: string | null;
+  merchantId: string | null; 
   price: number;
   warranty: number;
   capacity: number;

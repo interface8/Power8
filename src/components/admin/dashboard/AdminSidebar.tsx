@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   Store,
   ClipboardCheck,
+  BoxesIcon,
 } from "lucide-react";
 
 const sections = [
@@ -41,6 +42,7 @@ const sections = [
         icon: CreditCard,
       },
       { name: "Products", href: "/admin/products", icon: Package },
+      { name: "Bundles", href: "/admin/bundles", icon: BoxesIcon },
       { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
       {
         name: "Testimonials",

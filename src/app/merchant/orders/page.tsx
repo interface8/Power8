@@ -42,7 +42,7 @@ export default function MerchantOrdersPage() {
     try {
       const params = new URLSearchParams({ page: "1", limit: "200" });
       if (status) params.set("orderStatus", status);
-      const res = await fetch(`/api/merchant/orders?${params}`);
+      const res = await fetch(`/api/merchants/orders?${params}`);
       if (!res.ok) { toast.error("Failed to load orders"); return; }
       const json = await res.json();
       setAllOrders((json.data?.data ?? []).map(mapOrder));

@@ -46,7 +46,7 @@ export default function MerchantBundlesPage() {
   const fetchBundles = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/merchant/bundles");
+      const res = await fetch("/api/merchants/bundles");
       if (!res.ok) { toast.error("Failed to load bundles"); return; }
       const json = await res.json();
       setBundles((json.data ?? []).map(mapBundle));
@@ -72,7 +72,7 @@ export default function MerchantBundlesPage() {
     const prev = bundles;
     setBundles((b) => b.filter((x) => x.id !== id));
     try {
-      const res = await fetch(`/api/merchant/bundles/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/merchants/bundles/${id}`, { method: "DELETE" });
       if (!res.ok) { setBundles(prev); toast.error("Failed to delete bundle"); return; }
       toast.success("Bundle deactivated");
     } catch { setBundles(prev); toast.error("Failed to delete bundle"); }

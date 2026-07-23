@@ -23,7 +23,7 @@ export default function AddProductPage() {
 
   const handleSubmit = async (data: ProductSubmitData) => {
     try {
-      const res = await fetch("/api/merchant/products", {
+      const res = await fetch("/api/merchants/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

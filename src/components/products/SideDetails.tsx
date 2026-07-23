@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Star, ShoppingCart, CheckCircle, Shield, Truck, CreditCard} from "lucide-react";
 import type { ProductDto } from "@/modules/products";
+import Link from "next/link";
 
 interface SideDetailsProps {
   product: ProductDto;
@@ -41,9 +42,15 @@ export default function SideDetails({
         {product.name}
       </h1>
 
-      {product.merchantName && (
+      {product.merchantName && product.merchantId && (
         <p className="text-sm md:text-base text-gray-600 mb-4">
-          Sold by: <span className="font-medium text-gray-800">{product.merchantName}</span>
+          Sold by:{" "}
+          <Link
+            href={`/store/${product.merchantId}`}
+            className="font-medium text-green-700 hover:text-orange-500 hover:underline transition"
+          >
+            {product.merchantName} →
+          </Link>
         </p>
       )}
 

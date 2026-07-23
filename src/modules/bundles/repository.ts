@@ -2,9 +2,19 @@ import { prisma } from "@/lib/prisma";
 import type { BundleDto, BundleItemDto, CreateBundleInput, UpdateBundleInput } from "./types";
 
 const bundleWithItems = {
-  include: {
+  select: {
+    id: true,
+    name: true,
+    totalPrice: true,
+    systemCapacityKw: true,
+    merchantBundleId: true, // ADD THIS
+    createdAt: true,
+    updatedAt: true,
     items: {
-      include: {
+      select: {
+        id: true,
+        productId: true,
+        quantity: true,
         product: { select: { name: true, price: true } },
       },
     },
@@ -16,6 +26,7 @@ function toBundleDto(bundle: {
   name: string;
   totalPrice: { toNumber: () => number };
   systemCapacityKw: { toNumber: () => number } | null;
+  merchantBundleId: string | null;
   items: {
     id: string;
     productId: string;
@@ -30,6 +41,7 @@ function toBundleDto(bundle: {
     name: bundle.name,
     totalPrice: bundle.totalPrice.toNumber(),
     systemCapacityKw: bundle.systemCapacityKw?.toNumber() ?? null,
+    merchantBundleId: bundle.merchantBundleId,
     items: bundle.items.map(
       (item): BundleItemDto => ({
         id: item.id,
@@ -52,13 +64,88 @@ export async function findBundles(): Promise<BundleDto[]> {
   return bundles.map(toBundleDto);
 }
 
-export async function findBundleById(id: string): Promise<BundleDto | null> {
+export async function findBundleById(id: string) {
   const bundle = await prisma.productBundle.findUnique({
     where: { id },
-    ...bundleWithItems,
+    select: {
+      id: true,
+      name: true,
+      totalPrice: true,
+      systemCapacityKw: true,
+      merchantBundleId: true,
+      createdAt: true,
+      updatedAt: true,
+      items: {
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              price: true,
+              warranty: true,
+              capacity: true,
+              stockQuantity: true,
+              imageUrls: true,
+              category: { select: { name: true } },
+              company: { select: { name: true } },
+            },
+          },
+        },
+      },
+      merchantBundle: {
+        select: {
+          id: true,
+          merchant: {
+            select: {
+              id: true,
+              businessName: true,
+              logoUrl: true,
+            },
+          },
+        },
+      },
+    },
   });
-  return bundle ? toBundleDto(bundle) : null;
+
+  if (!bundle) return null;
+
+  return {
+    id: bundle.id,
+    name: bundle.name,
+    totalPrice: bundle.totalPrice.toNumber(),
+    systemCapacityKw: bundle.systemCapacityKw?.toNumber() ?? null,
+    merchantBundleId: bundle.merchantBundleId,
+    merchant: bundle.merchantBundle
+      ? {
+          id: bundle.merchantBundle.merchant.id,
+          businessName: bundle.merchantBundle.merchant.businessName,
+          logoUrl: bundle.merchantBundle.merchant.logoUrl,
+        }
+      : null,
+    items: bundle.items.map((item) => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.product.name,
+      productDescription: item.product.description,
+      quantity: item.quantity,
+      price: item.product.price.toNumber(),
+      warranty: item.product.warranty,
+      capacity: item.product.capacity,
+      stockQuantity: item.product.stockQuantity,
+      imageUrls: item.product.imageUrls ?? [],
+      categoryName: item.product.category.name,
+      companyName: item.product.company.name,
+    })),
+    createdAt: bundle.createdAt,
+    updatedAt: bundle.updatedAt,
+  };
 }
+
+export type BundleDetailDto = NonNullable<Awaited<ReturnType<typeof findBundleById>>>;
 
 export async function createBundle(input: CreateBundleInput): Promise<BundleDto> {
   const bundle = await prisma.productBundle.create({

@@ -46,7 +46,7 @@ export default function EditProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/merchant/products/${productId}`);
+        const res = await fetch(`/api/merchants/products/${productId}`);
         const json = await res.json();
 
         if (res.ok) {
@@ -67,7 +67,7 @@ export default function EditProductPage() {
 
   const handleSubmit = async (data: ProductSubmitData) => {
     try {
-      const res = await fetch(`/api/merchant/products/${productId}`, {
+      const res = await fetch(`/api/merchants/products/${productId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

@@ -107,7 +107,7 @@ const Cart = () => {
                   {/* DETAILS */}
                   <div className="flex-1 flex flex-col">
                     <h3 className="font-semibold text-green-950">
-                      {item.productName || "Unnamed Product"}
+                      {item.productName || item.bundleName || "Unnamed Product"}
                     </h3>
 
                     <p className="text-orange-500 font-bold mt-1">

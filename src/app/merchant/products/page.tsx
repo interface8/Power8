@@ -60,7 +60,7 @@ export default function MerchantProductsPage() {
       params.set("page", currentPage.toString());
       params.set("limit", itemsPerPage.toString());
 
-      const res = await fetch(`/api/merchant/products?${params}`);
+      const res = await fetch(`/api/merchants/products?${params}`);
       const json: ApiResponse = await res.json();
 
       if (res.ok) {
@@ -103,7 +103,7 @@ export default function MerchantProductsPage() {
     setProducts((prev) => prev.filter((p) => p.id !== id));
 
     try {
-      const res = await fetch(`/api/merchant/products/${id}`, {
+      const res = await fetch(`/api/merchants/products/${id}`, {
         method: "DELETE",
       });
 

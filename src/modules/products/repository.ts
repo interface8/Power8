@@ -307,6 +307,7 @@ const productWithRelations = {
         merchant: {
           select: {
             businessName: true,
+            id: true,
           },
         },
       },
@@ -322,7 +323,7 @@ function toProductDto(product: {
   category: { name: string };
   companyId: string;
   company: { name: string };
-  merchantProduct?: { merchant: { businessName: string } } | null;
+  merchantProduct?: { merchant: { businessName: string; id: string } } | null;
   price: { toNumber: () => number };
   warranty: number;
   capacity: number;
@@ -343,6 +344,7 @@ function toProductDto(product: {
     companyId: product.companyId,
     companyName: product.company.name,
     merchantName: product.merchantProduct?.merchant.businessName ?? null,
+    merchantId: product.merchantProduct?.merchant.id ?? null,
     price: product.price.toNumber(),
     warranty: product.warranty,
     capacity: product.capacity,
@@ -356,7 +358,12 @@ function toProductDto(product: {
 }
 
 export async function findProducts(filters: ProductFilters = {}): Promise<PaginatedProducts> {
-  await backfillApprovedMerchantProducts();
+    try {
+    await backfillApprovedMerchantProducts();
+  } catch (err) {
+    console.error("backfillApprovedMerchantProducts failed:", err);
+    // Don't block the product list if backfill fails
+  }
 
   const { search, categoryId, companyId, minCapacity, page = 1, limit = 12 } = filters;
 
@@ -442,7 +449,11 @@ export async function findProductByName(name: string): Promise<ProductDto | null
 export async function findProductsAdmin(
   filters: AdminProductFilters = {},
 ): Promise<PaginatedProducts> {
-  await backfillApprovedMerchantProducts();
+  try {
+    await backfillApprovedMerchantProducts();
+  } catch (err) {
+    console.error("backfillApprovedMerchantProducts failed:", err);
+  }
 
   const {
     search,

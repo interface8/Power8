@@ -58,7 +58,7 @@ export default function EditBundlePage() {
 
   const fetchBundle = useCallback(async () => {
     try {
-      const res = await fetch(`/api/merchant/bundles`);
+      const res = await fetch(`/api/merchants/bundles`);
       const json = await res.json();
       if (!res.ok) { toast.error("Failed to load bundle"); router.push("/merchant/bundles"); return; }
       const bundle: ExistingBundle = (json.data ?? []).find((b: ExistingBundle) => b.id === bundleId);
@@ -81,7 +81,7 @@ export default function EditBundlePage() {
     fetchBundle();
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/merchant/products?approvalStatus=APPROVED&limit=100");
+        const res = await fetch("/api/merchants/products?approvalStatus=APPROVED&limit=100");
         const json = await res.json();
         if (res.ok) setApprovedProducts(
           (json.data ?? []).map((p: { id: string; name: string; categoryName: string; price: number }) => ({
@@ -119,7 +119,7 @@ export default function EditBundlePage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/merchant/bundles/${bundleId}`, {
+      const res = await fetch(`/api/merchants/bundles/${bundleId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
